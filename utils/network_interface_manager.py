@@ -1,69 +1,63 @@
+# wireless_pen_test_lib/utils/network_interface_manager.py
+
 import subprocess
 import logging
 
 class NetworkInterfaceManager:
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self, interface: str = "wlan0mon"):
+        """
+        Initialize the NetworkInterfaceManager with the specified interface.
 
-    def run_command(self, command: list) -> subprocess.CompletedProcess:
+        Args:
+            interface (str): Name of the wireless interface.
         """
-        Executes a system command and returns the CompletedProcess instance.
+        self.interface = interface
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.info(f"NetworkInterfaceManager initialized for interface: {self.interface}")
+
+    def set_monitor_mode(self):
         """
-        self.logger.debug(f"Executing command: {' '.join(command)}")
+        Sets the wireless interface to monitor mode.
+        """
+        self.logger.info(f"Setting interface {self.interface} to monitor mode.")
         try:
-            result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            self.logger.debug(f"Command Output: {result.stdout}")
-            if result.stderr:
-                self.logger.warning(f"Command Error Output: {result.stderr}")
-            return result
+            subprocess.run(["sudo", "ifconfig", self.interface, "down"], check=True)
+            subprocess.run(["sudo", "iwconfig", self.interface, "mode", "monitor"], check=True)
+            subprocess.run(["sudo", "ifconfig", self.interface, "up"], check=True)
+            self.logger.info(f"Interface {self.interface} set to monitor mode successfully.")
         except subprocess.CalledProcessError as e:
-            self.logger.error(f"Command '{' '.join(command)}' failed with error: {e.stderr}")
+            self.logger.error(f"Failed to set monitor mode: {e}")
             raise e
 
-    def enable_monitor_mode(self, interface: str):
+    def set_managed_mode(self):
         """
-        Enables monitor mode on the specified wireless interface.
+        Sets the wireless interface to managed mode.
         """
-        self.logger.info(f"Enabling monitor mode on interface {interface}")
-        # Stop the network manager to prevent conflicts
-        self.run_command(['sudo', 'airmon-ng', 'check', 'kill'])
-        # Start monitor mode
-        self.run_command(['sudo', 'airmon-ng', 'start', interface])
+        self.logger.info(f"Setting interface {self.interface} to managed mode.")
+        try:
+            subprocess.run(["sudo", "ifconfig", self.interface, "down"], check=True)
+            subprocess.run(["sudo", "iwconfig", self.interface, "mode", "managed"], check=True)
+            subprocess.run(["sudo", "ifconfig", self.interface, "up"], check=True)
+            self.logger.info(f"Interface {self.interface} set to managed mode successfully.")
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"Failed to set managed mode: {e}")
+            raise e
 
-    def disable_monitor_mode(self, interface: str):
+    def get_interface_status(self) -> str:
         """
-        Disables monitor mode on the specified wireless interface.
-        """
-        self.logger.info(f"Disabling monitor mode on interface {interface}")
-        self.run_command(['sudo', 'airmon-ng', 'stop', interface])
-        # Restart the network manager
-        self.run_command(['sudo', 'service', 'NetworkManager', 'restart'])
+        Retrieves the current status of the wireless interface.
 
-    def bring_interface_up(self, interface: str):
+        Returns:
+            str: Current mode of the interface (e.g., Monitor, Managed).
         """
-        Brings the specified network interface up.
-        """
-        self.logger.info(f"Bringing interface {interface} up")
-        self.run_command(['sudo', 'ifconfig', interface, 'up'])
-
-    def bring_interface_down(self, interface: str):
-        """
-        Brings the specified network interface down.
-        """
-        self.logger.info(f"Bringing interface {interface} down")
-        self.run_command(['sudo', 'ifconfig', interface, 'down'])
-
-    def get_interface_status(self, interface: str) -> str:
-        """
-        Retrieves the status of the specified network interface.
-        """
-        self.logger.debug(f"Retrieving status for interface {interface}")
-        result = self.run_command(['iwconfig', interface])
-        if "Mode:Monitor" in result.stdout:
-            status = "Monitor Mode"
-        elif "Mode:Managed" in result.stdout:
-            status = "Managed Mode"
-        else:
-            status = "Unknown"
-        self.logger.info(f"Interface {interface} is in {status}")
-        return status
+        try:
+            result = subprocess.check_output(["iwconfig", self.interface], stderr=subprocess.STDOUT).decode()
+            if "Mode:Monitor" in result:
+                return "Monitor Mode"
+            elif "Mode:Managed" in result:
+                return "Managed Mode"
+            else:
+                return "Unknown Mode"
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"Failed to get interface status: {e.output.decode()}")
+            return "Unknown Mode"
