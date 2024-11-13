@@ -4,11 +4,17 @@ import threading
 import json
 import os
 from core import CoreFramework
+import sys
+import tkinter as tk
+from tkinter import ttk
+from live_network_frame import LiveNetworkFrame
+
+
 
 # Adjust the path to import core modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..'))
-os.sys.path.insert(0, project_root)
+sys.path.insert(0, project_root)
 
 
 class WirelessPenTestGUI(tk.Tk):
@@ -20,6 +26,22 @@ class WirelessPenTestGUI(tk.Tk):
         # Initialize Core Framework
         self.core = CoreFramework(modules_path=os.path.join(project_root, 'protocols'))
         self.core.load_protocol_modules()
+
+        # Create a Notebook (tabbed interface)
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(fill=tk.BOTH, expand=True)
+
+        # Add Live Network Details tab
+        self.live_network_frame = LiveNetworkFrame(
+            parent=self.notebook,
+            core_framework=self.core,
+            scan_interval=30  # Scan every 30 seconds
+        )
+        self.notebook.add(self.live_network_frame, text="Live Network Details")
+
+        # You can add more tabs/pages here as needed
+        # e.g., self.another_frame = AnotherFrame(...)
+        # self.notebook.add(self.another_frame, text="Another Page")
 
         # Load vulnerability database
         self.vulnerability_db = self.core.vulnerability_db

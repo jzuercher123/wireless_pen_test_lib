@@ -1,0 +1,507 @@
+[2024-11-12 18:53:15,856] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 18:53:17,706] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 18:53:17,710] INFO - LocalScanner - LocalScanner initialized with scan duration: 10 seconds.
+[2024-11-12 18:53:30,064] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 18:53:30,264] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 18:53:30,286] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:53:30,287] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:53:30,287] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:53:30,462] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:53:30,500] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:53:30,636] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:53:30,638] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:53:30,638] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:56:19,638] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 18:56:19,962] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 18:56:19,974] INFO - LocalScanner - LocalScanner initialized with scan duration: 10 seconds.
+[2024-11-12 18:56:34,808] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 18:56:35,215] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 18:56:35,235] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:56:35,237] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:56:35,238] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:56:35,335] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:56:35,335] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:56:35,373] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:56:35,374] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:56:35,374] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:57:03,676] INFO - LocalScanner - Manual network scan initiated.
+[2024-11-12 18:57:03,677] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:57:03,677] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:57:03,770] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:57:03,770] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:57:03,817] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:57:03,818] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:57:03,818] INFO - LocalScanner - Manual network scan completed.
+[2024-11-12 18:57:05,380] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:57:05,381] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:57:05,381] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:57:05,460] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:57:05,460] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:57:05,500] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:57:05,500] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:57:05,501] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:57:35,502] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:57:35,503] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:57:35,503] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:57:35,595] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:57:35,597] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:57:35,635] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:57:35,635] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:57:35,635] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:58:05,636] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:58:05,636] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:58:05,636] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:58:05,719] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:58:05,720] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:58:05,756] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:58:05,756] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:58:05,757] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:58:35,757] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:58:35,757] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:58:35,757] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:58:35,813] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:58:35,814] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:58:35,838] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:58:35,840] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:58:35,840] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:59:05,841] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:59:05,841] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:59:05,841] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:59:05,933] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:59:05,934] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:59:05,977] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:59:05,977] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:59:05,978] INFO - LocalScanner - Network scan completed.
+[2024-11-12 18:59:35,978] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 18:59:35,978] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 18:59:35,978] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 18:59:36,057] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 18:59:36,057] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 18:59:36,087] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:59:36,087] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 18:59:36,087] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:00:06,090] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:00:06,090] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:00:06,090] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:00:06,191] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:00:06,191] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:00:06,237] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:00:06,238] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:00:06,238] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:00:36,239] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:00:36,239] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:00:36,239] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:00:36,378] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:00:36,386] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:00:36,449] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:00:36,449] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:00:36,449] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:01:06,450] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:01:06,450] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:01:06,450] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:01:06,561] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:01:06,561] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:01:06,594] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:01:06,594] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:01:06,594] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:01:36,635] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:01:36,636] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:01:36,636] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:01:36,728] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:01:36,729] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:01:36,774] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:01:36,775] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:01:36,775] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:02:06,781] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:02:06,781] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:02:06,781] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:02:06,890] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:02:06,891] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:02:06,942] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:02:06,942] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:02:06,942] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:02:36,952] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:02:36,952] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:02:36,952] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:02:37,091] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:02:37,092] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:02:37,143] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:02:37,143] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:02:37,144] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:03:07,145] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:03:07,145] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:03:07,145] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:03:07,202] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:03:07,202] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:03:07,229] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:03:07,230] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:03:07,230] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:03:37,231] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:03:37,231] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:03:37,231] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:03:37,312] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:03:37,313] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:03:37,350] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:03:37,351] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:03:37,351] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:04:07,360] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:04:07,360] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:04:07,360] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:04:07,521] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:04:07,522] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:04:07,569] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:04:07,569] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:04:07,570] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:04:37,570] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:04:37,570] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:04:37,570] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:04:37,635] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:04:37,635] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:04:37,666] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:04:37,667] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:04:37,667] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:05:07,668] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:05:07,668] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:05:07,668] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:05:07,779] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:05:07,780] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:05:07,833] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:05:07,833] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:05:07,833] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:05:37,846] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:05:37,846] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:05:37,846] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:05:37,952] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:05:37,952] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:05:37,994] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:05:37,994] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:05:37,994] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:06:07,997] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:06:07,997] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:06:07,997] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:06:08,097] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:06:08,097] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:06:08,132] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:06:08,132] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:06:08,138] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:06:38,138] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:06:38,138] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:06:38,139] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:06:38,212] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:06:38,212] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:06:38,238] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:06:38,239] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:06:38,239] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:07:08,240] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:07:08,240] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:07:08,240] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:07:08,328] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:07:08,328] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:07:08,364] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:07:08,365] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:07:08,365] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:07:38,373] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:07:38,374] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:07:38,374] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:07:38,460] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:07:38,460] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:07:38,514] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:07:38,515] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:07:38,515] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:08:08,529] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:08:08,529] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:08:08,529] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:08:08,680] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:08:08,681] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:08:08,722] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:08:08,723] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:08:08,723] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:08:38,725] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:08:38,725] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:08:38,725] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:08:38,796] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:08:38,796] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:08:38,827] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:08:38,827] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:08:38,828] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:09:08,828] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:09:08,829] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:09:08,829] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:09:08,996] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:09:08,996] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:09:09,060] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:09:09,060] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:09:09,060] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:09:39,064] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:09:39,064] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:09:39,065] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:09:39,150] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:09:39,150] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:09:39,185] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:09:39,185] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:09:39,186] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:10:09,187] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:10:09,187] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:10:09,187] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:10:09,274] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:10:09,275] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:10:09,309] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:10:09,310] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:10:09,310] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:10:39,310] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:10:39,310] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:10:39,311] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:10:39,371] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:10:39,372] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:10:39,399] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:10:39,400] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:10:39,400] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:11:09,405] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:11:09,407] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:11:09,407] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:11:09,502] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:11:09,502] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:11:09,550] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:11:09,550] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:11:09,551] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:11:39,565] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:11:39,566] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:11:39,567] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:11:39,628] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:11:39,628] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:11:39,656] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:11:39,656] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:11:39,657] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:12:09,658] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:12:09,658] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:12:09,658] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:12:09,790] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:12:09,790] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:12:09,851] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:12:09,852] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:12:09,852] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:12:39,853] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:12:39,853] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:12:39,853] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:12:39,934] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:12:39,934] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:12:39,975] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:12:39,975] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:12:39,976] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:13:09,976] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:13:09,977] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:13:09,977] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:13:10,093] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:13:10,093] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:13:10,133] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:13:10,139] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:13:10,139] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:13:40,145] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:13:40,145] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:13:40,146] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:13:40,226] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:13:40,226] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:13:40,264] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:13:40,265] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:13:40,265] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:14:10,268] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:14:10,268] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:14:10,268] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:14:10,354] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:14:10,354] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:14:10,392] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:14:10,393] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:14:10,393] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:14:40,394] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:14:40,394] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:14:40,394] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:14:40,491] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:14:40,491] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:14:40,542] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:14:40,543] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:14:40,543] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:15:10,543] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:15:10,543] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:15:10,544] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:15:10,624] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:15:10,624] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:15:10,659] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:15:10,659] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:15:10,659] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:15:40,660] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:15:40,661] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:15:40,661] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:15:40,749] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:15:40,749] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:15:40,787] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:15:40,787] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:15:40,788] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:16:10,789] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:16:10,789] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:16:10,789] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:16:10,873] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:16:10,873] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:16:10,910] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:16:10,910] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:16:10,911] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:16:40,920] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:16:40,920] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:16:40,921] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:16:41,048] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:16:41,048] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:16:41,099] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:16:41,099] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:16:41,099] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:17:11,100] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:17:11,100] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:17:11,100] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:17:11,196] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:17:11,196] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:17:11,236] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:17:11,236] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:17:11,236] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:17:41,645] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:17:41,648] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:17:41,650] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:17:42,986] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:17:42,987] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:17:43,882] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:17:43,883] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:17:43,883] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:27:04,249] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:27:04,600] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:27:04,606] INFO - LocalScanner - LocalScanner initialized with scan duration: 10 seconds.
+[2024-11-12 19:27:18,328] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:27:18,584] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:27:18,611] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:27:18,612] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:27:18,612] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:27:18,701] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:27:18,701] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:27:18,734] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:27:18,734] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:27:18,734] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:27:48,828] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:27:48,828] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:27:48,828] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:27:49,023] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:27:49,023] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:27:49,162] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:27:49,163] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:27:49,164] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:28:19,164] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:28:19,165] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:28:19,165] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:28:19,242] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:28:19,242] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:28:19,277] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:28:19,277] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:28:19,277] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:36:22,805] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:36:23,092] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:36:23,123] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:36:23,131] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:36:23,132] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:36:23,404] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:36:23,405] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:36:23,651] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:36:23,651] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:36:23,654] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:36:53,654] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:36:53,654] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:36:53,655] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:36:53,748] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:36:53,749] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:36:53,787] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:36:53,787] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:36:53,787] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:38:20,358] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:38:20,529] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:38:20,533] INFO - LocalScanner - LocalScanner initialized with scan duration: 10 seconds.
+[2024-11-12 19:38:30,942] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:38:31,188] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:38:31,201] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:38:31,201] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:38:31,201] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:38:31,270] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:38:31,271] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:38:31,359] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:38:31,359] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:38:31,360] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:38:52,948] INFO - LocalScanner - Manual network scan initiated.
+[2024-11-12 19:38:52,948] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:38:52,948] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:38:53,089] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:38:53,090] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:38:53,125] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:38:53,125] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:38:53,125] INFO - LocalScanner - Manual network scan completed.
+[2024-11-12 19:39:01,361] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:39:01,361] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:39:01,361] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:39:01,461] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:39:01,462] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:39:01,522] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:39:01,523] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:39:01,523] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:39:31,529] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:39:31,529] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:39:31,529] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:39:31,619] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:39:31,619] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:39:31,662] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:39:31,662] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:39:31,662] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:40:01,663] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:40:01,663] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:40:01,663] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:40:01,767] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:40:01,767] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:40:01,815] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:40:01,815] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:40:01,816] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:40:31,820] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:40:31,820] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:40:31,821] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:40:31,908] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:40:31,908] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:40:31,938] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:40:31,938] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:40:31,938] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:53:28,545] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:53:29,555] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:53:29,560] INFO - LocalScanner - LocalScanner initialized with scan duration: 10 seconds.
+[2024-11-12 19:53:42,633] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 19:53:42,954] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 19:53:43,010] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:53:43,020] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:53:43,020] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:53:43,269] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:53:43,269] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:53:43,308] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:53:43,309] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:53:43,309] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:54:06,306] INFO - LocalScanner - Manual network scan initiated.
+[2024-11-12 19:54:06,306] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:54:06,306] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:54:06,404] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:54:06,404] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:54:06,437] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:54:06,438] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:54:06,438] INFO - LocalScanner - Manual network scan completed.
+[2024-11-12 19:54:13,310] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:54:13,311] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:54:13,311] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:54:13,367] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:54:13,368] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:54:13,396] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:54:13,397] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:54:13,397] INFO - LocalScanner - Network scan completed.
+[2024-11-12 19:54:43,399] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 19:54:43,399] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 19:54:43,399] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 19:54:43,470] DEBUG - LocalScanner - Active interface found: Hyper-V Virtual Ethernet Adapter with IP 172.24.144.1 and netmask None
+[2024-11-12 19:54:43,470] DEBUG - LocalScanner - Calculating network range for interface: Hyper-V Virtual Ethernet Adapter
+[2024-11-12 19:54:43,499] ERROR - LocalScanner - IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:54:43,499] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface Hyper-V Virtual Ethernet Adapter.
+[2024-11-12 19:54:43,499] INFO - LocalScanner - Network scan completed.
