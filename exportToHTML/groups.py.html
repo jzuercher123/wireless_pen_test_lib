@@ -1,0 +1,788 @@
+<html>
+<head>
+<title>groups.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #848bbd; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #fede5d; font-style: italic;}
+.s3 { color: #b6b1b1;}
+.s4 { color: #fede5d;}
+.s5 { color: #36f9f6;}
+.s6 { color: #03edf9;}
+.s7 { color: #ff8b39;}
+.s8 { color: #f97e72;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+groups.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0"># SPDX-License-Identifier: GPL-2.0-only</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0"># This file is part of Scapy</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0"># See https://scapy.net/ for more information</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0"># Copyright (C) 2007, 2008, 2009 Arnaud Ebalard</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">#               2015, 2016, 2017 Maxence Tury</span>
+<a name="l6"><span class="ln">6    </span></a>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">&quot;&quot;&quot; 
+<a name="l8"><span class="ln">8    </span></a>This is a register for DH groups from RFC 3526 and RFC 4306. 
+<a name="l9"><span class="ln">9    </span></a>At this time the groups from RFC 7919 have not been registered by openssl, 
+<a name="l10"><span class="ln">10   </span></a>thus they cannot be imported from the cryptography library. 
+<a name="l11"><span class="ln">11   </span></a> 
+<a name="l12"><span class="ln">12   </span></a>We also provide TLS identifiers for these DH groups and also the ECDH groups. 
+<a name="l13"><span class="ln">13   </span></a>(Note that the equivalent of _ffdh_groups for ECDH is ec._CURVE_TYPES.) 
+<a name="l14"><span class="ln">14   </span></a>&quot;&quot;&quot;</span>
+<a name="l15"><span class="ln">15   </span></a>
+<a name="l16"><span class="ln">16   </span></a>
+<a name="l17"><span class="ln">17   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">config </span><span class="s2">import </span><span class="s1">conf</span>
+<a name="l18"><span class="ln">18   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">compat </span><span class="s2">import </span><span class="s1">bytes_int</span><span class="s3">, </span><span class="s1">int_bytes</span>
+<a name="l19"><span class="ln">19   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">error </span><span class="s2">import </span><span class="s1">warning</span>
+<a name="l20"><span class="ln">20   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">utils </span><span class="s2">import </span><span class="s1">long_converter</span>
+<a name="l21"><span class="ln">21   </span></a><span class="s2">if </span><span class="s1">conf</span><span class="s3">.</span><span class="s1">crypto_valid</span><span class="s4">:</span>
+<a name="l22"><span class="ln">22   </span></a>    <span class="s2">from </span><span class="s1">cryptography</span><span class="s3">.</span><span class="s1">hazmat</span><span class="s3">.</span><span class="s1">backends </span><span class="s2">import </span><span class="s1">default_backend</span>
+<a name="l23"><span class="ln">23   </span></a>    <span class="s2">from </span><span class="s1">cryptography</span><span class="s3">.</span><span class="s1">hazmat</span><span class="s3">.</span><span class="s1">primitives</span><span class="s3">.</span><span class="s1">asymmetric </span><span class="s2">import </span><span class="s1">dh</span><span class="s3">, </span><span class="s1">ec</span>
+<a name="l24"><span class="ln">24   </span></a>    <span class="s2">from </span><span class="s1">cryptography</span><span class="s3">.</span><span class="s1">hazmat</span><span class="s3">.</span><span class="s1">primitives </span><span class="s2">import </span><span class="s1">serialization</span>
+<a name="l25"><span class="ln">25   </span></a>    <span class="s2">from </span><span class="s1">cryptography</span><span class="s3">.</span><span class="s1">hazmat</span><span class="s3">.</span><span class="s1">primitives</span><span class="s3">.</span><span class="s1">asymmetric</span><span class="s3">.</span><span class="s1">dh </span><span class="s2">import </span><span class="s1">DHParameterNumbers</span>
+<a name="l26"><span class="ln">26   </span></a><span class="s2">if </span><span class="s1">conf</span><span class="s3">.</span><span class="s1">crypto_valid_advanced</span><span class="s4">:</span>
+<a name="l27"><span class="ln">27   </span></a>    <span class="s2">from </span><span class="s1">cryptography</span><span class="s3">.</span><span class="s1">hazmat</span><span class="s3">.</span><span class="s1">primitives</span><span class="s3">.</span><span class="s1">asymmetric </span><span class="s2">import </span><span class="s1">x25519</span>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s2">from </span><span class="s1">cryptography</span><span class="s3">.</span><span class="s1">hazmat</span><span class="s3">.</span><span class="s1">primitives</span><span class="s3">.</span><span class="s1">asymmetric </span><span class="s2">import </span><span class="s1">x448</span>
+<a name="l29"><span class="ln">29   </span></a>
+<a name="l30"><span class="ln">30   </span></a>
+<a name="l31"><span class="ln">31   </span></a><span class="s1">_ffdh_groups </span><span class="s4">= </span><span class="s5">{}</span>
+<a name="l32"><span class="ln">32   </span></a>
+<a name="l33"><span class="ln">33   </span></a>
+<a name="l34"><span class="ln">34   </span></a><span class="s2">class </span><span class="s1">_FFDHParamsMetaclass</span><span class="s6">(</span><span class="s1">type</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l35"><span class="ln">35   </span></a>    <span class="s2">def </span><span class="s1">__new__</span><span class="s6">(</span><span class="s1">cls</span><span class="s3">, </span><span class="s1">ffdh_name</span><span class="s3">, </span><span class="s1">bases</span><span class="s3">, </span><span class="s1">dct</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l36"><span class="ln">36   </span></a>        <span class="s1">the_class </span><span class="s4">= </span><span class="s1">super</span><span class="s6">(</span><span class="s1">_FFDHParamsMetaclass</span><span class="s3">, </span><span class="s1">cls</span><span class="s6">)</span><span class="s3">.</span><span class="s1">__new__</span><span class="s6">(</span><span class="s1">cls</span><span class="s3">, </span><span class="s1">ffdh_name</span><span class="s3">,</span>
+<a name="l37"><span class="ln">37   </span></a>                                                             <span class="s1">bases</span><span class="s3">, </span><span class="s1">dct</span><span class="s6">)</span>
+<a name="l38"><span class="ln">38   </span></a>        <span class="s2">if </span><span class="s1">conf</span><span class="s3">.</span><span class="s1">crypto_valid </span><span class="s2">and </span><span class="s1">ffdh_name </span><span class="s4">!= </span><span class="s7">&quot;_FFDHParams&quot;</span><span class="s4">:</span>
+<a name="l39"><span class="ln">39   </span></a>            <span class="s1">pn </span><span class="s4">= </span><span class="s1">DHParameterNumbers</span><span class="s6">(</span><span class="s1">the_class</span><span class="s3">.</span><span class="s1">m</span><span class="s3">, </span><span class="s1">the_class</span><span class="s3">.</span><span class="s1">g</span><span class="s6">)</span>
+<a name="l40"><span class="ln">40   </span></a>            <span class="s1">params </span><span class="s4">= </span><span class="s1">pn</span><span class="s3">.</span><span class="s1">parameters</span><span class="s6">(</span><span class="s1">default_backend</span><span class="s6">())</span>
+<a name="l41"><span class="ln">41   </span></a>            <span class="s1">_ffdh_groups</span><span class="s5">[</span><span class="s1">ffdh_name</span><span class="s5">] </span><span class="s4">= </span><span class="s5">[</span><span class="s1">params</span><span class="s3">, </span><span class="s1">the_class</span><span class="s3">.</span><span class="s1">mLen</span><span class="s5">]</span>
+<a name="l42"><span class="ln">42   </span></a>        <span class="s2">return </span><span class="s1">the_class</span>
+<a name="l43"><span class="ln">43   </span></a>
+<a name="l44"><span class="ln">44   </span></a>
+<a name="l45"><span class="ln">45   </span></a><span class="s2">class </span><span class="s1">_FFDHParams</span><span class="s6">(</span><span class="s1">metaclass</span><span class="s4">=</span><span class="s1">_FFDHParamsMetaclass</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l46"><span class="ln">46   </span></a>    <span class="s2">pass</span>
+<a name="l47"><span class="ln">47   </span></a>
+<a name="l48"><span class="ln">48   </span></a>
+<a name="l49"><span class="ln">49   </span></a><span class="s2">class </span><span class="s1">modp768</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l50"><span class="ln">50   </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l51"><span class="ln">51   </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l52"><span class="ln">52   </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08 
+<a name="l53"><span class="ln">53   </span></a>    8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B 
+<a name="l54"><span class="ln">54   </span></a>    302B0A6D F25F1437 4FE1356D 6D51C245 E485B576 625E7EC6 F44C42E9 
+<a name="l55"><span class="ln">55   </span></a>    A63A3620 FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l56"><span class="ln">56   </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">768</span>
+<a name="l57"><span class="ln">57   </span></a>
+<a name="l58"><span class="ln">58   </span></a>
+<a name="l59"><span class="ln">59   </span></a><span class="s2">class </span><span class="s1">modp1024</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 4306</span>
+<a name="l60"><span class="ln">60   </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l61"><span class="ln">61   </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l62"><span class="ln">62   </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08 
+<a name="l63"><span class="ln">63   </span></a>    8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B 
+<a name="l64"><span class="ln">64   </span></a>    302B0A6D F25F1437 4FE1356D 6D51C245 E485B576 625E7EC6 F44C42E9 
+<a name="l65"><span class="ln">65   </span></a>    A637ED6B 0BFF5CB6 F406B7ED EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 
+<a name="l66"><span class="ln">66   </span></a>    49286651 ECE65381 FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l67"><span class="ln">67   </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">1024</span>
+<a name="l68"><span class="ln">68   </span></a>
+<a name="l69"><span class="ln">69   </span></a>
+<a name="l70"><span class="ln">70   </span></a><span class="s2">class </span><span class="s1">modp1536</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 3526</span>
+<a name="l71"><span class="ln">71   </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l72"><span class="ln">72   </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l73"><span class="ln">73   </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 
+<a name="l74"><span class="ln">74   </span></a>    29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD 
+<a name="l75"><span class="ln">75   </span></a>    EF9519B3 CD3A431B 302B0A6D F25F1437 4FE1356D 6D51C245 
+<a name="l76"><span class="ln">76   </span></a>    E485B576 625E7EC6 F44C42E9 A637ED6B 0BFF5CB6 F406B7ED 
+<a name="l77"><span class="ln">77   </span></a>    EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D 
+<a name="l78"><span class="ln">78   </span></a>    C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F 
+<a name="l79"><span class="ln">79   </span></a>    83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D 
+<a name="l80"><span class="ln">80   </span></a>    670C354E 4ABC9804 F1746C08 CA237327 FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l81"><span class="ln">81   </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">1536</span>
+<a name="l82"><span class="ln">82   </span></a>
+<a name="l83"><span class="ln">83   </span></a>
+<a name="l84"><span class="ln">84   </span></a><span class="s2">class </span><span class="s1">modp2048</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 3526</span>
+<a name="l85"><span class="ln">85   </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l86"><span class="ln">86   </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l87"><span class="ln">87   </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 
+<a name="l88"><span class="ln">88   </span></a>    29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD 
+<a name="l89"><span class="ln">89   </span></a>    EF9519B3 CD3A431B 302B0A6D F25F1437 4FE1356D 6D51C245 
+<a name="l90"><span class="ln">90   </span></a>    E485B576 625E7EC6 F44C42E9 A637ED6B 0BFF5CB6 F406B7ED 
+<a name="l91"><span class="ln">91   </span></a>    EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D 
+<a name="l92"><span class="ln">92   </span></a>    C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F 
+<a name="l93"><span class="ln">93   </span></a>    83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D 
+<a name="l94"><span class="ln">94   </span></a>    670C354E 4ABC9804 F1746C08 CA18217C 32905E46 2E36CE3B 
+<a name="l95"><span class="ln">95   </span></a>    E39E772C 180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9 
+<a name="l96"><span class="ln">96   </span></a>    DE2BCBF6 95581718 3995497C EA956AE5 15D22618 98FA0510 
+<a name="l97"><span class="ln">97   </span></a>    15728E5A 8AACAA68 FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l98"><span class="ln">98   </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">2048</span>
+<a name="l99"><span class="ln">99   </span></a>
+<a name="l100"><span class="ln">100  </span></a>
+<a name="l101"><span class="ln">101  </span></a><span class="s2">class </span><span class="s1">modp3072</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 3526</span>
+<a name="l102"><span class="ln">102  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l103"><span class="ln">103  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l104"><span class="ln">104  </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 
+<a name="l105"><span class="ln">105  </span></a>    29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD 
+<a name="l106"><span class="ln">106  </span></a>    EF9519B3 CD3A431B 302B0A6D F25F1437 4FE1356D 6D51C245 
+<a name="l107"><span class="ln">107  </span></a>    E485B576 625E7EC6 F44C42E9 A637ED6B 0BFF5CB6 F406B7ED 
+<a name="l108"><span class="ln">108  </span></a>    EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D 
+<a name="l109"><span class="ln">109  </span></a>    C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F 
+<a name="l110"><span class="ln">110  </span></a>    83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D 
+<a name="l111"><span class="ln">111  </span></a>    670C354E 4ABC9804 F1746C08 CA18217C 32905E46 2E36CE3B 
+<a name="l112"><span class="ln">112  </span></a>    E39E772C 180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9 
+<a name="l113"><span class="ln">113  </span></a>    DE2BCBF6 95581718 3995497C EA956AE5 15D22618 98FA0510 
+<a name="l114"><span class="ln">114  </span></a>    15728E5A 8AAAC42D AD33170D 04507A33 A85521AB DF1CBA64 
+<a name="l115"><span class="ln">115  </span></a>    ECFB8504 58DBEF0A 8AEA7157 5D060C7D B3970F85 A6E1E4C7 
+<a name="l116"><span class="ln">116  </span></a>    ABF5AE8C DB0933D7 1E8C94E0 4A25619D CEE3D226 1AD2EE6B 
+<a name="l117"><span class="ln">117  </span></a>    F12FFA06 D98A0864 D8760273 3EC86A64 521F2B18 177B200C 
+<a name="l118"><span class="ln">118  </span></a>    BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 
+<a name="l119"><span class="ln">119  </span></a>    43DB5BFC E0FD108E 4B82D120 A93AD2CA FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l120"><span class="ln">120  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">3072</span>
+<a name="l121"><span class="ln">121  </span></a>
+<a name="l122"><span class="ln">122  </span></a>
+<a name="l123"><span class="ln">123  </span></a><span class="s2">class </span><span class="s1">modp4096</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 3526</span>
+<a name="l124"><span class="ln">124  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l125"><span class="ln">125  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l126"><span class="ln">126  </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 
+<a name="l127"><span class="ln">127  </span></a>    29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD 
+<a name="l128"><span class="ln">128  </span></a>    EF9519B3 CD3A431B 302B0A6D F25F1437 4FE1356D 6D51C245 
+<a name="l129"><span class="ln">129  </span></a>    E485B576 625E7EC6 F44C42E9 A637ED6B 0BFF5CB6 F406B7ED 
+<a name="l130"><span class="ln">130  </span></a>    EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D 
+<a name="l131"><span class="ln">131  </span></a>    C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F 
+<a name="l132"><span class="ln">132  </span></a>    83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D 
+<a name="l133"><span class="ln">133  </span></a>    670C354E 4ABC9804 F1746C08 CA18217C 32905E46 2E36CE3B 
+<a name="l134"><span class="ln">134  </span></a>    E39E772C 180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9 
+<a name="l135"><span class="ln">135  </span></a>    DE2BCBF6 95581718 3995497C EA956AE5 15D22618 98FA0510 
+<a name="l136"><span class="ln">136  </span></a>    15728E5A 8AAAC42D AD33170D 04507A33 A85521AB DF1CBA64 
+<a name="l137"><span class="ln">137  </span></a>    ECFB8504 58DBEF0A 8AEA7157 5D060C7D B3970F85 A6E1E4C7 
+<a name="l138"><span class="ln">138  </span></a>    ABF5AE8C DB0933D7 1E8C94E0 4A25619D CEE3D226 1AD2EE6B 
+<a name="l139"><span class="ln">139  </span></a>    F12FFA06 D98A0864 D8760273 3EC86A64 521F2B18 177B200C 
+<a name="l140"><span class="ln">140  </span></a>    BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 
+<a name="l141"><span class="ln">141  </span></a>    43DB5BFC E0FD108E 4B82D120 A9210801 1A723C12 A787E6D7 
+<a name="l142"><span class="ln">142  </span></a>    88719A10 BDBA5B26 99C32718 6AF4E23C 1A946834 B6150BDA 
+<a name="l143"><span class="ln">143  </span></a>    2583E9CA 2AD44CE8 DBBBC2DB 04DE8EF9 2E8EFC14 1FBECAA6 
+<a name="l144"><span class="ln">144  </span></a>    287C5947 4E6BC05D 99B2964F A090C3A2 233BA186 515BE7ED 
+<a name="l145"><span class="ln">145  </span></a>    1F612970 CEE2D7AF B81BDD76 2170481C D0069127 D5B05AA9 
+<a name="l146"><span class="ln">146  </span></a>    93B4EA98 8D8FDDC1 86FFB7DC 90A6C08F 4DF435C9 34063199 
+<a name="l147"><span class="ln">147  </span></a>    FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l148"><span class="ln">148  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">4096</span>
+<a name="l149"><span class="ln">149  </span></a>
+<a name="l150"><span class="ln">150  </span></a>
+<a name="l151"><span class="ln">151  </span></a><span class="s2">class </span><span class="s1">modp6144</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 3526</span>
+<a name="l152"><span class="ln">152  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l153"><span class="ln">153  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l154"><span class="ln">154  </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08 
+<a name="l155"><span class="ln">155  </span></a>    8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B 
+<a name="l156"><span class="ln">156  </span></a>    302B0A6D F25F1437 4FE1356D 6D51C245 E485B576 625E7EC6 F44C42E9 
+<a name="l157"><span class="ln">157  </span></a>    A637ED6B 0BFF5CB6 F406B7ED EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 
+<a name="l158"><span class="ln">158  </span></a>    49286651 ECE45B3D C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 
+<a name="l159"><span class="ln">159  </span></a>    FD24CF5F 83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D 
+<a name="l160"><span class="ln">160  </span></a>    670C354E 4ABC9804 F1746C08 CA18217C 32905E46 2E36CE3B E39E772C 
+<a name="l161"><span class="ln">161  </span></a>    180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9 DE2BCBF6 95581718 
+<a name="l162"><span class="ln">162  </span></a>    3995497C EA956AE5 15D22618 98FA0510 15728E5A 8AAAC42D AD33170D 
+<a name="l163"><span class="ln">163  </span></a>    04507A33 A85521AB DF1CBA64 ECFB8504 58DBEF0A 8AEA7157 5D060C7D 
+<a name="l164"><span class="ln">164  </span></a>    B3970F85 A6E1E4C7 ABF5AE8C DB0933D7 1E8C94E0 4A25619D CEE3D226 
+<a name="l165"><span class="ln">165  </span></a>    1AD2EE6B F12FFA06 D98A0864 D8760273 3EC86A64 521F2B18 177B200C 
+<a name="l166"><span class="ln">166  </span></a>    BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 43DB5BFC 
+<a name="l167"><span class="ln">167  </span></a>    E0FD108E 4B82D120 A9210801 1A723C12 A787E6D7 88719A10 BDBA5B26 
+<a name="l168"><span class="ln">168  </span></a>    99C32718 6AF4E23C 1A946834 B6150BDA 2583E9CA 2AD44CE8 DBBBC2DB 
+<a name="l169"><span class="ln">169  </span></a>    04DE8EF9 2E8EFC14 1FBECAA6 287C5947 4E6BC05D 99B2964F A090C3A2 
+<a name="l170"><span class="ln">170  </span></a>    233BA186 515BE7ED 1F612970 CEE2D7AF B81BDD76 2170481C D0069127 
+<a name="l171"><span class="ln">171  </span></a>    D5B05AA9 93B4EA98 8D8FDDC1 86FFB7DC 90A6C08F 4DF435C9 34028492 
+<a name="l172"><span class="ln">172  </span></a>    36C3FAB4 D27C7026 C1D4DCB2 602646DE C9751E76 3DBA37BD F8FF9406 
+<a name="l173"><span class="ln">173  </span></a>    AD9E530E E5DB382F 413001AE B06A53ED 9027D831 179727B0 865A8918 
+<a name="l174"><span class="ln">174  </span></a>    DA3EDBEB CF9B14ED 44CE6CBA CED4BB1B DB7F1447 E6CC254B 33205151 
+<a name="l175"><span class="ln">175  </span></a>    2BD7AF42 6FB8F401 378CD2BF 5983CA01 C64B92EC F032EA15 D1721D03 
+<a name="l176"><span class="ln">176  </span></a>    F482D7CE 6E74FEF6 D55E702F 46980C82 B5A84031 900B1C9E 59E7C97F 
+<a name="l177"><span class="ln">177  </span></a>    BEC7E8F3 23A97A7E 36CC88BE 0F1D45B7 FF585AC5 4BD407B2 2B4154AA 
+<a name="l178"><span class="ln">178  </span></a>    CC8F6D7E BF48E1D8 14CC5ED2 0F8037E0 A79715EE F29BE328 06A1D58B 
+<a name="l179"><span class="ln">179  </span></a>    B7C5DA76 F550AA3D 8A1FBFF0 EB19CCB1 A313D55C DA56C9EC 2EF29632 
+<a name="l180"><span class="ln">180  </span></a>    387FE8D7 6E3C0468 043E8F66 3F4860EE 12BF2D5B 0B7474D6 E694F91E 
+<a name="l181"><span class="ln">181  </span></a>    6DCC4024 FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l182"><span class="ln">182  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">6144</span>
+<a name="l183"><span class="ln">183  </span></a>
+<a name="l184"><span class="ln">184  </span></a>
+<a name="l185"><span class="ln">185  </span></a><span class="s2">class </span><span class="s1">modp8192</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 3526</span>
+<a name="l186"><span class="ln">186  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l187"><span class="ln">187  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l188"><span class="ln">188  </span></a>    FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 
+<a name="l189"><span class="ln">189  </span></a>    29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD 
+<a name="l190"><span class="ln">190  </span></a>    EF9519B3 CD3A431B 302B0A6D F25F1437 4FE1356D 6D51C245 
+<a name="l191"><span class="ln">191  </span></a>    E485B576 625E7EC6 F44C42E9 A637ED6B 0BFF5CB6 F406B7ED 
+<a name="l192"><span class="ln">192  </span></a>    EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D 
+<a name="l193"><span class="ln">193  </span></a>    C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F 
+<a name="l194"><span class="ln">194  </span></a>    83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D 
+<a name="l195"><span class="ln">195  </span></a>    670C354E 4ABC9804 F1746C08 CA18217C 32905E46 2E36CE3B 
+<a name="l196"><span class="ln">196  </span></a>    E39E772C 180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9 
+<a name="l197"><span class="ln">197  </span></a>    DE2BCBF6 95581718 3995497C EA956AE5 15D22618 98FA0510 
+<a name="l198"><span class="ln">198  </span></a>    15728E5A 8AAAC42D AD33170D 04507A33 A85521AB DF1CBA64 
+<a name="l199"><span class="ln">199  </span></a>    ECFB8504 58DBEF0A 8AEA7157 5D060C7D B3970F85 A6E1E4C7 
+<a name="l200"><span class="ln">200  </span></a>    ABF5AE8C DB0933D7 1E8C94E0 4A25619D CEE3D226 1AD2EE6B 
+<a name="l201"><span class="ln">201  </span></a>    F12FFA06 D98A0864 D8760273 3EC86A64 521F2B18 177B200C 
+<a name="l202"><span class="ln">202  </span></a>    BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 
+<a name="l203"><span class="ln">203  </span></a>    43DB5BFC E0FD108E 4B82D120 A9210801 1A723C12 A787E6D7 
+<a name="l204"><span class="ln">204  </span></a>    88719A10 BDBA5B26 99C32718 6AF4E23C 1A946834 B6150BDA 
+<a name="l205"><span class="ln">205  </span></a>    2583E9CA 2AD44CE8 DBBBC2DB 04DE8EF9 2E8EFC14 1FBECAA6 
+<a name="l206"><span class="ln">206  </span></a>    287C5947 4E6BC05D 99B2964F A090C3A2 233BA186 515BE7ED 
+<a name="l207"><span class="ln">207  </span></a>    1F612970 CEE2D7AF B81BDD76 2170481C D0069127 D5B05AA9 
+<a name="l208"><span class="ln">208  </span></a>    93B4EA98 8D8FDDC1 86FFB7DC 90A6C08F 4DF435C9 34028492 
+<a name="l209"><span class="ln">209  </span></a>    36C3FAB4 D27C7026 C1D4DCB2 602646DE C9751E76 3DBA37BD 
+<a name="l210"><span class="ln">210  </span></a>    F8FF9406 AD9E530E E5DB382F 413001AE B06A53ED 9027D831 
+<a name="l211"><span class="ln">211  </span></a>    179727B0 865A8918 DA3EDBEB CF9B14ED 44CE6CBA CED4BB1B 
+<a name="l212"><span class="ln">212  </span></a>    DB7F1447 E6CC254B 33205151 2BD7AF42 6FB8F401 378CD2BF 
+<a name="l213"><span class="ln">213  </span></a>    5983CA01 C64B92EC F032EA15 D1721D03 F482D7CE 6E74FEF6 
+<a name="l214"><span class="ln">214  </span></a>    D55E702F 46980C82 B5A84031 900B1C9E 59E7C97F BEC7E8F3 
+<a name="l215"><span class="ln">215  </span></a>    23A97A7E 36CC88BE 0F1D45B7 FF585AC5 4BD407B2 2B4154AA 
+<a name="l216"><span class="ln">216  </span></a>    CC8F6D7E BF48E1D8 14CC5ED2 0F8037E0 A79715EE F29BE328 
+<a name="l217"><span class="ln">217  </span></a>    06A1D58B B7C5DA76 F550AA3D 8A1FBFF0 EB19CCB1 A313D55C 
+<a name="l218"><span class="ln">218  </span></a>    DA56C9EC 2EF29632 387FE8D7 6E3C0468 043E8F66 3F4860EE 
+<a name="l219"><span class="ln">219  </span></a>    12BF2D5B 0B7474D6 E694F91E 6DBE1159 74A3926F 12FEE5E4 
+<a name="l220"><span class="ln">220  </span></a>    38777CB6 A932DF8C D8BEC4D0 73B931BA 3BC832B6 8D9DD300 
+<a name="l221"><span class="ln">221  </span></a>    741FA7BF 8AFC47ED 2576F693 6BA42466 3AAB639C 5AE4F568 
+<a name="l222"><span class="ln">222  </span></a>    3423B474 2BF1C978 238F16CB E39D652D E3FDB8BE FC848AD9 
+<a name="l223"><span class="ln">223  </span></a>    22222E04 A4037C07 13EB57A8 1A23F0C7 3473FC64 6CEA306B 
+<a name="l224"><span class="ln">224  </span></a>    4BCBC886 2F8385DD FA9D4B7F A2C087E8 79683303 ED5BDD3A 
+<a name="l225"><span class="ln">225  </span></a>    062B3CF5 B3A278A6 6D2A13F8 3F44F82D DF310EE0 74AB6A36 
+<a name="l226"><span class="ln">226  </span></a>    4597E899 A0255DC1 64F31CC5 0846851D F9AB4819 5DED7EA1 
+<a name="l227"><span class="ln">227  </span></a>    B1D510BD 7EE74D73 FAF36BC3 1ECFA268 359046F4 EB879F92 
+<a name="l228"><span class="ln">228  </span></a>    4009438B 481C6CD7 889A002E D5EE382B C9190DA6 FC026E47 
+<a name="l229"><span class="ln">229  </span></a>    9558E447 5677E9AA 9E3050E2 765694DF C81F56E8 80B96E71 
+<a name="l230"><span class="ln">230  </span></a>    60C980DD 98EDD3DF FFFFFFFF FFFFFFFF&quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l231"><span class="ln">231  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">8192</span>
+<a name="l232"><span class="ln">232  </span></a>
+<a name="l233"><span class="ln">233  </span></a>
+<a name="l234"><span class="ln">234  </span></a><span class="s2">class </span><span class="s1">ffdhe2048</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 7919</span>
+<a name="l235"><span class="ln">235  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l236"><span class="ln">236  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l237"><span class="ln">237  </span></a>    FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1 
+<a name="l238"><span class="ln">238  </span></a>    D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9 
+<a name="l239"><span class="ln">239  </span></a>    7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561 
+<a name="l240"><span class="ln">240  </span></a>    2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935 
+<a name="l241"><span class="ln">241  </span></a>    984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735 
+<a name="l242"><span class="ln">242  </span></a>    30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB 
+<a name="l243"><span class="ln">243  </span></a>    B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19 
+<a name="l244"><span class="ln">244  </span></a>    0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61 
+<a name="l245"><span class="ln">245  </span></a>    9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73 
+<a name="l246"><span class="ln">246  </span></a>    3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA 
+<a name="l247"><span class="ln">247  </span></a>    886B4238 61285C97 FFFFFFFF FFFFFFFF 
+<a name="l248"><span class="ln">248  </span></a>    &quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l249"><span class="ln">249  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">2048</span>
+<a name="l250"><span class="ln">250  </span></a>
+<a name="l251"><span class="ln">251  </span></a>
+<a name="l252"><span class="ln">252  </span></a><span class="s2">class </span><span class="s1">ffdhe3072</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 7919</span>
+<a name="l253"><span class="ln">253  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l254"><span class="ln">254  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l255"><span class="ln">255  </span></a>    FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1 
+<a name="l256"><span class="ln">256  </span></a>    D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9 
+<a name="l257"><span class="ln">257  </span></a>    7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561 
+<a name="l258"><span class="ln">258  </span></a>    2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935 
+<a name="l259"><span class="ln">259  </span></a>    984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735 
+<a name="l260"><span class="ln">260  </span></a>    30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB 
+<a name="l261"><span class="ln">261  </span></a>    B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19 
+<a name="l262"><span class="ln">262  </span></a>    0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61 
+<a name="l263"><span class="ln">263  </span></a>    9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73 
+<a name="l264"><span class="ln">264  </span></a>    3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA 
+<a name="l265"><span class="ln">265  </span></a>    886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238 
+<a name="l266"><span class="ln">266  </span></a>    61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C 
+<a name="l267"><span class="ln">267  </span></a>    AEFE1309 85139270 B4130C93 BC437944 F4FD4452 E2D74DD3 
+<a name="l268"><span class="ln">268  </span></a>    64F2E21E 71F54BFF 5CAE82AB 9C9DF69E E86D2BC5 22363A0D 
+<a name="l269"><span class="ln">269  </span></a>    ABC52197 9B0DEADA 1DBF9A42 D5C4484E 0ABCD06B FA53DDEF 
+<a name="l270"><span class="ln">270  </span></a>    3C1B20EE 3FD59D7C 25E41D2B 66C62E37 FFFFFFFF FFFFFFFF 
+<a name="l271"><span class="ln">271  </span></a>    &quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l272"><span class="ln">272  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">3072</span>
+<a name="l273"><span class="ln">273  </span></a>
+<a name="l274"><span class="ln">274  </span></a>
+<a name="l275"><span class="ln">275  </span></a><span class="s2">class </span><span class="s1">ffdhe4096</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 7919</span>
+<a name="l276"><span class="ln">276  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l277"><span class="ln">277  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l278"><span class="ln">278  </span></a>    FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1 
+<a name="l279"><span class="ln">279  </span></a>    D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9 
+<a name="l280"><span class="ln">280  </span></a>    7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561 
+<a name="l281"><span class="ln">281  </span></a>    2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935 
+<a name="l282"><span class="ln">282  </span></a>    984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735 
+<a name="l283"><span class="ln">283  </span></a>    30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB 
+<a name="l284"><span class="ln">284  </span></a>    B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19 
+<a name="l285"><span class="ln">285  </span></a>    0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61 
+<a name="l286"><span class="ln">286  </span></a>    9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73 
+<a name="l287"><span class="ln">287  </span></a>    3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA 
+<a name="l288"><span class="ln">288  </span></a>    886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238 
+<a name="l289"><span class="ln">289  </span></a>    61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C 
+<a name="l290"><span class="ln">290  </span></a>    AEFE1309 85139270 B4130C93 BC437944 F4FD4452 E2D74DD3 
+<a name="l291"><span class="ln">291  </span></a>    64F2E21E 71F54BFF 5CAE82AB 9C9DF69E E86D2BC5 22363A0D 
+<a name="l292"><span class="ln">292  </span></a>    ABC52197 9B0DEADA 1DBF9A42 D5C4484E 0ABCD06B FA53DDEF 
+<a name="l293"><span class="ln">293  </span></a>    3C1B20EE 3FD59D7C 25E41D2B 669E1EF1 6E6F52C3 164DF4FB 
+<a name="l294"><span class="ln">294  </span></a>    7930E9E4 E58857B6 AC7D5F42 D69F6D18 7763CF1D 55034004 
+<a name="l295"><span class="ln">295  </span></a>    87F55BA5 7E31CC7A 7135C886 EFB4318A ED6A1E01 2D9E6832 
+<a name="l296"><span class="ln">296  </span></a>    A907600A 918130C4 6DC778F9 71AD0038 092999A3 33CB8B7A 
+<a name="l297"><span class="ln">297  </span></a>    1A1DB93D 7140003C 2A4ECEA9 F98D0ACC 0A8291CD CEC97DCF 
+<a name="l298"><span class="ln">298  </span></a>    8EC9B55A 7F88A46B 4DB5A851 F44182E1 C68A007E 5E655F6A 
+<a name="l299"><span class="ln">299  </span></a>    FFFFFFFF FFFFFFFF 
+<a name="l300"><span class="ln">300  </span></a>    &quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l301"><span class="ln">301  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">4096</span>
+<a name="l302"><span class="ln">302  </span></a>
+<a name="l303"><span class="ln">303  </span></a>
+<a name="l304"><span class="ln">304  </span></a><span class="s2">class </span><span class="s1">ffdhe6144</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 7919</span>
+<a name="l305"><span class="ln">305  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l306"><span class="ln">306  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l307"><span class="ln">307  </span></a>    FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1 
+<a name="l308"><span class="ln">308  </span></a>    D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9 
+<a name="l309"><span class="ln">309  </span></a>    7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561 
+<a name="l310"><span class="ln">310  </span></a>    2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935 
+<a name="l311"><span class="ln">311  </span></a>    984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735 
+<a name="l312"><span class="ln">312  </span></a>    30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB 
+<a name="l313"><span class="ln">313  </span></a>    B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19 
+<a name="l314"><span class="ln">314  </span></a>    0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61 
+<a name="l315"><span class="ln">315  </span></a>    9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73 
+<a name="l316"><span class="ln">316  </span></a>    3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA 
+<a name="l317"><span class="ln">317  </span></a>    886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238 
+<a name="l318"><span class="ln">318  </span></a>    61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C 
+<a name="l319"><span class="ln">319  </span></a>    AEFE1309 85139270 B4130C93 BC437944 F4FD4452 E2D74DD3 
+<a name="l320"><span class="ln">320  </span></a>    64F2E21E 71F54BFF 5CAE82AB 9C9DF69E E86D2BC5 22363A0D 
+<a name="l321"><span class="ln">321  </span></a>    ABC52197 9B0DEADA 1DBF9A42 D5C4484E 0ABCD06B FA53DDEF 
+<a name="l322"><span class="ln">322  </span></a>    3C1B20EE 3FD59D7C 25E41D2B 669E1EF1 6E6F52C3 164DF4FB 
+<a name="l323"><span class="ln">323  </span></a>    7930E9E4 E58857B6 AC7D5F42 D69F6D18 7763CF1D 55034004 
+<a name="l324"><span class="ln">324  </span></a>    87F55BA5 7E31CC7A 7135C886 EFB4318A ED6A1E01 2D9E6832 
+<a name="l325"><span class="ln">325  </span></a>    A907600A 918130C4 6DC778F9 71AD0038 092999A3 33CB8B7A 
+<a name="l326"><span class="ln">326  </span></a>    1A1DB93D 7140003C 2A4ECEA9 F98D0ACC 0A8291CD CEC97DCF 
+<a name="l327"><span class="ln">327  </span></a>    8EC9B55A 7F88A46B 4DB5A851 F44182E1 C68A007E 5E0DD902 
+<a name="l328"><span class="ln">328  </span></a>    0BFD64B6 45036C7A 4E677D2C 38532A3A 23BA4442 CAF53EA6 
+<a name="l329"><span class="ln">329  </span></a>    3BB45432 9B7624C8 917BDD64 B1C0FD4C B38E8C33 4C701C3A 
+<a name="l330"><span class="ln">330  </span></a>    CDAD0657 FCCFEC71 9B1F5C3E 4E46041F 388147FB 4CFDB477 
+<a name="l331"><span class="ln">331  </span></a>    A52471F7 A9A96910 B855322E DB6340D8 A00EF092 350511E3 
+<a name="l332"><span class="ln">332  </span></a>    0ABEC1FF F9E3A26E 7FB29F8C 183023C3 587E38DA 0077D9B4 
+<a name="l333"><span class="ln">333  </span></a>    763E4E4B 94B2BBC1 94C6651E 77CAF992 EEAAC023 2A281BF6 
+<a name="l334"><span class="ln">334  </span></a>    B3A739C1 22611682 0AE8DB58 47A67CBE F9C9091B 462D538C 
+<a name="l335"><span class="ln">335  </span></a>    D72B0374 6AE77F5E 62292C31 1562A846 505DC82D B854338A 
+<a name="l336"><span class="ln">336  </span></a>    E49F5235 C95B9117 8CCF2DD5 CACEF403 EC9D1810 C6272B04 
+<a name="l337"><span class="ln">337  </span></a>    5B3B71F9 DC6B80D6 3FDD4A8E 9ADB1E69 62A69526 D43161C1 
+<a name="l338"><span class="ln">338  </span></a>    A41D570D 7938DAD4 A40E329C D0E40E65 FFFFFFFF FFFFFFFF 
+<a name="l339"><span class="ln">339  </span></a>    &quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l340"><span class="ln">340  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">6144</span>
+<a name="l341"><span class="ln">341  </span></a>
+<a name="l342"><span class="ln">342  </span></a>
+<a name="l343"><span class="ln">343  </span></a><span class="s2">class </span><span class="s1">ffdhe8192</span><span class="s6">(</span><span class="s1">_FFDHParams</span><span class="s6">)</span><span class="s4">:  </span><span class="s0"># From RFC 7919</span>
+<a name="l344"><span class="ln">344  </span></a>    <span class="s1">g </span><span class="s4">= </span><span class="s8">0x02</span>
+<a name="l345"><span class="ln">345  </span></a>    <span class="s1">m </span><span class="s4">= </span><span class="s1">long_converter</span><span class="s6">(</span><span class="s7">&quot;&quot;&quot; 
+<a name="l346"><span class="ln">346  </span></a>    FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1 
+<a name="l347"><span class="ln">347  </span></a>    D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9 
+<a name="l348"><span class="ln">348  </span></a>    7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561 
+<a name="l349"><span class="ln">349  </span></a>    2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935 
+<a name="l350"><span class="ln">350  </span></a>    984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735 
+<a name="l351"><span class="ln">351  </span></a>    30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB 
+<a name="l352"><span class="ln">352  </span></a>    B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19 
+<a name="l353"><span class="ln">353  </span></a>    0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61 
+<a name="l354"><span class="ln">354  </span></a>    9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73 
+<a name="l355"><span class="ln">355  </span></a>    3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA 
+<a name="l356"><span class="ln">356  </span></a>    886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238 
+<a name="l357"><span class="ln">357  </span></a>    61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C 
+<a name="l358"><span class="ln">358  </span></a>    AEFE1309 85139270 B4130C93 BC437944 F4FD4452 E2D74DD3 
+<a name="l359"><span class="ln">359  </span></a>    64F2E21E 71F54BFF 5CAE82AB 9C9DF69E E86D2BC5 22363A0D 
+<a name="l360"><span class="ln">360  </span></a>    ABC52197 9B0DEADA 1DBF9A42 D5C4484E 0ABCD06B FA53DDEF 
+<a name="l361"><span class="ln">361  </span></a>    3C1B20EE 3FD59D7C 25E41D2B 669E1EF1 6E6F52C3 164DF4FB 
+<a name="l362"><span class="ln">362  </span></a>    7930E9E4 E58857B6 AC7D5F42 D69F6D18 7763CF1D 55034004 
+<a name="l363"><span class="ln">363  </span></a>    87F55BA5 7E31CC7A 7135C886 EFB4318A ED6A1E01 2D9E6832 
+<a name="l364"><span class="ln">364  </span></a>    A907600A 918130C4 6DC778F9 71AD0038 092999A3 33CB8B7A 
+<a name="l365"><span class="ln">365  </span></a>    1A1DB93D 7140003C 2A4ECEA9 F98D0ACC 0A8291CD CEC97DCF 
+<a name="l366"><span class="ln">366  </span></a>    8EC9B55A 7F88A46B 4DB5A851 F44182E1 C68A007E 5E0DD902 
+<a name="l367"><span class="ln">367  </span></a>    0BFD64B6 45036C7A 4E677D2C 38532A3A 23BA4442 CAF53EA6 
+<a name="l368"><span class="ln">368  </span></a>    3BB45432 9B7624C8 917BDD64 B1C0FD4C B38E8C33 4C701C3A 
+<a name="l369"><span class="ln">369  </span></a>    CDAD0657 FCCFEC71 9B1F5C3E 4E46041F 388147FB 4CFDB477 
+<a name="l370"><span class="ln">370  </span></a>    A52471F7 A9A96910 B855322E DB6340D8 A00EF092 350511E3 
+<a name="l371"><span class="ln">371  </span></a>    0ABEC1FF F9E3A26E 7FB29F8C 183023C3 587E38DA 0077D9B4 
+<a name="l372"><span class="ln">372  </span></a>    763E4E4B 94B2BBC1 94C6651E 77CAF992 EEAAC023 2A281BF6 
+<a name="l373"><span class="ln">373  </span></a>    B3A739C1 22611682 0AE8DB58 47A67CBE F9C9091B 462D538C 
+<a name="l374"><span class="ln">374  </span></a>    D72B0374 6AE77F5E 62292C31 1562A846 505DC82D B854338A 
+<a name="l375"><span class="ln">375  </span></a>    E49F5235 C95B9117 8CCF2DD5 CACEF403 EC9D1810 C6272B04 
+<a name="l376"><span class="ln">376  </span></a>    5B3B71F9 DC6B80D6 3FDD4A8E 9ADB1E69 62A69526 D43161C1 
+<a name="l377"><span class="ln">377  </span></a>    A41D570D 7938DAD4 A40E329C CFF46AAA 36AD004C F600C838 
+<a name="l378"><span class="ln">378  </span></a>    1E425A31 D951AE64 FDB23FCE C9509D43 687FEB69 EDD1CC5E 
+<a name="l379"><span class="ln">379  </span></a>    0B8CC3BD F64B10EF 86B63142 A3AB8829 555B2F74 7C932665 
+<a name="l380"><span class="ln">380  </span></a>    CB2C0F1C C01BD702 29388839 D2AF05E4 54504AC7 8B758282 
+<a name="l381"><span class="ln">381  </span></a>    2846C0BA 35C35F5C 59160CC0 46FD8251 541FC68C 9C86B022 
+<a name="l382"><span class="ln">382  </span></a>    BB709987 6A460E74 51A8A931 09703FEE 1C217E6C 3826E52C 
+<a name="l383"><span class="ln">383  </span></a>    51AA691E 0E423CFC 99E9E316 50C1217B 624816CD AD9A95F9 
+<a name="l384"><span class="ln">384  </span></a>    D5B80194 88D9C0A0 A1FE3075 A577E231 83F81D4A 3F2FA457 
+<a name="l385"><span class="ln">385  </span></a>    1EFC8CE0 BA8A4FE8 B6855DFE 72B0A66E DED2FBAB FBE58A30 
+<a name="l386"><span class="ln">386  </span></a>    FAFABE1C 5D71A87E 2F741EF8 C1FE86FE A6BBFDE5 30677F0D 
+<a name="l387"><span class="ln">387  </span></a>    97D11D49 F7A8443D 0822E506 A9F4614E 011E2A94 838FF88C 
+<a name="l388"><span class="ln">388  </span></a>    D68C8BB7 C5C6424C FFFFFFFF FFFFFFFF 
+<a name="l389"><span class="ln">389  </span></a>    &quot;&quot;&quot;</span><span class="s6">)</span>
+<a name="l390"><span class="ln">390  </span></a>    <span class="s1">mLen </span><span class="s4">= </span><span class="s8">8192</span>
+<a name="l391"><span class="ln">391  </span></a>
+<a name="l392"><span class="ln">392  </span></a>
+<a name="l393"><span class="ln">393  </span></a><span class="s1">_tls_named_ffdh_groups </span><span class="s4">= </span><span class="s5">{</span><span class="s8">256</span><span class="s4">: </span><span class="s7">&quot;ffdhe2048&quot;</span><span class="s3">, </span><span class="s8">257</span><span class="s4">: </span><span class="s7">&quot;ffdhe3072&quot;</span><span class="s3">,</span>
+<a name="l394"><span class="ln">394  </span></a>                          <span class="s8">258</span><span class="s4">: </span><span class="s7">&quot;ffdhe4096&quot;</span><span class="s3">, </span><span class="s8">259</span><span class="s4">: </span><span class="s7">&quot;ffdhe6144&quot;</span><span class="s3">,</span>
+<a name="l395"><span class="ln">395  </span></a>                          <span class="s8">260</span><span class="s4">: </span><span class="s7">&quot;ffdhe8192&quot;</span><span class="s5">}</span>
+<a name="l396"><span class="ln">396  </span></a>
+<a name="l397"><span class="ln">397  </span></a><span class="s1">_tls_named_curves </span><span class="s4">= </span><span class="s5">{</span><span class="s8">1</span><span class="s4">: </span><span class="s7">&quot;sect163k1&quot;</span><span class="s3">, </span><span class="s8">2</span><span class="s4">: </span><span class="s7">&quot;sect163r1&quot;</span><span class="s3">, </span><span class="s8">3</span><span class="s4">: </span><span class="s7">&quot;sect163r2&quot;</span><span class="s3">,</span>
+<a name="l398"><span class="ln">398  </span></a>                     <span class="s8">4</span><span class="s4">: </span><span class="s7">&quot;sect193r1&quot;</span><span class="s3">, </span><span class="s8">5</span><span class="s4">: </span><span class="s7">&quot;sect193r2&quot;</span><span class="s3">, </span><span class="s8">6</span><span class="s4">: </span><span class="s7">&quot;sect233k1&quot;</span><span class="s3">,</span>
+<a name="l399"><span class="ln">399  </span></a>                     <span class="s8">7</span><span class="s4">: </span><span class="s7">&quot;sect233r1&quot;</span><span class="s3">, </span><span class="s8">8</span><span class="s4">: </span><span class="s7">&quot;sect239k1&quot;</span><span class="s3">, </span><span class="s8">9</span><span class="s4">: </span><span class="s7">&quot;sect283k1&quot;</span><span class="s3">,</span>
+<a name="l400"><span class="ln">400  </span></a>                     <span class="s8">10</span><span class="s4">: </span><span class="s7">&quot;sect283r1&quot;</span><span class="s3">, </span><span class="s8">11</span><span class="s4">: </span><span class="s7">&quot;sect409k1&quot;</span><span class="s3">, </span><span class="s8">12</span><span class="s4">: </span><span class="s7">&quot;sect409r1&quot;</span><span class="s3">,</span>
+<a name="l401"><span class="ln">401  </span></a>                     <span class="s8">13</span><span class="s4">: </span><span class="s7">&quot;sect571k1&quot;</span><span class="s3">, </span><span class="s8">14</span><span class="s4">: </span><span class="s7">&quot;sect571r1&quot;</span><span class="s3">, </span><span class="s8">15</span><span class="s4">: </span><span class="s7">&quot;secp160k1&quot;</span><span class="s3">,</span>
+<a name="l402"><span class="ln">402  </span></a>                     <span class="s8">16</span><span class="s4">: </span><span class="s7">&quot;secp160r1&quot;</span><span class="s3">, </span><span class="s8">17</span><span class="s4">: </span><span class="s7">&quot;secp160r2&quot;</span><span class="s3">, </span><span class="s8">18</span><span class="s4">: </span><span class="s7">&quot;secp192k1&quot;</span><span class="s3">,</span>
+<a name="l403"><span class="ln">403  </span></a>                     <span class="s8">19</span><span class="s4">: </span><span class="s7">&quot;secp192r1&quot;</span><span class="s3">, </span><span class="s8">20</span><span class="s4">: </span><span class="s7">&quot;secp224k1&quot;</span><span class="s3">, </span><span class="s8">21</span><span class="s4">: </span><span class="s7">&quot;secp224r1&quot;</span><span class="s3">,</span>
+<a name="l404"><span class="ln">404  </span></a>                     <span class="s8">22</span><span class="s4">: </span><span class="s7">&quot;secp256k1&quot;</span><span class="s3">, </span><span class="s8">23</span><span class="s4">: </span><span class="s7">&quot;secp256r1&quot;</span><span class="s3">, </span><span class="s8">24</span><span class="s4">: </span><span class="s7">&quot;secp384r1&quot;</span><span class="s3">,</span>
+<a name="l405"><span class="ln">405  </span></a>                     <span class="s8">25</span><span class="s4">: </span><span class="s7">&quot;secp521r1&quot;</span><span class="s3">, </span><span class="s8">26</span><span class="s4">: </span><span class="s7">&quot;brainpoolP256r1&quot;</span><span class="s3">,</span>
+<a name="l406"><span class="ln">406  </span></a>                     <span class="s8">27</span><span class="s4">: </span><span class="s7">&quot;brainpoolP384r1&quot;</span><span class="s3">, </span><span class="s8">28</span><span class="s4">: </span><span class="s7">&quot;brainpoolP512r1&quot;</span><span class="s3">,</span>
+<a name="l407"><span class="ln">407  </span></a>                     <span class="s8">29</span><span class="s4">: </span><span class="s7">&quot;x25519&quot;</span><span class="s3">, </span><span class="s8">30</span><span class="s4">: </span><span class="s7">&quot;x448&quot;</span><span class="s3">,</span>
+<a name="l408"><span class="ln">408  </span></a>                     <span class="s8">0xff01</span><span class="s4">: </span><span class="s7">&quot;arbitrary_explicit_prime_curves&quot;</span><span class="s3">,</span>
+<a name="l409"><span class="ln">409  </span></a>                     <span class="s8">0xff02</span><span class="s4">: </span><span class="s7">&quot;arbitrary_explicit_char2_curves&quot;</span><span class="s5">}</span>
+<a name="l410"><span class="ln">410  </span></a>
+<a name="l411"><span class="ln">411  </span></a><span class="s1">_tls_named_groups </span><span class="s4">= </span><span class="s5">{}</span>
+<a name="l412"><span class="ln">412  </span></a><span class="s1">_tls_named_groups</span><span class="s3">.</span><span class="s1">update</span><span class="s6">(</span><span class="s1">_tls_named_ffdh_groups</span><span class="s6">)</span>
+<a name="l413"><span class="ln">413  </span></a><span class="s1">_tls_named_groups</span><span class="s3">.</span><span class="s1">update</span><span class="s6">(</span><span class="s1">_tls_named_curves</span><span class="s6">)</span>
+<a name="l414"><span class="ln">414  </span></a>
+<a name="l415"><span class="ln">415  </span></a>
+<a name="l416"><span class="ln">416  </span></a><span class="s2">def </span><span class="s1">_tls_named_groups_import</span><span class="s6">(</span><span class="s1">group</span><span class="s3">, </span><span class="s1">pubbytes</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l417"><span class="ln">417  </span></a>    <span class="s2">if </span><span class="s1">group </span><span class="s2">in </span><span class="s1">_tls_named_ffdh_groups</span><span class="s4">:</span>
+<a name="l418"><span class="ln">418  </span></a>        <span class="s0"># https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8.1</span>
+<a name="l419"><span class="ln">419  </span></a>        <span class="s1">params </span><span class="s4">= </span><span class="s1">_ffdh_groups</span><span class="s5">[</span><span class="s1">_tls_named_ffdh_groups</span><span class="s5">[</span><span class="s1">group</span><span class="s5">]][</span><span class="s8">0</span><span class="s5">]</span>
+<a name="l420"><span class="ln">420  </span></a>        <span class="s1">pn </span><span class="s4">= </span><span class="s1">params</span><span class="s3">.</span><span class="s1">parameter_numbers</span><span class="s6">()</span>
+<a name="l421"><span class="ln">421  </span></a>        <span class="s1">y </span><span class="s4">= </span><span class="s1">bytes_int</span><span class="s6">(</span><span class="s1">pubbytes</span><span class="s6">)</span>
+<a name="l422"><span class="ln">422  </span></a>        <span class="s1">public_numbers </span><span class="s4">= </span><span class="s1">dh</span><span class="s3">.</span><span class="s1">DHPublicNumbers</span><span class="s6">(</span><span class="s1">y</span><span class="s3">, </span><span class="s1">pn</span><span class="s6">)</span>
+<a name="l423"><span class="ln">423  </span></a>        <span class="s2">return </span><span class="s1">public_numbers</span><span class="s3">.</span><span class="s1">public_key</span><span class="s6">(</span><span class="s1">default_backend</span><span class="s6">())</span>
+<a name="l424"><span class="ln">424  </span></a>    <span class="s2">elif </span><span class="s1">group </span><span class="s2">in </span><span class="s1">_tls_named_curves</span><span class="s4">:</span>
+<a name="l425"><span class="ln">425  </span></a>        <span class="s0"># https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8.2</span>
+<a name="l426"><span class="ln">426  </span></a>        <span class="s2">if </span><span class="s1">_tls_named_curves</span><span class="s5">[</span><span class="s1">group</span><span class="s5">] </span><span class="s2">in </span><span class="s5">[</span><span class="s7">&quot;x25519&quot;</span><span class="s3">, </span><span class="s7">&quot;x448&quot;</span><span class="s5">]</span><span class="s4">:</span>
+<a name="l427"><span class="ln">427  </span></a>            <span class="s2">if </span><span class="s1">conf</span><span class="s3">.</span><span class="s1">crypto_valid_advanced</span><span class="s4">:</span>
+<a name="l428"><span class="ln">428  </span></a>                <span class="s2">if </span><span class="s1">_tls_named_curves</span><span class="s5">[</span><span class="s1">group</span><span class="s5">] </span><span class="s4">== </span><span class="s7">&quot;x25519&quot;</span><span class="s4">:</span>
+<a name="l429"><span class="ln">429  </span></a>                    <span class="s1">import_point </span><span class="s4">= </span><span class="s1">x25519</span><span class="s3">.</span><span class="s1">X25519PublicKey</span><span class="s3">.</span><span class="s1">from_public_bytes</span>
+<a name="l430"><span class="ln">430  </span></a>                <span class="s2">else</span><span class="s4">:</span>
+<a name="l431"><span class="ln">431  </span></a>                    <span class="s1">import_point </span><span class="s4">= </span><span class="s1">x448</span><span class="s3">.</span><span class="s1">X448PublicKey</span><span class="s3">.</span><span class="s1">from_public_bytes</span>
+<a name="l432"><span class="ln">432  </span></a>                <span class="s2">return </span><span class="s1">import_point</span><span class="s6">(</span><span class="s1">pubbytes</span><span class="s6">)</span>
+<a name="l433"><span class="ln">433  </span></a>        <span class="s2">else</span><span class="s4">:</span>
+<a name="l434"><span class="ln">434  </span></a>            <span class="s1">curve </span><span class="s4">= </span><span class="s1">ec</span><span class="s3">.</span><span class="s1">_CURVE_TYPES</span><span class="s5">[</span><span class="s1">_tls_named_curves</span><span class="s5">[</span><span class="s1">group</span><span class="s5">]]</span>
+<a name="l435"><span class="ln">435  </span></a>            <span class="s2">try</span><span class="s4">:</span>
+<a name="l436"><span class="ln">436  </span></a>                <span class="s0"># cryptography &lt; 42</span>
+<a name="l437"><span class="ln">437  </span></a>                <span class="s1">curve </span><span class="s4">= </span><span class="s1">curve</span><span class="s6">()</span>
+<a name="l438"><span class="ln">438  </span></a>            <span class="s2">except </span><span class="s1">TypeError</span><span class="s4">:</span>
+<a name="l439"><span class="ln">439  </span></a>                <span class="s2">pass</span>
+<a name="l440"><span class="ln">440  </span></a>            <span class="s2">try</span><span class="s4">:  </span><span class="s0"># cryptography &gt;= 2.5</span>
+<a name="l441"><span class="ln">441  </span></a>                <span class="s2">return </span><span class="s1">ec</span><span class="s3">.</span><span class="s1">EllipticCurvePublicKey</span><span class="s3">.</span><span class="s1">from_encoded_point</span><span class="s6">(</span>
+<a name="l442"><span class="ln">442  </span></a>                    <span class="s1">curve</span><span class="s3">,</span>
+<a name="l443"><span class="ln">443  </span></a>                    <span class="s1">pubbytes</span>
+<a name="l444"><span class="ln">444  </span></a>                <span class="s6">)</span>
+<a name="l445"><span class="ln">445  </span></a>            <span class="s2">except </span><span class="s1">AttributeError</span><span class="s4">:</span>
+<a name="l446"><span class="ln">446  </span></a>                <span class="s1">pub_num </span><span class="s4">= </span><span class="s1">ec</span><span class="s3">.</span><span class="s1">EllipticCurvePublicNumbers</span><span class="s3">.</span><span class="s1">from_encoded_point</span><span class="s6">(</span>
+<a name="l447"><span class="ln">447  </span></a>                    <span class="s1">curve</span><span class="s3">,</span>
+<a name="l448"><span class="ln">448  </span></a>                    <span class="s1">pubbytes</span>
+<a name="l449"><span class="ln">449  </span></a>                <span class="s6">)</span><span class="s3">.</span><span class="s1">public_numbers</span><span class="s6">()</span>
+<a name="l450"><span class="ln">450  </span></a>                <span class="s2">return </span><span class="s1">pub_num</span><span class="s3">.</span><span class="s1">public_key</span><span class="s6">(</span><span class="s1">default_backend</span><span class="s6">())</span>
+<a name="l451"><span class="ln">451  </span></a>
+<a name="l452"><span class="ln">452  </span></a>
+<a name="l453"><span class="ln">453  </span></a><span class="s2">def </span><span class="s1">_tls_named_groups_pubbytes</span><span class="s6">(</span><span class="s1">privkey</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l454"><span class="ln">454  </span></a>    <span class="s2">if </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">privkey</span><span class="s3">, </span><span class="s1">dh</span><span class="s3">.</span><span class="s1">DHPrivateKey</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l455"><span class="ln">455  </span></a>        <span class="s0"># https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8.1</span>
+<a name="l456"><span class="ln">456  </span></a>        <span class="s1">pubkey </span><span class="s4">= </span><span class="s1">privkey</span><span class="s3">.</span><span class="s1">public_key</span><span class="s6">()</span>
+<a name="l457"><span class="ln">457  </span></a>        <span class="s2">return </span><span class="s1">int_bytes</span><span class="s6">(</span><span class="s1">pubkey</span><span class="s3">.</span><span class="s1">public_numbers</span><span class="s6">()</span><span class="s3">.</span><span class="s1">y</span><span class="s3">, </span><span class="s1">privkey</span><span class="s3">.</span><span class="s1">key_size </span><span class="s4">// </span><span class="s8">8</span><span class="s6">)</span>
+<a name="l458"><span class="ln">458  </span></a>    <span class="s2">elif </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">privkey</span><span class="s3">, </span><span class="s6">(</span><span class="s1">x25519</span><span class="s3">.</span><span class="s1">X25519PrivateKey</span><span class="s3">,</span>
+<a name="l459"><span class="ln">459  </span></a>                              <span class="s1">x448</span><span class="s3">.</span><span class="s1">X448PrivateKey</span><span class="s6">))</span><span class="s4">:</span>
+<a name="l460"><span class="ln">460  </span></a>        <span class="s0"># https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8.2</span>
+<a name="l461"><span class="ln">461  </span></a>        <span class="s1">pubkey </span><span class="s4">= </span><span class="s1">privkey</span><span class="s3">.</span><span class="s1">public_key</span><span class="s6">()</span>
+<a name="l462"><span class="ln">462  </span></a>        <span class="s2">return </span><span class="s1">pubkey</span><span class="s3">.</span><span class="s1">public_bytes</span><span class="s6">(</span>
+<a name="l463"><span class="ln">463  </span></a>            <span class="s1">serialization</span><span class="s3">.</span><span class="s1">Encoding</span><span class="s3">.</span><span class="s1">Raw</span><span class="s3">,</span>
+<a name="l464"><span class="ln">464  </span></a>            <span class="s1">serialization</span><span class="s3">.</span><span class="s1">PublicFormat</span><span class="s3">.</span><span class="s1">Raw</span>
+<a name="l465"><span class="ln">465  </span></a>        <span class="s6">)</span>
+<a name="l466"><span class="ln">466  </span></a>    <span class="s2">else</span><span class="s4">:</span>
+<a name="l467"><span class="ln">467  </span></a>        <span class="s1">pubkey </span><span class="s4">= </span><span class="s1">privkey</span><span class="s3">.</span><span class="s1">public_key</span><span class="s6">()</span>
+<a name="l468"><span class="ln">468  </span></a>        <span class="s2">try</span><span class="s4">:</span>
+<a name="l469"><span class="ln">469  </span></a>            <span class="s0"># cryptography &gt;= 2.5</span>
+<a name="l470"><span class="ln">470  </span></a>            <span class="s2">return </span><span class="s1">pubkey</span><span class="s3">.</span><span class="s1">public_bytes</span><span class="s6">(</span>
+<a name="l471"><span class="ln">471  </span></a>                <span class="s1">serialization</span><span class="s3">.</span><span class="s1">Encoding</span><span class="s3">.</span><span class="s1">X962</span><span class="s3">,</span>
+<a name="l472"><span class="ln">472  </span></a>                <span class="s1">serialization</span><span class="s3">.</span><span class="s1">PublicFormat</span><span class="s3">.</span><span class="s1">UncompressedPoint</span>
+<a name="l473"><span class="ln">473  </span></a>            <span class="s6">)</span>
+<a name="l474"><span class="ln">474  </span></a>        <span class="s2">except </span><span class="s1">TypeError</span><span class="s4">:</span>
+<a name="l475"><span class="ln">475  </span></a>            <span class="s0"># older versions</span>
+<a name="l476"><span class="ln">476  </span></a>            <span class="s2">return </span><span class="s1">pubkey</span><span class="s3">.</span><span class="s1">public_numbers</span><span class="s6">()</span><span class="s3">.</span><span class="s1">encode_point</span><span class="s6">()</span>
+<a name="l477"><span class="ln">477  </span></a>
+<a name="l478"><span class="ln">478  </span></a>
+<a name="l479"><span class="ln">479  </span></a><span class="s2">def </span><span class="s1">_tls_named_groups_generate</span><span class="s6">(</span><span class="s1">group</span><span class="s6">)</span><span class="s4">:</span>
+<a name="l480"><span class="ln">480  </span></a>    <span class="s2">if </span><span class="s1">group </span><span class="s2">in </span><span class="s1">_tls_named_ffdh_groups</span><span class="s4">:</span>
+<a name="l481"><span class="ln">481  </span></a>        <span class="s1">params </span><span class="s4">= </span><span class="s1">_ffdh_groups</span><span class="s5">[</span><span class="s1">_tls_named_ffdh_groups</span><span class="s5">[</span><span class="s1">group</span><span class="s5">]][</span><span class="s8">0</span><span class="s5">]</span>
+<a name="l482"><span class="ln">482  </span></a>        <span class="s2">return </span><span class="s1">params</span><span class="s3">.</span><span class="s1">generate_private_key</span><span class="s6">()</span>
+<a name="l483"><span class="ln">483  </span></a>    <span class="s2">elif </span><span class="s1">group </span><span class="s2">in </span><span class="s1">_tls_named_curves</span><span class="s4">:</span>
+<a name="l484"><span class="ln">484  </span></a>        <span class="s1">group_name </span><span class="s4">= </span><span class="s1">_tls_named_curves</span><span class="s5">[</span><span class="s1">group</span><span class="s5">]</span>
+<a name="l485"><span class="ln">485  </span></a>        <span class="s2">if </span><span class="s1">group_name </span><span class="s2">in </span><span class="s5">[</span><span class="s7">&quot;x25519&quot;</span><span class="s3">, </span><span class="s7">&quot;x448&quot;</span><span class="s5">]</span><span class="s4">:</span>
+<a name="l486"><span class="ln">486  </span></a>            <span class="s2">if </span><span class="s1">conf</span><span class="s3">.</span><span class="s1">crypto_valid_advanced</span><span class="s4">:</span>
+<a name="l487"><span class="ln">487  </span></a>                <span class="s2">if </span><span class="s1">group_name </span><span class="s4">== </span><span class="s7">&quot;x25519&quot;</span><span class="s4">:</span>
+<a name="l488"><span class="ln">488  </span></a>                    <span class="s2">return </span><span class="s1">x25519</span><span class="s3">.</span><span class="s1">X25519PrivateKey</span><span class="s3">.</span><span class="s1">generate</span><span class="s6">()</span>
+<a name="l489"><span class="ln">489  </span></a>                <span class="s2">else</span><span class="s4">:</span>
+<a name="l490"><span class="ln">490  </span></a>                    <span class="s2">return </span><span class="s1">x448</span><span class="s3">.</span><span class="s1">X448PrivateKey</span><span class="s3">.</span><span class="s1">generate</span><span class="s6">()</span>
+<a name="l491"><span class="ln">491  </span></a>            <span class="s2">else</span><span class="s4">:</span>
+<a name="l492"><span class="ln">492  </span></a>                <span class="s1">warning</span><span class="s6">(</span>
+<a name="l493"><span class="ln">493  </span></a>                    <span class="s7">&quot;Your cryptography version doesn't support &quot; </span><span class="s4">+ </span><span class="s1">group_name</span>
+<a name="l494"><span class="ln">494  </span></a>                <span class="s6">)</span>
+<a name="l495"><span class="ln">495  </span></a>        <span class="s2">else</span><span class="s4">:</span>
+<a name="l496"><span class="ln">496  </span></a>            <span class="s1">curve </span><span class="s4">= </span><span class="s1">ec</span><span class="s3">.</span><span class="s1">_CURVE_TYPES</span><span class="s5">[</span><span class="s1">_tls_named_curves</span><span class="s5">[</span><span class="s1">group</span><span class="s5">]]</span>
+<a name="l497"><span class="ln">497  </span></a>            <span class="s2">try</span><span class="s4">:</span>
+<a name="l498"><span class="ln">498  </span></a>                <span class="s0"># cryptography &lt; 42</span>
+<a name="l499"><span class="ln">499  </span></a>                <span class="s1">curve </span><span class="s4">= </span><span class="s1">curve</span><span class="s6">()</span>
+<a name="l500"><span class="ln">500  </span></a>            <span class="s2">except </span><span class="s1">TypeError</span><span class="s4">:</span>
+<a name="l501"><span class="ln">501  </span></a>                <span class="s2">pass</span>
+<a name="l502"><span class="ln">502  </span></a>            <span class="s2">return </span><span class="s1">ec</span><span class="s3">.</span><span class="s1">generate_private_key</span><span class="s6">(</span><span class="s1">curve</span><span class="s3">, </span><span class="s1">default_backend</span><span class="s6">())</span>
+<a name="l503"><span class="ln">503  </span></a>
+<a name="l504"><span class="ln">504  </span></a><span class="s0"># Below lies ghost code since the shift from 'ecdsa' to 'cryptography' lib.</span>
+<a name="l505"><span class="ln">505  </span></a><span class="s0"># Part of the code has been kept, but commented out, in case anyone would like</span>
+<a name="l506"><span class="ln">506  </span></a><span class="s0"># to improve ECC support in 'cryptography' (namely for the compressed point</span>
+<a name="l507"><span class="ln">507  </span></a><span class="s0"># format and additional curves).</span>
+<a name="l508"><span class="ln">508  </span></a><span class="s0">#</span>
+<a name="l509"><span class="ln">509  </span></a><span class="s0"># Recommended curve parameters from www.secg.org/SEC2-Ver-1.0.pdf</span>
+<a name="l510"><span class="ln">510  </span></a><span class="s0"># and www.ecc-brainpool.org/download/Domain-parameters.pdf</span>
+<a name="l511"><span class="ln">511  </span></a><span class="s0">#</span>
+<a name="l512"><span class="ln">512  </span></a><span class="s0">#</span>
+<a name="l513"><span class="ln">513  </span></a><span class="s0"># import math</span>
+<a name="l514"><span class="ln">514  </span></a><span class="s0">#</span>
+<a name="l515"><span class="ln">515  </span></a><span class="s0"># from scapy.utils import long_converter, binrepr</span>
+<a name="l516"><span class="ln">516  </span></a><span class="s0"># from scapy.layers.tls.crypto.pkcs1 import pkcs_i2osp, pkcs_os2ip</span>
+<a name="l517"><span class="ln">517  </span></a><span class="s0">#</span>
+<a name="l518"><span class="ln">518  </span></a><span class="s0">#</span>
+<a name="l519"><span class="ln">519  </span></a><span class="s0"># def encode_point(point, point_format=0):</span>
+<a name="l520"><span class="ln">520  </span></a><span class="s0">#    &quot;&quot;&quot;</span>
+<a name="l521"><span class="ln">521  </span></a><span class="s0">#    Return a string representation of the Point p, according to point_format.</span>
+<a name="l522"><span class="ln">522  </span></a><span class="s0">#    &quot;&quot;&quot;</span>
+<a name="l523"><span class="ln">523  </span></a><span class="s0">#    pLen = len(binrepr(point.curve().p()))</span>
+<a name="l524"><span class="ln">524  </span></a><span class="s0">#    x = pkcs_i2osp(point.x(), math.ceil(pLen/8))</span>
+<a name="l525"><span class="ln">525  </span></a><span class="s0">#    y = pkcs_i2osp(point.y(), math.ceil(pLen/8))</span>
+<a name="l526"><span class="ln">526  </span></a><span class="s0">#    if point_format == 0:</span>
+<a name="l527"><span class="ln">527  </span></a><span class="s0">#        frmt = b'\x04'</span>
+<a name="l528"><span class="ln">528  </span></a><span class="s0">#    elif point_format == 1:</span>
+<a name="l529"><span class="ln">529  </span></a><span class="s0">#        frmt = chr(2 + y%2)</span>
+<a name="l530"><span class="ln">530  </span></a><span class="s0">#        y = ''</span>
+<a name="l531"><span class="ln">531  </span></a><span class="s0">#    else:</span>
+<a name="l532"><span class="ln">532  </span></a><span class="s0">#        raise Exception(&quot;No support for point_format %d&quot; % point_format)</span>
+<a name="l533"><span class="ln">533  </span></a><span class="s0">#    return frmt + x + y</span>
+<a name="l534"><span class="ln">534  </span></a><span class="s0">#</span>
+<a name="l535"><span class="ln">535  </span></a><span class="s0">#</span>
+<a name="l536"><span class="ln">536  </span></a><span class="s0"># try:</span>
+<a name="l537"><span class="ln">537  </span></a><span class="s0">#    import ecdsa</span>
+<a name="l538"><span class="ln">538  </span></a><span class="s0">#    ecdsa_support = True</span>
+<a name="l539"><span class="ln">539  </span></a><span class="s0"># except ImportError:</span>
+<a name="l540"><span class="ln">540  </span></a><span class="s0">#    import logging</span>
+<a name="l541"><span class="ln">541  </span></a><span class="s0">#    log_loading = logging.getLogger(&quot;scapy.loading&quot;)</span>
+<a name="l542"><span class="ln">542  </span></a><span class="s0">#    log_loading.info(&quot;Can't import python ecdsa lib. No curves.&quot;)</span>
+<a name="l543"><span class="ln">543  </span></a><span class="s0">#</span>
+<a name="l544"><span class="ln">544  </span></a><span class="s0">#</span>
+<a name="l545"><span class="ln">545  </span></a><span class="s0"># if ecdsa_support:</span>
+<a name="l546"><span class="ln">546  </span></a><span class="s0">#</span>
+<a name="l547"><span class="ln">547  </span></a><span class="s0">#    from ecdsa.ellipticcurve import CurveFp, Point</span>
+<a name="l548"><span class="ln">548  </span></a><span class="s0">#    from ecdsa.curves import Curve</span>
+<a name="l549"><span class="ln">549  </span></a><span class="s0">#    from ecdsa.numbertheory import square_root_mod_prime</span>
+<a name="l550"><span class="ln">550  </span></a><span class="s0">#</span>
+<a name="l551"><span class="ln">551  </span></a><span class="s0">#</span>
+<a name="l552"><span class="ln">552  </span></a><span class="s0">#    def extract_coordinates(g, curve):</span>
+<a name="l553"><span class="ln">553  </span></a><span class="s0">#        &quot;&quot;&quot;</span>
+<a name="l554"><span class="ln">554  </span></a><span class="s0">#        Return the coordinates x and y as integers,</span>
+<a name="l555"><span class="ln">555  </span></a><span class="s0">#        regardless of the point format of string g.</span>
+<a name="l556"><span class="ln">556  </span></a><span class="s0">#        Second expected parameter is a CurveFp.</span>
+<a name="l557"><span class="ln">557  </span></a><span class="s0">#        &quot;&quot;&quot;</span>
+<a name="l558"><span class="ln">558  </span></a><span class="s0">#        p = curve.p()</span>
+<a name="l559"><span class="ln">559  </span></a><span class="s0">#        point_format = g[0]</span>
+<a name="l560"><span class="ln">560  </span></a><span class="s0">#        point = g[1:]</span>
+<a name="l561"><span class="ln">561  </span></a><span class="s0">#        if point_format == b'\x04':</span>
+<a name="l562"><span class="ln">562  </span></a><span class="s0">#            point_len = len(point)</span>
+<a name="l563"><span class="ln">563  </span></a><span class="s0">#            if point_len % 2 != 0:</span>
+<a name="l564"><span class="ln">564  </span></a><span class="s0">#                raise Exception(&quot;Point length is not even.&quot;)</span>
+<a name="l565"><span class="ln">565  </span></a><span class="s0">#            x_bytes = point[:point_len&gt;&gt;1]</span>
+<a name="l566"><span class="ln">566  </span></a><span class="s0">#            x = pkcs_os2ip(x_bytes) % p</span>
+<a name="l567"><span class="ln">567  </span></a><span class="s0">#            y_bytes = point[point_len&gt;&gt;1:]</span>
+<a name="l568"><span class="ln">568  </span></a><span class="s0">#            y = pkcs_os2ip(y_bytes) % p</span>
+<a name="l569"><span class="ln">569  </span></a><span class="s0">#        elif point_format in [b'\x02', b'\x03']:</span>
+<a name="l570"><span class="ln">570  </span></a><span class="s0">#            x_bytes = point</span>
+<a name="l571"><span class="ln">571  </span></a><span class="s0">#            x = pkcs_os2ip(x_bytes) % p</span>
+<a name="l572"><span class="ln">572  </span></a><span class="s0">#            # perform the y coordinate computation with self.tls_ec</span>
+<a name="l573"><span class="ln">573  </span></a><span class="s0">#            y_square = (x*x*x + curve.a()*x + curve.b()) % p</span>
+<a name="l574"><span class="ln">574  </span></a><span class="s0">#            y = square_root_mod_prime(y_square, p)</span>
+<a name="l575"><span class="ln">575  </span></a><span class="s0">#            y_parity = ord(point_format) % 2    # \x02 means even, \x03 means odd  # noqa: E501</span>
+<a name="l576"><span class="ln">576  </span></a><span class="s0">#            if y % 2 != y_parity:</span>
+<a name="l577"><span class="ln">577  </span></a><span class="s0">#                y = -y % p</span>
+<a name="l578"><span class="ln">578  </span></a><span class="s0">#        else:</span>
+<a name="l579"><span class="ln">579  </span></a><span class="s0">#            raise Exception(&quot;Point starts with %s. This encoding &quot;</span>
+<a name="l580"><span class="ln">580  </span></a><span class="s0">#                            &quot;is not recognized.&quot; % repr(point_format))</span>
+<a name="l581"><span class="ln">581  </span></a><span class="s0">#        if not curve.contains_point(x, y):</span>
+<a name="l582"><span class="ln">582  </span></a><span class="s0">#            raise Exception(&quot;The point we extracted does not belong on the curve!&quot;)  # noqa: E501</span>
+<a name="l583"><span class="ln">583  </span></a><span class="s0">#        return x, y</span>
+<a name="l584"><span class="ln">584  </span></a><span class="s0">#</span>
+<a name="l585"><span class="ln">585  </span></a><span class="s0">#    def import_curve(p, a, b, g, r, name=&quot;dummyName&quot;, oid=(1, 3, 132, 0, 0xff)):  # noqa: E501</span>
+<a name="l586"><span class="ln">586  </span></a><span class="s0">#        &quot;&quot;&quot;</span>
+<a name="l587"><span class="ln">587  </span></a><span class="s0">#        Create an ecdsa.curves.Curve from the usual parameters.</span>
+<a name="l588"><span class="ln">588  </span></a><span class="s0">#        Arguments may be either octet strings or integers,</span>
+<a name="l589"><span class="ln">589  </span></a><span class="s0">#        except g which we expect to be an octet string.</span>
+<a name="l590"><span class="ln">590  </span></a><span class="s0">#        &quot;&quot;&quot;</span>
+<a name="l591"><span class="ln">591  </span></a><span class="s0">#        if isinstance(p, str):</span>
+<a name="l592"><span class="ln">592  </span></a><span class="s0">#            p = pkcs_os2ip(p)</span>
+<a name="l593"><span class="ln">593  </span></a><span class="s0">#        if isinstance(a, str):</span>
+<a name="l594"><span class="ln">594  </span></a><span class="s0">#            a = pkcs_os2ip(a)</span>
+<a name="l595"><span class="ln">595  </span></a><span class="s0">#        if isinstance(b, str):</span>
+<a name="l596"><span class="ln">596  </span></a><span class="s0">#            b = pkcs_os2ip(b)</span>
+<a name="l597"><span class="ln">597  </span></a><span class="s0">#        if isinstance(r, str):</span>
+<a name="l598"><span class="ln">598  </span></a><span class="s0">#            r = pkcs_os2ip(r)</span>
+<a name="l599"><span class="ln">599  </span></a><span class="s0">#        curve = CurveFp(p, a, b)</span>
+<a name="l600"><span class="ln">600  </span></a><span class="s0">#        x, y = extract_coordinates(g, curve)</span>
+<a name="l601"><span class="ln">601  </span></a><span class="s0">#        generator = Point(curve, x, y, r)</span>
+<a name="l602"><span class="ln">602  </span></a><span class="s0">#        return Curve(name, curve, generator, oid)</span>
+<a name="l603"><span class="ln">603  </span></a>
+<a name="l604"><span class="ln">604  </span></a><span class="s0"># Named curves</span>
+<a name="l605"><span class="ln">605  </span></a>
+<a name="l606"><span class="ln">606  </span></a><span class="s0"># We always provide _a as a positive integer.</span>
+<a name="l607"><span class="ln">607  </span></a>
+<a name="l608"><span class="ln">608  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l609"><span class="ln">609  </span></a><span class="s0">#                  ffffffff ffffffff ffffffff fffffffe ffffac73&quot;&quot;&quot;)</span>
+<a name="l610"><span class="ln">610  </span></a><span class="s0">#    _a          = 0</span>
+<a name="l611"><span class="ln">611  </span></a><span class="s0">#    _b          = 7</span>
+<a name="l612"><span class="ln">612  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l613"><span class="ln">613  </span></a><span class="s0">#                  3b4c382c e37aa192 a4019e76 3036f4f5 dd4d7ebb&quot;&quot;&quot;)</span>
+<a name="l614"><span class="ln">614  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l615"><span class="ln">615  </span></a><span class="s0">#                  938cf935 318fdced 6bc28286 531733c3 f03c4fee&quot;&quot;&quot;)</span>
+<a name="l616"><span class="ln">616  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;01</span>
+<a name="l617"><span class="ln">617  </span></a><span class="s0">#                  00000000 00000000 0001b8fa 16dfab9a ca16b6b3&quot;&quot;&quot;)</span>
+<a name="l618"><span class="ln">618  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l619"><span class="ln">619  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l620"><span class="ln">620  </span></a><span class="s0">#    SECP160k1   = Curve(&quot;SECP160k1&quot;, curve, generator,</span>
+<a name="l621"><span class="ln">621  </span></a><span class="s0">#                        (1, 3, 132, 0, 9), &quot;secp160k1&quot;)</span>
+<a name="l622"><span class="ln">622  </span></a>
+<a name="l623"><span class="ln">623  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l624"><span class="ln">624  </span></a><span class="s0">#                  ffffffff ffffffff ffffffff ffffffff 7fffffff&quot;&quot;&quot;)</span>
+<a name="l625"><span class="ln">625  </span></a><span class="s0">#    _a          = -3 % _p</span>
+<a name="l626"><span class="ln">626  </span></a><span class="s0">#    _b          = long_converter(&quot;&quot;&quot;</span>
+<a name="l627"><span class="ln">627  </span></a><span class="s0">#                  1c97befc 54bd7a8b 65acf89f 81d4d4ad c565fa45&quot;&quot;&quot;)</span>
+<a name="l628"><span class="ln">628  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l629"><span class="ln">629  </span></a><span class="s0">#                  4a96b568 8ef57328 46646989 68c38bb9 13cbfc82&quot;&quot;&quot;)</span>
+<a name="l630"><span class="ln">630  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l631"><span class="ln">631  </span></a><span class="s0">#                  23a62855 3168947d 59dcc912 04235137 7ac5fb32&quot;&quot;&quot;)</span>
+<a name="l632"><span class="ln">632  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;01</span>
+<a name="l633"><span class="ln">633  </span></a><span class="s0">#                  00000000 00000000 0001f4c8 f927aed3 ca752257&quot;&quot;&quot;)</span>
+<a name="l634"><span class="ln">634  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l635"><span class="ln">635  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l636"><span class="ln">636  </span></a><span class="s0">#    SECP160r1   = Curve(&quot;SECP160r1&quot;, curve, generator,</span>
+<a name="l637"><span class="ln">637  </span></a><span class="s0">#                        (1, 3, 132, 0, 8), &quot;secp160r1&quot;)</span>
+<a name="l638"><span class="ln">638  </span></a>
+<a name="l639"><span class="ln">639  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l640"><span class="ln">640  </span></a><span class="s0">#                  ffffffff ffffffff ffffffff fffffffe ffffac73&quot;&quot;&quot;)</span>
+<a name="l641"><span class="ln">641  </span></a><span class="s0">#    _a          = -3 % _p</span>
+<a name="l642"><span class="ln">642  </span></a><span class="s0">#    _b          = long_converter(&quot;&quot;&quot;</span>
+<a name="l643"><span class="ln">643  </span></a><span class="s0">#                  b4e134d3 fb59eb8b ab572749 04664d5a f50388ba&quot;&quot;&quot;)</span>
+<a name="l644"><span class="ln">644  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l645"><span class="ln">645  </span></a><span class="s0">#                  52dcb034 293a117e 1f4ff11b 30f7199d 3144ce6d&quot;&quot;&quot;)</span>
+<a name="l646"><span class="ln">646  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l647"><span class="ln">647  </span></a><span class="s0">#                  feaffef2 e331f296 e071fa0d f9982cfe a7d43f2e&quot;&quot;&quot;)</span>
+<a name="l648"><span class="ln">648  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;01</span>
+<a name="l649"><span class="ln">649  </span></a><span class="s0">#                  00000000 00000000 0000351e e786a818 f3a1a16b&quot;&quot;&quot;)</span>
+<a name="l650"><span class="ln">650  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l651"><span class="ln">651  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l652"><span class="ln">652  </span></a><span class="s0">#    SECP160r2   = Curve(&quot;SECP160r2&quot;, curve, generator,</span>
+<a name="l653"><span class="ln">653  </span></a><span class="s0">#                        (1, 3, 132, 0, 30), &quot;secp160r2&quot;)</span>
+<a name="l654"><span class="ln">654  </span></a>
+<a name="l655"><span class="ln">655  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l656"><span class="ln">656  </span></a><span class="s0">#                  ffffffff ffffffff ffffffff ffffffff fffffffe ffffee37&quot;&quot;&quot;)</span>
+<a name="l657"><span class="ln">657  </span></a><span class="s0">#    _a          = 0</span>
+<a name="l658"><span class="ln">658  </span></a><span class="s0">#    _b          = 3</span>
+<a name="l659"><span class="ln">659  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l660"><span class="ln">660  </span></a><span class="s0">#                  db4ff10e c057e9ae 26b07d02 80b7f434 1da5d1b1 eae06c7d&quot;&quot;&quot;)</span>
+<a name="l661"><span class="ln">661  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l662"><span class="ln">662  </span></a><span class="s0">#                  9b2f2f6d 9c5628a7 844163d0 15be8634 4082aa88 d95e2f9d&quot;&quot;&quot;)</span>
+<a name="l663"><span class="ln">663  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;</span>
+<a name="l664"><span class="ln">664  </span></a><span class="s0">#                  ffffffff ffffffff fffffffe 26f2fc17 0f69466a 74defd8d&quot;&quot;&quot;)</span>
+<a name="l665"><span class="ln">665  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l666"><span class="ln">666  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l667"><span class="ln">667  </span></a><span class="s0">#    SECP192k1   = Curve(&quot;SECP192k1&quot;, curve, generator,</span>
+<a name="l668"><span class="ln">668  </span></a><span class="s0">#                        (1, 3, 132, 0, 31), &quot;secp192k1&quot;)</span>
+<a name="l669"><span class="ln">669  </span></a>
+<a name="l670"><span class="ln">670  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l671"><span class="ln">671  </span></a><span class="s0">#                  ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe</span>
+<a name="l672"><span class="ln">672  </span></a><span class="s0">#                  ffffe56d&quot;&quot;&quot;)</span>
+<a name="l673"><span class="ln">673  </span></a><span class="s0">#    _a          = 0</span>
+<a name="l674"><span class="ln">674  </span></a><span class="s0">#    _b          = 5</span>
+<a name="l675"><span class="ln">675  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l676"><span class="ln">676  </span></a><span class="s0">#                  a1455b33 4df099df 30fc28a1 69a467e9 e47075a9 0f7e650e</span>
+<a name="l677"><span class="ln">677  </span></a><span class="s0">#                  b6b7a45c&quot;&quot;&quot;)</span>
+<a name="l678"><span class="ln">678  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l679"><span class="ln">679  </span></a><span class="s0">#                  7e089fed 7fba3442 82cafbd6 f7e319f7 c0b0bd59 e2ca4bdb</span>
+<a name="l680"><span class="ln">680  </span></a><span class="s0">#                  556d61a5&quot;&quot;&quot;)</span>
+<a name="l681"><span class="ln">681  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;01</span>
+<a name="l682"><span class="ln">682  </span></a><span class="s0">#                  00000000 00000000 00000000 0001dce8 d2ec6184 caf0a971</span>
+<a name="l683"><span class="ln">683  </span></a><span class="s0">#                  769fb1f7&quot;&quot;&quot;)</span>
+<a name="l684"><span class="ln">684  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l685"><span class="ln">685  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l686"><span class="ln">686  </span></a><span class="s0">#    SECP224k1   = Curve(&quot;SECP224k1&quot;, curve, generator,</span>
+<a name="l687"><span class="ln">687  </span></a><span class="s0">#                        (1, 3, 132, 0, 32), &quot;secp224k1&quot;)</span>
+<a name="l688"><span class="ln">688  </span></a>
+<a name="l689"><span class="ln">689  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l690"><span class="ln">690  </span></a><span class="s0">#                  A9FB57DB A1EEA9BC 3E660A90 9D838D72 6E3BF623 D5262028</span>
+<a name="l691"><span class="ln">691  </span></a><span class="s0">#                  2013481D 1F6E5377&quot;&quot;&quot;)</span>
+<a name="l692"><span class="ln">692  </span></a><span class="s0">#    _a          = long_converter(&quot;&quot;&quot;</span>
+<a name="l693"><span class="ln">693  </span></a><span class="s0">#                  7D5A0975 FC2C3057 EEF67530 417AFFE7 FB8055C1 26DC5C6C</span>
+<a name="l694"><span class="ln">694  </span></a><span class="s0">#                  E94A4B44 F330B5D9&quot;&quot;&quot;)</span>
+<a name="l695"><span class="ln">695  </span></a><span class="s0">#    _b          = long_converter(&quot;&quot;&quot;</span>
+<a name="l696"><span class="ln">696  </span></a><span class="s0">#                  26DC5C6C E94A4B44 F330B5D9 BBD77CBF 95841629 5CF7E1CE</span>
+<a name="l697"><span class="ln">697  </span></a><span class="s0">#                  6BCCDC18 FF8C07B6&quot;&quot;&quot;)</span>
+<a name="l698"><span class="ln">698  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l699"><span class="ln">699  </span></a><span class="s0">#                  8BD2AEB9 CB7E57CB 2C4B482F FC81B7AF B9DE27E1 E3BD23C2</span>
+<a name="l700"><span class="ln">700  </span></a><span class="s0">#                  3A4453BD 9ACE3262&quot;&quot;&quot;)</span>
+<a name="l701"><span class="ln">701  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l702"><span class="ln">702  </span></a><span class="s0">#                  547EF835 C3DAC4FD 97F8461A 14611DC9 C2774513 2DED8E54</span>
+<a name="l703"><span class="ln">703  </span></a><span class="s0">#                  5C1D54C7 2F046997&quot;&quot;&quot;)</span>
+<a name="l704"><span class="ln">704  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;</span>
+<a name="l705"><span class="ln">705  </span></a><span class="s0">#                  A9FB57DB A1EEA9BC 3E660A90 9D838D71 8C397AA3 B561A6F7</span>
+<a name="l706"><span class="ln">706  </span></a><span class="s0">#                  901E0E82 974856A7&quot;&quot;&quot;)</span>
+<a name="l707"><span class="ln">707  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l708"><span class="ln">708  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l709"><span class="ln">709  </span></a><span class="s0">#    BRNP256r1   = Curve(&quot;BRNP256r1&quot;, curve, generator,</span>
+<a name="l710"><span class="ln">710  </span></a><span class="s0">#                        (1, 3, 36, 3, 3, 2, 8, 1, 1, 7), &quot;brainpoolP256r1&quot;)</span>
+<a name="l711"><span class="ln">711  </span></a>
+<a name="l712"><span class="ln">712  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l713"><span class="ln">713  </span></a><span class="s0">#                  8CB91E82 A3386D28 0F5D6F7E 50E641DF 152F7109 ED5456B4</span>
+<a name="l714"><span class="ln">714  </span></a><span class="s0">#                  12B1DA19 7FB71123 ACD3A729 901D1A71 87470013 3107EC53&quot;&quot;&quot;)</span>
+<a name="l715"><span class="ln">715  </span></a><span class="s0">#    _a          = long_converter(&quot;&quot;&quot;</span>
+<a name="l716"><span class="ln">716  </span></a><span class="s0">#                  7BC382C6 3D8C150C 3C72080A CE05AFA0 C2BEA28E 4FB22787</span>
+<a name="l717"><span class="ln">717  </span></a><span class="s0">#                  139165EF BA91F90F 8AA5814A 503AD4EB 04A8C7DD 22CE2826&quot;&quot;&quot;)</span>
+<a name="l718"><span class="ln">718  </span></a><span class="s0">#    _b          = long_converter(&quot;&quot;&quot;</span>
+<a name="l719"><span class="ln">719  </span></a><span class="s0">#                  04A8C7DD 22CE2826 8B39B554 16F0447C 2FB77DE1 07DCD2A6</span>
+<a name="l720"><span class="ln">720  </span></a><span class="s0">#                  2E880EA5 3EEB62D5 7CB43902 95DBC994 3AB78696 FA504C11&quot;&quot;&quot;)</span>
+<a name="l721"><span class="ln">721  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l722"><span class="ln">722  </span></a><span class="s0">#                  1D1C64F0 68CF45FF A2A63A81 B7C13F6B 8847A3E7 7EF14FE3</span>
+<a name="l723"><span class="ln">723  </span></a><span class="s0">#                  DB7FCAFE 0CBD10E8 E826E034 36D646AA EF87B2E2 47D4AF1E&quot;&quot;&quot;)</span>
+<a name="l724"><span class="ln">724  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l725"><span class="ln">725  </span></a><span class="s0">#                  8ABE1D75 20F9C2A4 5CB1EB8E 95CFD552 62B70B29 FEEC5864</span>
+<a name="l726"><span class="ln">726  </span></a><span class="s0">#                  E19C054F F9912928 0E464621 77918111 42820341 263C5315&quot;&quot;&quot;)</span>
+<a name="l727"><span class="ln">727  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;</span>
+<a name="l728"><span class="ln">728  </span></a><span class="s0">#                  8CB91E82 A3386D28 0F5D6F7E 50E641DF 152F7109 ED5456B3</span>
+<a name="l729"><span class="ln">729  </span></a><span class="s0">#                  1F166E6C AC0425A7 CF3AB6AF 6B7FC310 3B883202 E9046565&quot;&quot;&quot;)</span>
+<a name="l730"><span class="ln">730  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l731"><span class="ln">731  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l732"><span class="ln">732  </span></a><span class="s0">#    BRNP384r1   = Curve(&quot;BRNP384r1&quot;, curve, generator,</span>
+<a name="l733"><span class="ln">733  </span></a><span class="s0">#                        (1, 3, 36, 3, 3, 2, 8, 1, 1, 11), &quot;brainpoolP384r1&quot;)</span>
+<a name="l734"><span class="ln">734  </span></a>
+<a name="l735"><span class="ln">735  </span></a><span class="s0">#    _p          = long_converter(&quot;&quot;&quot;</span>
+<a name="l736"><span class="ln">736  </span></a><span class="s0">#                  AADD9DB8 DBE9C48B 3FD4E6AE 33C9FC07 CB308DB3 B3C9D20E</span>
+<a name="l737"><span class="ln">737  </span></a><span class="s0">#                  D6639CCA 70330871 7D4D9B00 9BC66842 AECDA12A E6A380E6</span>
+<a name="l738"><span class="ln">738  </span></a><span class="s0">#                  2881FF2F 2D82C685 28AA6056 583A48F3&quot;&quot;&quot;)</span>
+<a name="l739"><span class="ln">739  </span></a><span class="s0">#    _a          = long_converter(&quot;&quot;&quot;</span>
+<a name="l740"><span class="ln">740  </span></a><span class="s0">#                  7830A331 8B603B89 E2327145 AC234CC5 94CBDD8D 3DF91610</span>
+<a name="l741"><span class="ln">741  </span></a><span class="s0">#                  A83441CA EA9863BC 2DED5D5A A8253AA1 0A2EF1C9 8B9AC8B5</span>
+<a name="l742"><span class="ln">742  </span></a><span class="s0">#                  7F1117A7 2BF2C7B9 E7C1AC4D 77FC94CA&quot;&quot;&quot;)</span>
+<a name="l743"><span class="ln">743  </span></a><span class="s0">#    _b          = long_converter(&quot;&quot;&quot;</span>
+<a name="l744"><span class="ln">744  </span></a><span class="s0">#                  3DF91610 A83441CA EA9863BC 2DED5D5A A8253AA1 0A2EF1C9</span>
+<a name="l745"><span class="ln">745  </span></a><span class="s0">#                  8B9AC8B5 7F1117A7 2BF2C7B9 E7C1AC4D 77FC94CA DC083E67</span>
+<a name="l746"><span class="ln">746  </span></a><span class="s0">#                  984050B7 5EBAE5DD 2809BD63 8016F723&quot;&quot;&quot;)</span>
+<a name="l747"><span class="ln">747  </span></a><span class="s0">#    _Gx         = long_converter(&quot;&quot;&quot;</span>
+<a name="l748"><span class="ln">748  </span></a><span class="s0">#                  81AEE4BD D82ED964 5A21322E 9C4C6A93 85ED9F70 B5D916C1</span>
+<a name="l749"><span class="ln">749  </span></a><span class="s0">#                  B43B62EE F4D0098E FF3B1F78 E2D0D48D 50D1687B 93B97D5F</span>
+<a name="l750"><span class="ln">750  </span></a><span class="s0">#                  7C6D5047 406A5E68 8B352209 BCB9F822&quot;&quot;&quot;)</span>
+<a name="l751"><span class="ln">751  </span></a><span class="s0">#    _Gy         = long_converter(&quot;&quot;&quot;</span>
+<a name="l752"><span class="ln">752  </span></a><span class="s0">#                  7DDE385D 566332EC C0EABFA9 CF7822FD F209F700 24A57B1A</span>
+<a name="l753"><span class="ln">753  </span></a><span class="s0">#                  A000C55B 881F8111 B2DCDE49 4A5F485E 5BCA4BD8 8A2763AE</span>
+<a name="l754"><span class="ln">754  </span></a><span class="s0">#                  D1CA2B2F A8F05406 78CD1E0F 3AD80892&quot;&quot;&quot;)</span>
+<a name="l755"><span class="ln">755  </span></a><span class="s0">#    _r          = long_converter(&quot;&quot;&quot;</span>
+<a name="l756"><span class="ln">756  </span></a><span class="s0">#                  AADD9DB8 DBE9C48B 3FD4E6AE 33C9FC07 CB308DB3 B3C9D20E</span>
+<a name="l757"><span class="ln">757  </span></a><span class="s0">#                  D6639CCA 70330870 553E5C41 4CA92619 41866119 7FAC1047</span>
+<a name="l758"><span class="ln">758  </span></a><span class="s0">#                  1DB1D381 085DDADD B5879682 9CA90069&quot;&quot;&quot;)</span>
+<a name="l759"><span class="ln">759  </span></a><span class="s0">#    curve       = CurveFp(_p, _a, _b)</span>
+<a name="l760"><span class="ln">760  </span></a><span class="s0">#    generator   = Point(curve, _Gx, _Gy, _r)</span>
+<a name="l761"><span class="ln">761  </span></a><span class="s0">#    BRNP512r1   = Curve(&quot;BRNP512r1&quot;, curve, generator,</span>
+<a name="l762"><span class="ln">762  </span></a><span class="s0">#                        (1, 3, 36, 3, 3, 2, 8, 1, 1, 13), &quot;brainpoolP512r1&quot;)</span>
+<a name="l763"><span class="ln">763  </span></a></pre>
+</body>
+</html>

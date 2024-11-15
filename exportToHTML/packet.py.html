@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>packet.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #848bbd; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #fede5d; font-style: italic;}
+.s3 { color: #b6b1b1;}
+.s4 { color: #03edf9;}
+.s5 { color: #fede5d;}
+.s6 { color: #ff8b39;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+packet.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0"># SPDX-License-Identifier: GPL-2.0-only</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0"># This file is part of Scapy</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0"># See https://scapy.net/ for more information</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0"># Copyright (C) Andreas Korb &lt;andreas.d.korb@gmail.com&gt;</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0"># Copyright (C) Nils Weiss &lt;nils@we155.de&gt;</span>
+<a name="l6"><span class="ln">6    </span></a>
+<a name="l7"><span class="ln">7    </span></a><span class="s0"># scapy.contrib.status = skip</span>
+<a name="l8"><span class="ln">8    </span></a>
+<a name="l9"><span class="ln">9    </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">packet </span><span class="s2">import </span><span class="s1">Packet</span>
+<a name="l10"><span class="ln">10   </span></a>
+<a name="l11"><span class="ln">11   </span></a>
+<a name="l12"><span class="ln">12   </span></a><span class="s2">class </span><span class="s1">OBD_Packet</span><span class="s4">(</span><span class="s1">Packet</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l13"><span class="ln">13   </span></a>    <span class="s2">def </span><span class="s1">extract_padding</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">s</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l14"><span class="ln">14   </span></a>        <span class="s2">return </span><span class="s6">''</span><span class="s3">, </span><span class="s1">s</span>
+<a name="l15"><span class="ln">15   </span></a></pre>
+</body>
+</html>

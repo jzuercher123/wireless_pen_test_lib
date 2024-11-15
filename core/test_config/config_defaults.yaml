@@ -1,0 +1,23 @@
+exploits:
+  payload_delivery:
+    default_duration: 10
+    payload_types:
+    - reverse_shell
+    - malicious_script
+  session_hijacking:
+    max_packets: 100
+general:
+  interface: wlan0mon
+  log_level: INFO
+  report_directory: reports
+scanners:
+  auth_bypass_scanner:
+    scan_duration: 10
+  dos_scanner:
+    scan_duration: 10
+  encryption_scanner:
+    scan_duration: 15
+  local_scanner:
+    scan_duration: 10
+ui:
+  theme: default

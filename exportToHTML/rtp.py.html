@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>rtp.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #848bbd; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #fede5d; font-style: italic;}
+.s3 { color: #b6b1b1;}
+.s4 { color: #fede5d;}
+.s5 { color: #36f9f6;}
+.s6 { color: #f97e72;}
+.s7 { color: #ff8b39;}
+.s8 { color: #03edf9;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+rtp.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0"># SPDX-License-Identifier: GPL-2.0-only</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0"># This file is part of Scapy</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0"># See https://scapy.net/ for more information</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0"># Copyright (C) Philippe Biondi &lt;phil@secdev.org&gt;</span>
+<a name="l5"><span class="ln">5    </span></a>
+<a name="l6"><span class="ln">6    </span></a><span class="s0">&quot;&quot;&quot; 
+<a name="l7"><span class="ln">7    </span></a>RTP (Real-time Transport Protocol). 
+<a name="l8"><span class="ln">8    </span></a> 
+<a name="l9"><span class="ln">9    </span></a>Remember to use:: 
+<a name="l10"><span class="ln">10   </span></a> 
+<a name="l11"><span class="ln">11   </span></a>    bind_layers(UDP, RTP, dport=XXX) 
+<a name="l12"><span class="ln">12   </span></a> 
+<a name="l13"><span class="ln">13   </span></a>To register the port you are using 
+<a name="l14"><span class="ln">14   </span></a>&quot;&quot;&quot;</span>
+<a name="l15"><span class="ln">15   </span></a>
+<a name="l16"><span class="ln">16   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">packet </span><span class="s2">import </span><span class="s1">Packet</span><span class="s3">, </span><span class="s1">bind_layers</span>
+<a name="l17"><span class="ln">17   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">fields </span><span class="s2">import </span><span class="s1">BitEnumField</span><span class="s3">, </span><span class="s1">BitField</span><span class="s3">, </span><span class="s1">BitFieldLenField</span><span class="s3">, </span><span class="s1">\</span>
+<a name="l18"><span class="ln">18   </span></a>    <span class="s1">FieldLenField</span><span class="s3">, </span><span class="s1">FieldListField</span><span class="s3">, </span><span class="s1">IntField</span><span class="s3">, </span><span class="s1">ShortField</span>
+<a name="l19"><span class="ln">19   </span></a>
+<a name="l20"><span class="ln">20   </span></a><span class="s1">_rtp_payload_types </span><span class="s4">= </span><span class="s5">{</span>
+<a name="l21"><span class="ln">21   </span></a>    <span class="s0"># http://www.iana.org/assignments/rtp-parameters</span>
+<a name="l22"><span class="ln">22   </span></a>    <span class="s6">0</span><span class="s4">: </span><span class="s7">'G.711 PCMU'</span><span class="s3">, </span><span class="s6">3</span><span class="s4">: </span><span class="s7">'GSM'</span><span class="s3">,</span>
+<a name="l23"><span class="ln">23   </span></a>    <span class="s6">4</span><span class="s4">: </span><span class="s7">'G723'</span><span class="s3">, </span><span class="s6">5</span><span class="s4">: </span><span class="s7">'DVI4'</span><span class="s3">,</span>
+<a name="l24"><span class="ln">24   </span></a>    <span class="s6">6</span><span class="s4">: </span><span class="s7">'DVI4'</span><span class="s3">, </span><span class="s6">7</span><span class="s4">: </span><span class="s7">'LPC'</span><span class="s3">,</span>
+<a name="l25"><span class="ln">25   </span></a>    <span class="s6">8</span><span class="s4">: </span><span class="s7">'PCMA'</span><span class="s3">, </span><span class="s6">9</span><span class="s4">: </span><span class="s7">'G722'</span><span class="s3">,</span>
+<a name="l26"><span class="ln">26   </span></a>    <span class="s6">10</span><span class="s4">: </span><span class="s7">'L16'</span><span class="s3">, </span><span class="s6">11</span><span class="s4">: </span><span class="s7">'L16'</span><span class="s3">,</span>
+<a name="l27"><span class="ln">27   </span></a>    <span class="s6">12</span><span class="s4">: </span><span class="s7">'QCELP'</span><span class="s3">, </span><span class="s6">13</span><span class="s4">: </span><span class="s7">'CN'</span><span class="s3">,</span>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s6">14</span><span class="s4">: </span><span class="s7">'MPA'</span><span class="s3">, </span><span class="s6">15</span><span class="s4">: </span><span class="s7">'G728'</span><span class="s3">,</span>
+<a name="l29"><span class="ln">29   </span></a>    <span class="s6">16</span><span class="s4">: </span><span class="s7">'DVI4'</span><span class="s3">, </span><span class="s6">17</span><span class="s4">: </span><span class="s7">'DVI4'</span><span class="s3">,</span>
+<a name="l30"><span class="ln">30   </span></a>    <span class="s6">18</span><span class="s4">: </span><span class="s7">'G729'</span><span class="s3">, </span><span class="s6">25</span><span class="s4">: </span><span class="s7">'CelB'</span><span class="s3">,</span>
+<a name="l31"><span class="ln">31   </span></a>    <span class="s6">26</span><span class="s4">: </span><span class="s7">'JPEG'</span><span class="s3">, </span><span class="s6">28</span><span class="s4">: </span><span class="s7">'nv'</span><span class="s3">,</span>
+<a name="l32"><span class="ln">32   </span></a>    <span class="s6">31</span><span class="s4">: </span><span class="s7">'H261'</span><span class="s3">, </span><span class="s6">32</span><span class="s4">: </span><span class="s7">'MPV'</span><span class="s3">,</span>
+<a name="l33"><span class="ln">33   </span></a>    <span class="s6">33</span><span class="s4">: </span><span class="s7">'MP2T'</span><span class="s3">, </span><span class="s6">34</span><span class="s4">: </span><span class="s7">'H263'</span><span class="s5">}</span>
+<a name="l34"><span class="ln">34   </span></a>
+<a name="l35"><span class="ln">35   </span></a>
+<a name="l36"><span class="ln">36   </span></a><span class="s2">class </span><span class="s1">RTPExtension</span><span class="s8">(</span><span class="s1">Packet</span><span class="s8">)</span><span class="s4">:</span>
+<a name="l37"><span class="ln">37   </span></a>    <span class="s1">name </span><span class="s4">= </span><span class="s7">&quot;RTP extension&quot;</span>
+<a name="l38"><span class="ln">38   </span></a>    <span class="s1">fields_desc </span><span class="s4">= </span><span class="s5">[</span><span class="s1">ShortField</span><span class="s8">(</span><span class="s7">&quot;header_id&quot;</span><span class="s3">, </span><span class="s6">0</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l39"><span class="ln">39   </span></a>                   <span class="s1">FieldLenField</span><span class="s8">(</span><span class="s7">&quot;header_len&quot;</span><span class="s3">, </span><span class="s2">None</span><span class="s3">, </span><span class="s1">count_of</span><span class="s4">=</span><span class="s7">&quot;header&quot;</span><span class="s3">, </span><span class="s1">fmt</span><span class="s4">=</span><span class="s7">&quot;H&quot;</span><span class="s8">)</span><span class="s3">,  </span><span class="s0"># noqa: E501</span>
+<a name="l40"><span class="ln">40   </span></a>                   <span class="s1">FieldListField</span><span class="s8">(</span><span class="s7">'header'</span><span class="s3">, </span><span class="s5">[]</span><span class="s3">, </span><span class="s1">IntField</span><span class="s8">(</span><span class="s7">&quot;hdr&quot;</span><span class="s3">, </span><span class="s6">0</span><span class="s8">)</span><span class="s3">, </span><span class="s1">count_from</span><span class="s4">=</span><span class="s2">lambda </span><span class="s1">pkt</span><span class="s4">: </span><span class="s1">pkt</span><span class="s3">.</span><span class="s1">header_len</span><span class="s8">)</span><span class="s5">]  </span><span class="s0"># noqa: E501</span>
+<a name="l41"><span class="ln">41   </span></a>
+<a name="l42"><span class="ln">42   </span></a>
+<a name="l43"><span class="ln">43   </span></a><span class="s2">class </span><span class="s1">RTP</span><span class="s8">(</span><span class="s1">Packet</span><span class="s8">)</span><span class="s4">:</span>
+<a name="l44"><span class="ln">44   </span></a>    <span class="s1">name </span><span class="s4">= </span><span class="s7">&quot;RTP&quot;</span>
+<a name="l45"><span class="ln">45   </span></a>    <span class="s1">fields_desc </span><span class="s4">= </span><span class="s5">[</span><span class="s1">BitField</span><span class="s8">(</span><span class="s7">'version'</span><span class="s3">, </span><span class="s6">2</span><span class="s3">, </span><span class="s6">2</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l46"><span class="ln">46   </span></a>                   <span class="s1">BitField</span><span class="s8">(</span><span class="s7">'padding'</span><span class="s3">, </span><span class="s6">0</span><span class="s3">, </span><span class="s6">1</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l47"><span class="ln">47   </span></a>                   <span class="s1">BitField</span><span class="s8">(</span><span class="s7">'extension'</span><span class="s3">, </span><span class="s6">0</span><span class="s3">, </span><span class="s6">1</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l48"><span class="ln">48   </span></a>                   <span class="s1">BitFieldLenField</span><span class="s8">(</span><span class="s7">'numsync'</span><span class="s3">, </span><span class="s2">None</span><span class="s3">, </span><span class="s6">4</span><span class="s3">, </span><span class="s1">count_of</span><span class="s4">=</span><span class="s7">'sync'</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l49"><span class="ln">49   </span></a>                   <span class="s1">BitField</span><span class="s8">(</span><span class="s7">'marker'</span><span class="s3">, </span><span class="s6">0</span><span class="s3">, </span><span class="s6">1</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l50"><span class="ln">50   </span></a>                   <span class="s1">BitEnumField</span><span class="s8">(</span><span class="s7">'payload_type'</span><span class="s3">, </span><span class="s6">0</span><span class="s3">, </span><span class="s6">7</span><span class="s3">, </span><span class="s1">_rtp_payload_types</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l51"><span class="ln">51   </span></a>                   <span class="s1">ShortField</span><span class="s8">(</span><span class="s7">'sequence'</span><span class="s3">, </span><span class="s6">0</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l52"><span class="ln">52   </span></a>                   <span class="s1">IntField</span><span class="s8">(</span><span class="s7">'timestamp'</span><span class="s3">, </span><span class="s6">0</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l53"><span class="ln">53   </span></a>                   <span class="s1">IntField</span><span class="s8">(</span><span class="s7">'sourcesync'</span><span class="s3">, </span><span class="s6">0</span><span class="s8">)</span><span class="s3">,</span>
+<a name="l54"><span class="ln">54   </span></a>                   <span class="s1">FieldListField</span><span class="s8">(</span><span class="s7">'sync'</span><span class="s3">, </span><span class="s5">[]</span><span class="s3">, </span><span class="s1">IntField</span><span class="s8">(</span><span class="s7">&quot;id&quot;</span><span class="s3">, </span><span class="s6">0</span><span class="s8">)</span><span class="s3">, </span><span class="s1">count_from</span><span class="s4">=</span><span class="s2">lambda </span><span class="s1">pkt</span><span class="s4">:</span><span class="s1">pkt</span><span class="s3">.</span><span class="s1">numsync</span><span class="s8">)</span><span class="s5">]  </span><span class="s0"># noqa: E501</span>
+<a name="l55"><span class="ln">55   </span></a>
+<a name="l56"><span class="ln">56   </span></a>
+<a name="l57"><span class="ln">57   </span></a><span class="s1">bind_layers</span><span class="s8">(</span><span class="s1">RTP</span><span class="s3">, </span><span class="s1">RTPExtension</span><span class="s3">, </span><span class="s1">extension</span><span class="s4">=</span><span class="s6">1</span><span class="s8">)</span>
+<a name="l58"><span class="ln">58   </span></a></pre>
+</body>
+</html>

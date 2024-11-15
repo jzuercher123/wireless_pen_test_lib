@@ -13,6 +13,7 @@ class DataStorageManager:
             report_directory (str): Path to the directory where reports will be stored.
         """
         self.report_directory = report_directory
+        os.makedirs(self.report_directory, exist_ok=True)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info(f"DataStorageManager initialized for report directory: {self.report_directory}")
 

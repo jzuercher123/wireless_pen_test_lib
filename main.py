@@ -1,8 +1,11 @@
+# main.py
+
 #!/usr/bin/env python3
 
 import sys
 import logging
 from ui.cli import cli
+
 
 def setup_logging():
     """
@@ -28,7 +31,13 @@ def main():
     The main entry point of the application.
     """
     setup_logging()
-    sys.exit(cli())
+
+    try:
+        # Pass an empty dictionary since CoreFramework is handled inside the CLI
+        cli(obj={})
+    except Exception as e:
+        logging.error(f"An error occurred while running the CLI: {e}")
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

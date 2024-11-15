@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>authentication_tools.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #fede5d; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #fede5d;}
+.s3 { color: #03edf9;}
+.s4 { color: #b6b1b1;}
+.s5 { color: #848bbd; font-style: italic;}
+.s6 { color: #ff8b39;}
+.s7 { color: #36f9f6;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+authentication_tools.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">import </span><span class="s1">subprocess</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0">import </span><span class="s1">logging</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">import </span><span class="s1">os</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">from </span><span class="s1">typing </span><span class="s0">import </span><span class="s1">Optional</span>
+<a name="l5"><span class="ln">5    </span></a>
+<a name="l6"><span class="ln">6    </span></a>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">class </span><span class="s1">AuthenticationTools</span><span class="s2">:</span>
+<a name="l8"><span class="ln">8    </span></a>    <span class="s0">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s3">)</span><span class="s2">:</span>
+<a name="l9"><span class="ln">9    </span></a>        <span class="s1">self</span><span class="s4">.</span><span class="s1">logger </span><span class="s2">= </span><span class="s1">logging</span><span class="s4">.</span><span class="s1">getLogger</span><span class="s3">(</span><span class="s1">self</span><span class="s4">.</span><span class="s1">__class__</span><span class="s4">.</span><span class="s1">__name__</span><span class="s3">)</span>
+<a name="l10"><span class="ln">10   </span></a>
+<a name="l11"><span class="ln">11   </span></a>    <span class="s0">def </span><span class="s1">decrypt_handshake</span><span class="s3">(</span><span class="s1">self</span><span class="s4">, </span><span class="s1">handshake_file</span><span class="s2">: </span><span class="s1">str</span><span class="s4">, </span><span class="s1">wordlist</span><span class="s2">: </span><span class="s1">str</span><span class="s4">, </span><span class="s1">output_file</span><span class="s2">: </span><span class="s1">str</span><span class="s3">) </span><span class="s1">-&gt; bool</span><span class="s2">:</span>
+<a name="l12"><span class="ln">12   </span></a>        <span class="s5">&quot;&quot;&quot; 
+<a name="l13"><span class="ln">13   </span></a>        Decrypts a captured handshake using a wordlist with aircrack-ng. 
+<a name="l14"><span class="ln">14   </span></a> 
+<a name="l15"><span class="ln">15   </span></a>        :param handshake_file: Path to the captured handshake file (.cap or .pcap). 
+<a name="l16"><span class="ln">16   </span></a>        :param wordlist: Path to the wordlist file for brute-force. 
+<a name="l17"><span class="ln">17   </span></a>        :param output_file: Path to save the decrypted password. 
+<a name="l18"><span class="ln">18   </span></a>        :return: True if decryption is successful, False otherwise. 
+<a name="l19"><span class="ln">19   </span></a>        &quot;&quot;&quot;</span>
+<a name="l20"><span class="ln">20   </span></a>        <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">info</span><span class="s3">(</span><span class="s6">f&quot;Starting handshake decryption: </span><span class="s7">{</span><span class="s1">handshake_file</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l21"><span class="ln">21   </span></a>        <span class="s0">if not </span><span class="s1">os</span><span class="s4">.</span><span class="s1">path</span><span class="s4">.</span><span class="s1">exists</span><span class="s3">(</span><span class="s1">handshake_file</span><span class="s3">)</span><span class="s2">:</span>
+<a name="l22"><span class="ln">22   </span></a>            <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">error</span><span class="s3">(</span><span class="s6">f&quot;Handshake file does not exist: </span><span class="s7">{</span><span class="s1">handshake_file</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l23"><span class="ln">23   </span></a>            <span class="s0">return False</span>
+<a name="l24"><span class="ln">24   </span></a>        <span class="s0">if not </span><span class="s1">os</span><span class="s4">.</span><span class="s1">path</span><span class="s4">.</span><span class="s1">exists</span><span class="s3">(</span><span class="s1">wordlist</span><span class="s3">)</span><span class="s2">:</span>
+<a name="l25"><span class="ln">25   </span></a>            <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">error</span><span class="s3">(</span><span class="s6">f&quot;Wordlist file does not exist: </span><span class="s7">{</span><span class="s1">wordlist</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l26"><span class="ln">26   </span></a>            <span class="s0">return False</span>
+<a name="l27"><span class="ln">27   </span></a>
+<a name="l28"><span class="ln">28   </span></a>        <span class="s1">command </span><span class="s2">= </span><span class="s7">[</span><span class="s6">'aircrack-ng'</span><span class="s4">, </span><span class="s6">'-w'</span><span class="s4">, </span><span class="s1">wordlist</span><span class="s4">, </span><span class="s6">'-l'</span><span class="s4">, </span><span class="s1">output_file</span><span class="s4">, </span><span class="s1">handshake_file</span><span class="s7">]</span>
+<a name="l29"><span class="ln">29   </span></a>        <span class="s0">try</span><span class="s2">:</span>
+<a name="l30"><span class="ln">30   </span></a>            <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">debug</span><span class="s3">(</span><span class="s6">f&quot;Executing command: </span><span class="s7">{</span><span class="s6">' '</span><span class="s4">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">command</span><span class="s3">)</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l31"><span class="ln">31   </span></a>            <span class="s1">result </span><span class="s2">= </span><span class="s1">subprocess</span><span class="s4">.</span><span class="s1">run</span><span class="s3">(</span><span class="s1">command</span><span class="s4">, </span><span class="s1">check</span><span class="s2">=</span><span class="s0">True</span><span class="s4">, </span><span class="s1">stdout</span><span class="s2">=</span><span class="s1">subprocess</span><span class="s4">.</span><span class="s1">PIPE</span><span class="s4">, </span><span class="s1">stderr</span><span class="s2">=</span><span class="s1">subprocess</span><span class="s4">.</span><span class="s1">PIPE</span><span class="s4">, </span><span class="s1">text</span><span class="s2">=</span><span class="s0">True</span><span class="s3">)</span>
+<a name="l32"><span class="ln">32   </span></a>            <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">debug</span><span class="s3">(</span><span class="s6">f&quot;aircrack-ng Output: </span><span class="s7">{</span><span class="s1">result</span><span class="s4">.</span><span class="s1">stdout</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l33"><span class="ln">33   </span></a>            <span class="s0">if </span><span class="s6">&quot;KEY FOUND!&quot; </span><span class="s0">in </span><span class="s1">result</span><span class="s4">.</span><span class="s1">stdout</span><span class="s2">:</span>
+<a name="l34"><span class="ln">34   </span></a>                <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">info</span><span class="s3">(</span><span class="s6">f&quot;Password decrypted successfully. Saved to </span><span class="s7">{</span><span class="s1">output_file</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l35"><span class="ln">35   </span></a>                <span class="s0">return True</span>
+<a name="l36"><span class="ln">36   </span></a>            <span class="s0">else</span><span class="s2">:</span>
+<a name="l37"><span class="ln">37   </span></a>                <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">warning</span><span class="s3">(</span><span class="s6">&quot;Password not found in the provided wordlist.&quot;</span><span class="s3">)</span>
+<a name="l38"><span class="ln">38   </span></a>                <span class="s0">return False</span>
+<a name="l39"><span class="ln">39   </span></a>        <span class="s0">except </span><span class="s1">subprocess</span><span class="s4">.</span><span class="s1">CalledProcessError </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+<a name="l40"><span class="ln">40   </span></a>            <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">error</span><span class="s3">(</span><span class="s6">f&quot;Failed to decrypt handshake: </span><span class="s7">{</span><span class="s1">e</span><span class="s4">.</span><span class="s1">stderr</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l41"><span class="ln">41   </span></a>            <span class="s0">return False</span>
+<a name="l42"><span class="ln">42   </span></a>
+<a name="l43"><span class="ln">43   </span></a>    <span class="s0">def </span><span class="s1">generate_pmkid</span><span class="s3">(</span><span class="s1">self</span><span class="s4">, </span><span class="s1">bssid</span><span class="s2">: </span><span class="s1">str</span><span class="s4">, </span><span class="s1">ssid</span><span class="s2">: </span><span class="s1">str</span><span class="s4">, </span><span class="s1">wordlist</span><span class="s2">: </span><span class="s1">str</span><span class="s4">, </span><span class="s1">output_file</span><span class="s2">: </span><span class="s1">str</span><span class="s3">) </span><span class="s1">-&gt; bool</span><span class="s2">:</span>
+<a name="l44"><span class="ln">44   </span></a>        <span class="s5">&quot;&quot;&quot; 
+<a name="l45"><span class="ln">45   </span></a>        Generates PMKID for WPA/WPA2 networks using hashcat. 
+<a name="l46"><span class="ln">46   </span></a> 
+<a name="l47"><span class="ln">47   </span></a>        :param bssid: BSSID of the target network. 
+<a name="l48"><span class="ln">48   </span></a>        :param ssid: SSID of the target network. 
+<a name="l49"><span class="ln">49   </span></a>        :param wordlist: Path to the wordlist file. 
+<a name="l50"><span class="ln">50   </span></a>        :param output_file: Path to save the PMKID. 
+<a name="l51"><span class="ln">51   </span></a>        :return: True if PMKID generation is successful, False otherwise. 
+<a name="l52"><span class="ln">52   </span></a>        &quot;&quot;&quot;</span>
+<a name="l53"><span class="ln">53   </span></a>        <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">info</span><span class="s3">(</span><span class="s6">f&quot;Starting PMKID generation for SSID: </span><span class="s7">{</span><span class="s1">ssid</span><span class="s7">}</span><span class="s6">, BSSID: </span><span class="s7">{</span><span class="s1">bssid</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l54"><span class="ln">54   </span></a>        <span class="s0">if not </span><span class="s1">os</span><span class="s4">.</span><span class="s1">path</span><span class="s4">.</span><span class="s1">exists</span><span class="s3">(</span><span class="s1">wordlist</span><span class="s3">)</span><span class="s2">:</span>
+<a name="l55"><span class="ln">55   </span></a>            <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">error</span><span class="s3">(</span><span class="s6">f&quot;Wordlist file does not exist: </span><span class="s7">{</span><span class="s1">wordlist</span><span class="s7">}</span><span class="s6">&quot;</span><span class="s3">)</span>
+<a name="l56"><span class="ln">56   </span></a>            <span class="s0">return False</span>
+<a name="l57"><span class="ln">57   </span></a>
+<a name="l58"><span class="ln">58   </span></a>        <span class="s5"># This is a placeholder for PMKID generation logic</span>
+<a name="l59"><span class="ln">59   </span></a>        <span class="s5"># Implement using hashcat or other suitable tools</span>
+<a name="l60"><span class="ln">60   </span></a>        <span class="s5"># Example command for hashcat (requires .hccapx file)</span>
+<a name="l61"><span class="ln">61   </span></a>        <span class="s5"># command = ['hashcat', '-m', '16800', 'path_to_hash.hccapx', wordlist]</span>
+<a name="l62"><span class="ln">62   </span></a>        <span class="s5"># For demonstration, we'll assume PMKID generation is successful</span>
+<a name="l63"><span class="ln">63   </span></a>        <span class="s1">self</span><span class="s4">.</span><span class="s1">logger</span><span class="s4">.</span><span class="s1">debug</span><span class="s3">(</span><span class="s6">&quot;PMKID generation logic not implemented yet.&quot;</span><span class="s3">)</span>
+<a name="l64"><span class="ln">64   </span></a>        <span class="s5"># Implement the actual PMKID generation logic here</span>
+<a name="l65"><span class="ln">65   </span></a>        <span class="s0">return False</span>
+<a name="l66"><span class="ln">66   </span></a></pre>
+</body>
+</html>

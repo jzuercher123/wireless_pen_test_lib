@@ -1,21 +1,23 @@
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+# ui/gui.py
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tkinter import messagebox, filedialog
 import threading
 import json
-import os
-from core import CoreFramework
-import sys
+from core.__init__ import CoreFramework
 import tkinter as tk
 from tkinter import ttk
 from live_network_frame import LiveNetworkFrame
-
-
 
 # Adjust the path to import core modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..'))
 sys.path.insert(0, project_root)
 
+# Import register_scanners and register_exploits
+from core.config.protocols import register_scanners, register_exploits
 
 class WirelessPenTestGUI(tk.Tk):
     def __init__(self):
@@ -23,13 +25,23 @@ class WirelessPenTestGUI(tk.Tk):
         self.title("WirelessPenTestLib GUI")
         self.geometry("800x600")
 
-        # Initialize Core Framework
-        self.core = CoreFramework(modules_path=os.path.join(project_root, 'protocols'))
-        self.core.load_protocol_modules()
+        # Initialize stop event
+        self.stop_event = threading.Event()
 
-        # Create a Notebook (tabbed interface)
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill=tk.BOTH, expand=True)
+        # Initialize Core Framework
+        self.core = self.initialize_coreframework()
+        if not self.core:
+            messagebox.showerror("Initialization Error", "Failed to initialize CoreFramework. Exiting.")
+            self.destroy()
+            return
+
+        # Create a Container Frame to hold Notebook and Stop Button
+        container_frame = ttk.Frame(self)
+        container_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Create a Notebook (tabbed interface) inside the Container Frame
+        self.notebook = ttk.Notebook(container_frame)
+        self.notebook.pack(fill=tk.BOTH, expand=True, side='top')
 
         # Add Live Network Details tab
         self.live_network_frame = LiveNetworkFrame(
@@ -39,24 +51,42 @@ class WirelessPenTestGUI(tk.Tk):
         )
         self.notebook.add(self.live_network_frame, text="Live Network Details")
 
-        # You can add more tabs/pages here as needed
-        # e.g., self.another_frame = AnotherFrame(...)
-        # self.notebook.add(self.another_frame, text="Another Page")
-
         # Load vulnerability database
         self.vulnerability_db = self.core.vulnerability_db
 
-        # Create Notebook for tabs
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(expand=True, fill='both')
+        # Create additional tabs
+        self.create_scan_tab(container_frame)
+        self.create_exploit_tab(container_frame)
+        self.create_report_tab(container_frame)
+        self.create_settings_tab(container_frame)
 
-        # Create tabs
-        self.create_scan_tab()
-        self.create_exploit_tab()
-        self.create_report_tab()
-        self.create_settings_tab()
+        # Add Stop Button at the bottom of the Container Frame
+        self.add_stop_button(container_frame)
 
-    def create_scan_tab(self):
+    def initialize_coreframework(self):
+        """
+        Initializes the CoreFramework with necessary configurations.
+        """
+        protocols_path = os.path.join(project_root, 'core', 'config', 'protocols')
+        config_dir = os.path.join(project_root, 'core', 'config')
+        vulnerabilities_path = os.path.join(project_root, 'vulnerabilities', 'vulnerabilities.json')
+
+        # Initialize CoreFramework
+        try:
+            core = CoreFramework(
+                modules_path=protocols_path,
+                config_dir=config_dir,
+                scanners=register_scanners(),
+                exploits=register_exploits(),
+                vulnerabilities_path=vulnerabilities_path
+            )
+            core.logger.info("CoreFramework initialized successfully.")
+            return core
+        except Exception as e:
+            messagebox.showerror("Initialization Error", f"Failed to initialize CoreFramework: {e}")
+            return None
+
+    def create_scan_tab(self, parent):
         scan_frame = ttk.Frame(self.notebook)
         self.notebook.add(scan_frame, text='Scans')
 
@@ -97,6 +127,29 @@ class WirelessPenTestGUI(tk.Tk):
         self.scan_log = tk.Text(scan_frame, height=15, state='disabled')
         self.scan_log.pack(padx=10, pady=10, fill='both', expand=True)
 
+    def add_stop_button(self, parent):
+        """
+        Adds a Stop button at the bottom of the GUI to halt ongoing operations.
+        """
+        stop_button = ttk.Button(parent, text="Stop", command=self.stop_operations)
+        stop_button.pack(pady=10, side='bottom')
+
+    def stop_operations(self):
+        """
+        Handles the Stop button click event. Signals all running operations to terminate.
+        """
+        if not self.stop_event.is_set():
+            self.stop_event.set()
+            self.log_scan("Stop signal sent. Attempting to halt ongoing operations...")
+            self.log_exploit("Stop signal sent. Attempting to halt ongoing operations...")
+            # Stop ongoing exploits
+            self.core.stop_continuous_packets()
+            self.log_scan("Stop signal processed.")
+            self.log_exploit("Stop signal processed.")
+        else:
+            self.log_scan("No ongoing operations to stop.")
+            self.log_exploit("No ongoing operations to stop.")
+
     def run_scans(self):
         selected_scanners = [sc for sc, var in self.scanner_vars.items() if var.get()]
         ssid = self.scan_ssid_entry.get()
@@ -111,30 +164,43 @@ class WirelessPenTestGUI(tk.Tk):
 
         target = {'ssid': ssid, 'bssid': bssid}
 
-        # Disable the Run Scans button to prevent multiple clicks
-        # Find the Run Scans button and disable it
-        for widget in self.children.values():
-            if isinstance(widget, ttk.Notebook):
-                for tab in widget.tabs():
-                    pass  # Not needed in this context
+        # Reset stop_event before starting new scans
+        if self.stop_event.is_set():
+            self.stop_event.clear()
+
         # Start scanning in a separate thread
         threading.Thread(target=self.execute_scans, args=(selected_scanners, target), daemon=True).start()
 
     def finalize_and_generate_reports(self):
-        self.logger.info("Finalizing and generating reports.")
         threading.Thread(target=self.execute_finalize, daemon=True).start()
 
     def execute_finalize(self):
-        self.core.finalize()
-        self.report_text.config(state='normal')
-        self.report_text.insert(tk.END, "Reports generated successfully.\n")
-        self.report_text.see(tk.END)
-        self.report_text.config(state='disabled')
+        try:
+            self.core.finalize()
+            self.report_text.config(state='normal')
+            self.report_text.insert(tk.END, "Reports generated successfully.\n")
+            self.report_text.see(tk.END)
+            self.report_text.config(state='disabled')
+            messagebox.showinfo("Finalize Complete", "Reports generated successfully.")
+        except Exception as e:
+            messagebox.showerror("Finalize Error", f"Failed to finalize and generate reports: {e}")
+
     def execute_scans(self, scanners, target):
         for sc in scanners:
+            if self.stop_event.is_set():
+                self.log_scan("Scan operation interrupted by user.")
+                break
             self.log_scan(f"Running scanner: {sc}")
-            self.core.run_scanner(sc, target)
-            self.log_scan(f"Scanner '{sc}' completed.\n")
+            try:
+                # Pass the stop_event to the scanner's scan method if possible
+                scan_result = self.core.run_scanner(sc, target, self.stop_event)
+                self.log_scan(f"Scanner '{sc}' completed.\n")
+                # Optionally, display scan results in the log
+                for device in scan_result.get("devices", []):
+                    device_info = f"IP: {device.get('ip', 'N/A')}, MAC: {device.get('mac', 'N/A')}, Hostname: {device.get('hostname', 'N/A')}, SSID: {device.get('ssid', 'N/A')}, BSSID: {device.get('bssid', 'N/A')}"
+                    self.log_scan(f"Discovered Device: {device_info}")
+            except Exception as e:
+                self.log_scan(f"Error running scanner '{sc}': {e}\n")
 
     def log_scan(self, message):
         self.scan_log.config(state='normal')
@@ -142,7 +208,7 @@ class WirelessPenTestGUI(tk.Tk):
         self.scan_log.see(tk.END)
         self.scan_log.config(state='disabled')
 
-    def create_exploit_tab(self):
+    def create_exploit_tab(self, parent):
         exploit_frame = ttk.Frame(self.notebook)
         self.notebook.add(exploit_frame, text='Exploits')
 
@@ -175,8 +241,7 @@ class WirelessPenTestGUI(tk.Tk):
         params_frame = ttk.LabelFrame(exploit_frame, text="Exploit Parameters")
         params_frame.pack(padx=10, pady=10, fill='x')
 
-        # Placeholder: Depending on the exploit, dynamically create input fields
-        # For simplicity, we'll add common fields
+        # Session Hijacking Parameters
         ip_label = ttk.Label(params_frame, text="Target IP (for Session Hijacking):")
         ip_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
         self.exploit_ip_entry = ttk.Entry(params_frame, width=50)
@@ -242,12 +307,20 @@ class WirelessPenTestGUI(tk.Tk):
             'bssid': bssid
         }
 
+        # Reset stop_event before starting new exploits
+        if self.stop_event.is_set():
+            self.stop_event.clear()
+
         # Start exploitation in a separate thread
         threading.Thread(target=self.execute_exploits,
-                         args=(selected_exploits, target, target_session, payload_type, duration), daemon=True).start()
+                         args=(selected_exploits, target, target_session, payload_type, duration),
+                         daemon=True).start()
 
     def execute_exploits(self, exploits, target, target_session, payload_type, duration):
         for ex in exploits:
+            if self.stop_event.is_set():
+                self.log_exploit("Exploit operation interrupted by user.")
+                break
             self.log_exploit(f"Running exploit: {ex}")
             vuln = self.vulnerability_db.get(ex, {})
 
@@ -257,8 +330,12 @@ class WirelessPenTestGUI(tk.Tk):
                 vuln['payload_type'] = payload_type
                 vuln['duration'] = duration
 
-            self.core.run_exploit(ex, vuln)
-            self.log_exploit(f"Exploit '{ex}' completed.\n")
+            try:
+                # Pass the stop_event to the exploit's scan method
+                self.core.run_exploit(ex, vuln, self.stop_event)
+                self.log_exploit(f"Exploit '{ex}' completed.\n")
+            except Exception as e:
+                self.log_exploit(f"Error running exploit '{ex}': {e}\n")
 
     def log_exploit(self, message):
         self.exploit_log.config(state='normal')
@@ -266,7 +343,7 @@ class WirelessPenTestGUI(tk.Tk):
         self.exploit_log.see(tk.END)
         self.exploit_log.config(state='disabled')
 
-    def create_report_tab(self):
+    def create_report_tab(self, parent):
         report_frame = ttk.Frame(self.notebook)
         self.notebook.add(report_frame, text='Reports')
 
@@ -295,9 +372,12 @@ class WirelessPenTestGUI(tk.Tk):
             if selected_format == 'txt':
                 file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
                 if file_path:
-                    with open(file_path, 'w') as f:
-                        f.write(self.report_text.get(1.0, tk.END))
-                    messagebox.showinfo("Export Successful", f"Report exported to {file_path}")
+                    try:
+                        with open(file_path, 'w') as f:
+                            f.write(self.report_text.get(1.0, tk.END))
+                        messagebox.showinfo("Export Successful", f"Report exported to {file_path}")
+                    except Exception as e:
+                        messagebox.showerror("Export Error", f"Failed to export report: {e}")
             elif selected_format == 'json':
                 file_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
                 if file_path:
@@ -308,27 +388,30 @@ class WirelessPenTestGUI(tk.Tk):
                     }
 
                     for sc_name, scanner in self.core.scanners.items():
-                        if hasattr(scanner, 'detected_vulnerabilities'):
+                        if hasattr(scanner, 'detected_vulnerabilities') and scanner.detected_vulnerabilities:
                             report_data['scans'].append({
                                 'scanner': sc_name,
                                 'vulnerabilities': scanner.detected_vulnerabilities
                             })
 
                     for ex_name, exploit in self.core.exploits.items():
-                        if hasattr(exploit, 'detected_vulnerabilities'):
+                        if hasattr(exploit, 'detected_vulnerabilities') and exploit.detected_vulnerabilities:
                             report_data['exploits'].append({
                                 'exploit': ex_name,
                                 'vulnerabilities': exploit.detected_vulnerabilities
                             })
 
-                    with open(file_path, 'w') as f:
-                        json.dump(report_data, f, indent=4)
-                    messagebox.showinfo("Export Successful", f"Report exported to {file_path}")
+                    try:
+                        with open(file_path, 'w') as f:
+                            json.dump(report_data, f, indent=4)
+                        messagebox.showinfo("Export Successful", f"Report exported to {file_path}")
+                    except Exception as e:
+                        messagebox.showerror("Export Error", f"Failed to export report: {e}")
             format_window.destroy()
 
         ttk.Button(format_window, text="Export", command=confirm_export).pack(pady=10)
 
-    def create_settings_tab(self):
+    def create_settings_tab(self, parent):
         settings_frame = ttk.Frame(self.notebook)
         self.notebook.add(settings_frame, text='Settings')
 
@@ -347,21 +430,27 @@ class WirelessPenTestGUI(tk.Tk):
         refresh_button.pack(pady=5)
 
     def load_configuration(self):
-        config_path = os.path.join(project_root, 'config.json')
+        config_path = os.path.join(project_root, 'vulnerabilities', 'vulnerabilities.json')
         if os.path.exists(config_path):
-            with open(config_path, 'r') as f:
-                config = json.load(f)
-            self.config_text.config(state='normal')
-            self.config_text.delete(1.0, tk.END)
-            for key, value in config.items():
-                self.config_text.insert(tk.END, f"{key}: {value}\n")
-            self.config_text.config(state='disabled')
+            try:
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                self.config_text.config(state='normal')
+                self.config_text.delete(1.0, tk.END)
+                for key, value in config.items():
+                    self.config_text.insert(tk.END, f"{key}: {value}\n")
+                self.config_text.config(state='disabled')
+            except Exception as e:
+                messagebox.showerror("Configuration Error", f"Failed to load configuration: {e}")
+                self.config_text.config(state='normal')
+                self.config_text.delete(1.0, tk.END)
+                self.config_text.insert(tk.END, "Error loading configuration.")
+                self.config_text.config(state='disabled')
         else:
             self.config_text.config(state='normal')
             self.config_text.delete(1.0, tk.END)
             self.config_text.insert(tk.END, "No configuration found.")
             self.config_text.config(state='disabled')
-
 
 if __name__ == '__main__':
     app = WirelessPenTestGUI()

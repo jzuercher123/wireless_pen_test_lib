@@ -1,0 +1,26 @@
+exploits:
+  credential_extraction: {}
+  payload_delivery:
+    default_duration: 30
+    payload_types:
+    - type1
+    - type2
+  session_hijacking:
+    max_packets: 100
+general:
+  interface: wlan0mon
+  log_level: INFO
+  report_directory: reports
+scanners:
+  auth_bypass_scanner:
+    scan_duration: 15
+  dos_scanner:
+    scan_duration: 5
+  encryption_scanner:
+    scan_duration: 10
+  local_scanner:
+    interface: wlan0mon
+    scan_duration: 8
+    vendor_lookup: true
+ui:
+  theme: dark

@@ -1,30 +1,32 @@
-from abc import ABC, abstractmethod
+# scanners/base_scanner.py
+
 import logging
 
-class BaseScanner(ABC):
-    def __init__(self, core_framework, vulnerability_db):
+class BaseScanner:
+    def __init__(self, core_framework, scan_duration: int = 10):
         """
-        Initializes the BaseScanner.
+        Initialize the BaseScanner with core framework and scan duration.
 
-        :param core_framework: Instance of CoreFramework for accessing packet handling and event dispatching.
-        :param vulnerability_db: Dictionary containing known vulnerabilities.
+        Args:
+            core_framework (CoreFramework): Instance of CoreFramework.
+            scan_duration (int): Duration to run the scan in seconds.
         """
-        self.core = core_framework
-        self.vulnerability_db = vulnerability_db
+        self.core_framework = core_framework
+        self.scan_duration = scan_duration
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.info(f"{self.__class__.__name__} initialized with scan duration: {self.scan_duration} seconds.")
 
-    @abstractmethod
-    def scan(self, target):
+    def scan(self, target_info: dict) -> dict:
         """
-        Executes the vulnerability scan on the specified target.
+        Perform the scan on the target.
 
-        :param target: The target wireless network or device identifier.
-        """
-        pass
+        Args:
+            target_info (dict): Information about the target.
 
-    @abstractmethod
-    def report(self):
+        Returns:
+            dict: Detected vulnerabilities.
         """
-        Generates a report of the scan results.
-        """
-        pass
+        self.logger.info(f"Scanning target: {target_info}")
+        # Placeholder for scan logic
+        vulnerabilities = {}
+        return vulnerabilities

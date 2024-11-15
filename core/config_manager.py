@@ -1,41 +1,43 @@
 import os
 import yaml
-from pydantic import BaseModel, Field, ValidationError
-from typing import List, Optional, Dict
 import logging
-from dotenv import load_dotenv
+from pydantic import BaseModel, Field, ValidationError
 
-
-# Define Pydantic models for configuration sections
-
+# Define configuration models
 class GeneralConfig(BaseModel):
-    interface: str = Field(default="wlan0mon", description="Wireless interface in monitor mode.")
-    log_level: str = Field(default="INFO", description="Logging level.")
-    report_directory: str = Field(default="reports", description="Directory to store reports.")
+    interface: str
+    report_directory: str
+    log_level: str = 'INFO'  # Added missing field with default value
 
 class EncryptionScannerConfig(BaseModel):
-    scan_duration: int = Field(default=15, description="Duration to run the encryption scan (seconds).")
+    scan_duration: int
 
 class AuthBypassScannerConfig(BaseModel):
-    scan_duration: int = Field(default=10, description="Duration to run the authentication bypass scan (seconds).")
+    scan_duration: int
 
-class DoSScannerConfig(BaseModel):
-    scan_duration: int = Field(default=10, description="Duration to run the DoS scan (seconds).")
+class DosScannerConfig(BaseModel):
+    scan_duration: int
+
+class LocalScannerConfig(BaseModel):
+    scan_duration: int
+    interface: str
+    vendor_lookup: bool
 
 class ScannersConfig(BaseModel):
     encryption_scanner: EncryptionScannerConfig
     auth_bypass_scanner: AuthBypassScannerConfig
-    dos_scanner: DoSScannerConfig
+    dos_scanner: DosScannerConfig
+    local_scanner: LocalScannerConfig
 
 class SessionHijackingConfig(BaseModel):
-    max_packets: int = Field(default=100, description="Maximum number of packets to send during ARP spoofing.")
+    max_packets: int
 
 class CredentialExtractionConfig(BaseModel):
-    capture_duration: int = Field(default=20, description="Duration to capture handshakes (seconds).")
+    pass  # No required fields
 
 class PayloadDeliveryConfig(BaseModel):
-    payload_types: List[str] = Field(default_factory=lambda: ["reverse_shell", "malicious_script"], description="Supported payload types.")
-    default_duration: int = Field(default=10, description="Default duration to run payload delivery (seconds).")
+    payload_types: list
+    default_duration: int
 
 class ExploitsConfig(BaseModel):
     session_hijacking: SessionHijackingConfig
@@ -43,122 +45,90 @@ class ExploitsConfig(BaseModel):
     payload_delivery: PayloadDeliveryConfig
 
 class UIConfig(BaseModel):
-    theme: str = Field(default="default", description="Theme for GUI.")
+    theme: str = 'light'  # Default theme
 
-class Config(BaseModel):
-    general: GeneralConfig
+class ConfigModel(BaseModel):
+    general: GeneralConfig = Field(default_factory=GeneralConfig)
     scanners: ScannersConfig
     exploits: ExploitsConfig
-    ui: UIConfig
-
+    ui: UIConfig = Field(default_factory=UIConfig)
 
 class ConfigManager:
-    def __init__(self, config_dir: str = "config"):
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.config_dir = config_dir
-        self.default_config_path = os.path.join(self.config_dir, "config_defaults.yaml")
-        self.user_config_path = os.path.join(self.config_dir, "config.yaml")
-
-        # Load environment variables from .env file if it exists
-        dotenv_path = os.path.join(os.getcwd(), '.env')
-        if os.path.exists(dotenv_path):
-            load_dotenv(dotenv_path)
-            self.logger.debug("Loaded environment variables from .env file.")
-
-        self.config: Optional[Config] = None
+    def __init__(self, config_dir: str = None):
+        self.project_root = os.path.abspath(os.path.dirname(__file__))
+        self.config_dir = config_dir or os.path.join(self.project_root, 'config')
+        self.default_config_path = os.path.join(self.config_dir, 'default_config.yaml')
+        self.user_config_path = os.path.join(self.config_dir, 'config.yaml')
+        self.config = None
+        self.logger = logging.getLogger(__name__)
         self.load_config()
 
-    # ... rest of the ConfigManager class remains unchanged ...
-
-    def load_yaml(self, path: str) -> Dict:
-        if not os.path.exists(path):
-            self.logger.warning(f"Configuration file {path} does not exist.")
-            return {}
-        with open(path, 'r') as f:
-            try:
-                data = yaml.safe_load(f) or {}
-                self.logger.debug(f"Loaded configuration from {path}")
-                return data
-            except yaml.YAMLError as e:
-                self.logger.error(f"Error parsing YAML file {path}: {e}")
-                return {}
-
-    def merge_configs(self, default: Dict, override: Dict) -> Dict:
-        """
-        Recursively merge two dictionaries.
-        """
-        for key, value in override.items():
-            if key in default and isinstance(default[key], dict) and isinstance(value, dict):
-                default[key] = self.merge_configs(default[key], value)
-            else:
-                default[key] = value
-        return default
+    def create_default_config(self):
+        # Create default config if it doesn't exist
+        if not os.path.exists(self.default_config_path):
+            default_config = {
+                'general': {
+                    'interface': 'wlan0mon',
+                    'report_directory': 'reports',
+                    'log_level': 'INFO',
+                },
+                'scanners': {
+                    'encryption_scanner': {'scan_duration': 10},
+                    'auth_bypass_scanner': {'scan_duration': 15},
+                    'dos_scanner': {'scan_duration': 5},
+                    'local_scanner': {
+                        'scan_duration': 8,
+                        'interface': 'wlan0mon',
+                        'vendor_lookup': True
+                    },
+                },
+                'exploits': {
+                    'session_hijacking': {'max_packets': 100},
+                    'credential_extraction': {},
+                    'payload_delivery': {
+                        'payload_types': ['type1', 'type2'],
+                        'default_duration': 30
+                    },
+                },
+                'ui': {
+                    'theme': 'dark'
+                }
+            }
+            os.makedirs(self.config_dir, exist_ok=True)
+            with open(self.default_config_path, 'w') as f:
+                yaml.dump(default_config, f)
 
     def load_config(self):
-        """
-        Load and validate configuration from YAML files and environment variables.
-        """
-        # Load default and user configurations
-        default_config = self.load_yaml(self.default_config_path)
-        user_config = self.load_yaml(self.user_config_path)
-        merged_config = self.merge_configs(default_config, user_config)
-
-        # Override with environment variables if set
-        merged_config = self.override_with_env(merged_config)
-
-        # Validate the merged configuration
         try:
-            self.config = Config(**merged_config)
-            self.logger.info("Configuration loaded and validated successfully.")
-        except ValidationError as e:
-            self.logger.error(f"Configuration validation error: {e}")
+            self.create_default_config()
+            with open(self.default_config_path, 'r') as f:
+                default_config = yaml.safe_load(f)
+            self.logger.debug("Loaded default configuration.")
+
+            if os.path.exists(self.user_config_path):
+                with open(self.user_config_path, 'r') as f:
+                    user_config = yaml.safe_load(f)
+                self.logger.debug("Loaded user configuration.")
+            else:
+                user_config = {}
+                self.logger.info("User configuration file not found. Using defaults.")
+
+            # Merge configurations: user_config overrides default_config
+            merged_config = self.merge_configs(default_config, user_config)
+
+            self.config = ConfigModel(**merged_config)
+        except (yaml.YAMLError, ValidationError) as e:
+            self.logger.error(f"Error loading configuration: {e}")
             raise e
 
-    def override_with_env(self, config: Dict) -> Dict:
-        """
-        Override configuration with environment variables if they exist.
-        The environment variables should be in uppercase and use underscores to separate sections.
-        Example: GENERAL_INTERFACE, SCANNERS_ENCRYPTION_SCANNER_SCAN_DURATION
-        """
-        for section in config:
-            for key in config[section]:
-                env_var = f"{section.upper()}_{key.upper()}"
-                if isinstance(config[section][key], dict):
-                    for sub_key in config[section][key]:
-                        sub_env_var = f"{env_var}_{sub_key.upper()}"
-                        if sub_env_var in os.environ:
-                            config[section][key][sub_key] = self.parse_env_value(os.environ[sub_env_var])
-                else:
-                    if env_var in os.environ:
-                        config[section][key] = self.parse_env_value(os.environ[env_var])
-        return config
+    def merge_configs(self, default, override):
+        merged = default.copy()
+        for key, value in override.items():
+            if key in merged and isinstance(merged[key], dict):
+                merged[key] = self.merge_configs(merged[key], value)
+            else:
+                merged[key] = value
+        return merged
 
-    def parse_env_value(self, value: str):
-        """
-        Parse environment variable string to appropriate type.
-        """
-        # Attempt to parse integers
-        if value.isdigit():
-            return int(value)
-        # Attempt to parse booleans
-        if value.lower() in ['true', 'false']:
-            return value.lower() == 'true'
-        # Return as string
-        return value
-
-    def get_config(self) -> Config:
-        if not self.config:
-            self.logger.error("Configuration not loaded.")
-            raise Exception("Configuration not loaded.")
+    def get_config(self):
         return self.config
-
-    def update_user_config(self, updates: Dict):
-        """
-        Update the user configuration file with the provided updates.
-        """
-        user_config = self.load_yaml(self.user_config_path)
-        merged_config = self.merge_configs(user_config, updates)
-        with open(self.user_config_path, 'w') as f:
-            yaml.dump(merged_config, f)
-        self.logger.info(f"User configuration updated: {updates}")
-        self.load_config()

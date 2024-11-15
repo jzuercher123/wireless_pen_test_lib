@@ -1,0 +1,67 @@
+[2024-11-13 23:36:50,562] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-13 23:36:55,582] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-13 23:37:32,783] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-13 23:37:32,847] WARNING - CoreFramework - Vulnerability file not found at /mnt/c/Users/13096/wireless_pen_test_lib/vulnerabilities/vulnerabilities.json. Initializing empty vulnerability database.
+[2024-11-13 23:37:32,848] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/config/protocols...
+[2024-11-13 23:37:32,850] ERROR - CoreFramework - Protocols directory not found at /mnt/c/Users/13096/wireless_pen_test_lib/config/protocols.
+[2024-11-13 23:37:41,954] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-13 23:37:41,984] WARNING - CoreFramework - Vulnerability file not found at /mnt/c/Users/13096/wireless_pen_test_lib/vulnerabilities/vulnerabilities.json. Initializing empty vulnerability database.
+[2024-11-13 23:37:41,986] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/config/protocols...
+[2024-11-13 23:37:41,997] ERROR - CoreFramework - Protocols directory not found at /mnt/c/Users/13096/wireless_pen_test_lib/config/protocols.
+[2024-11-13 23:40:20,716] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-13 23:40:20,824] WARNING - CoreFramework - Vulnerability file not found at /mnt/c/Users/13096/wireless_pen_test_lib/vulnerabilities/vulnerabilities.json. Initializing empty vulnerability database.
+[2024-11-13 23:40:20,825] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/protocols...
+[2024-11-13 23:40:20,848] DEBUG - CoreFramework - Loading module 'base_protocol' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/base_protocol.py'.
+[2024-11-13 23:40:20,907] DEBUG - CoreFramework - Loading module 'bluetooth' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/bluetooth.py'.
+[2024-11-13 23:40:21,941] ERROR - CoreFramework - Failed to load module 'bluetooth': attempted relative import with no known parent package
+[2024-11-13 23:40:21,942] DEBUG - CoreFramework - Loading module 'wifi' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/wifi.py'.
+[2024-11-13 23:40:22,068] ERROR - CoreFramework - Failed to load module 'wifi': attempted relative import with no known parent package
+[2024-11-13 23:40:22,069] DEBUG - CoreFramework - Loading module '__init__' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/__init__.py'.
+[2024-11-13 23:40:22,203] ERROR - CoreFramework - Failed to load module '__init__': attempted relative import with no known parent package
+[2024-11-13 23:40:22,204] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-13 23:40:22,225] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-13 23:40:22,374] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/protocols...
+[2024-11-13 23:40:22,588] DEBUG - CoreFramework - Loading module 'base_protocol' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/base_protocol.py'.
+[2024-11-13 23:40:22,611] DEBUG - CoreFramework - Loading module 'bluetooth' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/bluetooth.py'.
+[2024-11-13 23:40:22,623] ERROR - CoreFramework - Failed to load module 'bluetooth': attempted relative import with no known parent package
+[2024-11-13 23:40:22,624] DEBUG - CoreFramework - Loading module 'wifi' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/wifi.py'.
+[2024-11-13 23:40:22,682] ERROR - CoreFramework - Failed to load module 'wifi': attempted relative import with no known parent package
+[2024-11-13 23:40:22,683] DEBUG - CoreFramework - Loading module '__init__' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/__init__.py'.
+[2024-11-13 23:40:22,737] ERROR - CoreFramework - Failed to load module '__init__': attempted relative import with no known parent package
+[2024-11-13 23:40:22,738] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-13 23:40:22,739] INFO - CoreFramework - CLI initialized successfully.
+[2024-11-13 23:40:30,912] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-13 23:40:30,945] WARNING - CoreFramework - Vulnerability file not found at /mnt/c/Users/13096/wireless_pen_test_lib/vulnerabilities/vulnerabilities.json. Initializing empty vulnerability database.
+[2024-11-13 23:40:30,946] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/protocols...
+[2024-11-13 23:40:30,954] DEBUG - CoreFramework - Loading module 'base_protocol' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/base_protocol.py'.
+[2024-11-13 23:40:30,963] DEBUG - CoreFramework - Loading module 'bluetooth' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/bluetooth.py'.
+[2024-11-13 23:40:31,462] ERROR - CoreFramework - Failed to load module 'bluetooth': attempted relative import with no known parent package
+[2024-11-13 23:40:31,474] DEBUG - CoreFramework - Loading module 'wifi' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/wifi.py'.
+[2024-11-13 23:40:31,525] ERROR - CoreFramework - Failed to load module 'wifi': attempted relative import with no known parent package
+[2024-11-13 23:40:31,526] DEBUG - CoreFramework - Loading module '__init__' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/__init__.py'.
+[2024-11-13 23:40:31,533] ERROR - CoreFramework - Failed to load module '__init__': attempted relative import with no known parent package
+[2024-11-13 23:40:31,534] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-13 23:40:31,535] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-13 23:40:31,536] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/protocols...
+[2024-11-13 23:40:31,592] DEBUG - CoreFramework - Loading module 'base_protocol' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/base_protocol.py'.
+[2024-11-13 23:40:31,603] DEBUG - CoreFramework - Loading module 'bluetooth' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/bluetooth.py'.
+[2024-11-13 23:40:31,611] ERROR - CoreFramework - Failed to load module 'bluetooth': attempted relative import with no known parent package
+[2024-11-13 23:40:31,612] DEBUG - CoreFramework - Loading module 'wifi' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/wifi.py'.
+[2024-11-13 23:40:31,623] ERROR - CoreFramework - Failed to load module 'wifi': attempted relative import with no known parent package
+[2024-11-13 23:40:31,623] DEBUG - CoreFramework - Loading module '__init__' from '/mnt/c/Users/13096/wireless_pen_test_lib/protocols/__init__.py'.
+[2024-11-13 23:40:31,676] ERROR - CoreFramework - Failed to load module '__init__': attempted relative import with no known parent package
+[2024-11-13 23:40:31,676] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-13 23:40:31,677] INFO - CoreFramework - CLI initialized successfully.
+[2024-11-14 19:05:32,092] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-14 19:05:32,131] WARNING - CoreFramework - Error loading vulnerability database: [Errno 2] No such file or directory: '/mnt/c/Users/13096/wireless_pen_test_lib/vulnerabilities/vulnerabilities.json'. Initializing empty vulnerability database.
+Traceback (most recent call last):
+  File "/mnt/c/Users/13096/wireless_pen_test_lib/core/__init__.py", line 71, in __init__
+    with open(path_to_vulnerabilities, 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/c/Users/13096/wireless_pen_test_lib/vulnerabilities/vulnerabilities.json'
+[2024-11-14 19:05:32,147] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/core/config...
+[2024-11-14 19:05:32,168] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-14 19:05:32,181] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-14 19:05:32,183] INFO - CoreFramework - Loading protocol modules from /mnt/c/Users/13096/wireless_pen_test_lib/core/config...
+[2024-11-14 19:05:32,195] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-14 19:05:32,196] INFO - CoreFramework - CLI initialized successfully with project root: /mnt/c/Users/13096/wireless_pen_test_lib and protocols path: /mnt/c/Users/13096/wireless_pen_test_lib/core/config/protocols

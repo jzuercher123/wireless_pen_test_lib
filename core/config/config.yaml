@@ -1,0 +1,34 @@
+---
+general:
+  interface: wlan0mon
+  log_level: INFO
+  report_directory: reports
+  additional_option: some_value  # Optional field
+
+scanners:
+  encryption_scanner:
+    scan_duration: 15
+
+  auth_bypass_scanner:
+    scan_duration: 10
+
+  dos_scanner:
+    scan_duration: 10
+
+  local_scanner:
+    scan_duration: 10
+    interface: eth0              # Required field
+    vendor_lookup: true          # Required field
+
+exploits:
+  session_hijacking:
+    max_packets: 100
+
+  payload_delivery:
+    payload_types:
+      - reverse_shell
+      - malicious_script
+    default_duration: 10
+
+ui:
+  theme: default

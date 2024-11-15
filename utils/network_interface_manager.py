@@ -11,9 +11,34 @@ class NetworkInterfaceManager:
         Args:
             interface (str): Name of the wireless interface.
         """
+        if not self.is_valid_interface(interface):
+            raise ValueError(f"Invalid network interface: {interface}")
         self.interface = interface
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info(f"NetworkInterfaceManager initialized for interface: {self.interface}")
+
+    def is_valid_interface(self, interface: str) -> bool:
+        available_interfaces = self.get_available_interfaces()
+        return interface in available_interfaces
+
+    def get_available_interfaces(self) -> list:
+        # This should be replaced with actual system call to list interfaces
+        return ['wlan0mon', 'eth0', 'lo']
+
+    def get_interface_mac(self) -> str:
+        """
+        Retrieves the MAC address of the wireless interface.
+
+        Returns:
+            str: MAC address of the interface.
+        """
+        try:
+            result = subprocess.check_output(["ifconfig", self.interface], stderr=subprocess.STDOUT).decode()
+            mac_address = result.split("ether ")[1].split(" ")[0]
+            return mac_address
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"Failed to get MAC address: {e.output.decode()}")
+            return "00:00:00:00:00:00"
 
     def set_monitor_mode(self):
         """

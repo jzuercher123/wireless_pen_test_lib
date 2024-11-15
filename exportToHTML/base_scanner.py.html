@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>base_scanner.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #fede5d; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #b6b1b1;}
+.s3 { color: #03edf9;}
+.s4 { color: #fede5d;}
+.s5 { color: #848bbd; font-style: italic;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+base_scanner.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">from </span><span class="s1">abc </span><span class="s0">import </span><span class="s1">ABC</span><span class="s2">, </span><span class="s1">abstractmethod</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0">import </span><span class="s1">logging</span>
+<a name="l3"><span class="ln">3    </span></a>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">class </span><span class="s1">BaseScanner</span><span class="s3">(</span><span class="s1">ABC</span><span class="s3">)</span><span class="s4">:</span>
+<a name="l5"><span class="ln">5    </span></a>    <span class="s0">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s2">, </span><span class="s1">core_framework</span><span class="s2">, </span><span class="s1">vulnerability_db</span><span class="s3">)</span><span class="s4">:</span>
+<a name="l6"><span class="ln">6    </span></a>        <span class="s5">&quot;&quot;&quot; 
+<a name="l7"><span class="ln">7    </span></a>        Initializes the BaseScanner. 
+<a name="l8"><span class="ln">8    </span></a> 
+<a name="l9"><span class="ln">9    </span></a>        :param core_framework: Instance of CoreFramework for accessing packet handling and event dispatching. 
+<a name="l10"><span class="ln">10   </span></a>        :param vulnerability_db: Dictionary containing known vulnerabilities. 
+<a name="l11"><span class="ln">11   </span></a>        &quot;&quot;&quot;</span>
+<a name="l12"><span class="ln">12   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core </span><span class="s4">= </span><span class="s1">core_framework</span>
+<a name="l13"><span class="ln">13   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">vulnerability_db </span><span class="s4">= </span><span class="s1">vulnerability_db</span>
+<a name="l14"><span class="ln">14   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger </span><span class="s4">= </span><span class="s1">logging</span><span class="s2">.</span><span class="s1">getLogger</span><span class="s3">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">__class__</span><span class="s2">.</span><span class="s1">__name__</span><span class="s3">)</span>
+<a name="l15"><span class="ln">15   </span></a>
+<a name="l16"><span class="ln">16   </span></a>    <span class="s4">@</span><span class="s1">abstractmethod</span>
+<a name="l17"><span class="ln">17   </span></a>    <span class="s0">def </span><span class="s1">scan</span><span class="s3">(</span><span class="s1">self</span><span class="s2">, </span><span class="s1">target</span><span class="s3">)</span><span class="s4">:</span>
+<a name="l18"><span class="ln">18   </span></a>        <span class="s5">&quot;&quot;&quot; 
+<a name="l19"><span class="ln">19   </span></a>        Executes the vulnerability scan on the specified target. 
+<a name="l20"><span class="ln">20   </span></a> 
+<a name="l21"><span class="ln">21   </span></a>        :param target: The target wireless network or device identifier. 
+<a name="l22"><span class="ln">22   </span></a>        &quot;&quot;&quot;</span>
+<a name="l23"><span class="ln">23   </span></a>        <span class="s0">pass</span>
+<a name="l24"><span class="ln">24   </span></a>
+<a name="l25"><span class="ln">25   </span></a>    <span class="s4">@</span><span class="s1">abstractmethod</span>
+<a name="l26"><span class="ln">26   </span></a>    <span class="s0">def </span><span class="s1">report</span><span class="s3">(</span><span class="s1">self</span><span class="s3">)</span><span class="s4">:</span>
+<a name="l27"><span class="ln">27   </span></a>        <span class="s5">&quot;&quot;&quot; 
+<a name="l28"><span class="ln">28   </span></a>        Generates a report of the scan results. 
+<a name="l29"><span class="ln">29   </span></a>        &quot;&quot;&quot;</span>
+<a name="l30"><span class="ln">30   </span></a>        <span class="s0">pass</span>
+<a name="l31"><span class="ln">31   </span></a></pre>
+</body>
+</html>

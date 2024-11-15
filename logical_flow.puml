@@ -1,0 +1,85 @@
+@startuml
+
+title Wireless Penetration Testing Library - Logical Flow
+
+actor User
+
+package "Main Entry Point" {
+    [main.py] as MainPy
+}
+
+package "CLI Interface" {
+    [CLI (ui/cli.py)] as CLI
+}
+
+package "Core Framework" {
+    [CoreFramework (core/__init__.py)] as Core
+}
+
+package "Configuration Management" {
+    [ConfigManager (core/config_manager.py)] as ConfigManager
+}
+
+package "Utilities" {
+    [NetworkInterfaceManager (utils/network_interface_manager.py)] as NetworkManager
+    [DataStorageManager (utils/data_storage_manager.py)] as DataStorage
+    [AuthenticationTools (utils/authentication_tools.py)] as AuthTools
+}
+
+package "Scanners" {
+    [EncryptionWeaknessScanner (scanners/encryption_scanner.py)] as EncryptionScanner
+    [AuthBypassScanner] as AuthBypassScanner
+    [DosScanner] as DosScanner
+}
+
+package "Exploits" {
+    [SessionHijacking (exploits/session_hijacking.py)] as SessionHijacking
+    [CredentialExtraction] as CredentialExtraction
+    [PayloadDelivery] as PayloadDelivery
+}
+
+database "Vulnerability Database" as VulnerabilityDB
+
+package "Reporting" {
+    [Reports Generation] as Reports
+}
+
+User --> MainPy : Runs with commands
+MainPy --> Core : Initializes CoreFramework
+MainPy --> Core : Loads Protocol Modules
+MainPy --> CLI : Invokes CLI with CoreFramework
+
+CLI --> Core : Executes Commands
+CLI --> Core : scan, exploit, configure, report, list, finalize
+
+Core --> ConfigManager : Manages Configurations
+Core --> NetworkManager : Manages Network Interfaces
+Core --> DataStorage : Handles Data Storage
+Core --> AuthTools : Handles Authentication Tasks
+Core --> EncryptionScanner : Initializes Scanners
+Core --> AuthBypassScanner : Initializes Scanners
+Core --> DosScanner : Initializes Scanners
+Core --> SessionHijacking : Initializes Exploits
+Core --> CredentialExtraction : Initializes Exploits
+Core --> PayloadDelivery : Initializes Exploits
+Core --> VulnerabilityDB : Stores Vulnerabilities
+Core --> Reports : Generates Reports
+
+CLI --> EncryptionScanner : scan command
+EncryptionScanner --> VulnerabilityDB : Updates with vulnerabilities
+
+CLI --> SessionHijacking : exploit command
+SessionHijacking --> VulnerabilityDB : Updates with exploit outcomes
+
+CLI --> ConfigManager : configure command
+CLI --> DataStorage : report & finalize commands
+
+Reports --> VulnerabilityDB : Uses vulnerability data
+
+CLI --> AuthBypassScanner : (Example scanner command)
+CLI --> DosScanner : (Example scanner command)
+
+CLI --> CredentialExtraction : (Example exploit command)
+CLI --> PayloadDelivery : (Example exploit command)
+
+@enduml

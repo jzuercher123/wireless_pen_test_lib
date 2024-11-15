@@ -1,0 +1,48 @@
+# test_network/docker-compose.yml
+
+version: '3.8'
+
+services:
+  host1:
+    build:
+      context: ./Dockerfile
+    container_name: host1
+    networks:
+      test_net:
+        ipv4_address: 172.20.0.2
+        ipv6_address: fd00:dead:beef::2
+    environment:
+      - HOST_NAME=host1
+      - SSID=TestNetwork
+      - BSSID=AA:BB:CC:DD:EE:01
+      - PASSWORD=Password123
+      - ENCRYPTION=WPA2
+      - MAC_ADDRESS=AA:BB:CC:DD:EE:01
+
+  host2:
+    build:
+      context: ./Dockerfile
+    container_name: host2
+    networks:
+      test_net:
+        ipv4_address: 172.20.0.3
+        ipv6_address: fd00:dead:beef::3
+    environment:
+      - HOST_NAME=host2
+      - SSID=TestNetwork
+      - BSSID=AA:BB:CC:DD:EE:01
+      - PASSWORD=Password123
+      - ENCRYPTION=WPA2
+      - MAC_ADDRESS=AA:BB:CC:DD:EE:02
+
+  # Add more hosts as needed
+
+networks:
+  test_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+        - subnet: fd00:dead:beef::/64
+          gateway: fd00:dead:beef::1

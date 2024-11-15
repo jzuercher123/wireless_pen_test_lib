@@ -50,7 +50,7 @@ class TestReportGenerator(unittest.TestCase):
             }
         }
 
-        with open(os.path.join(self.test_config_dir, "config_defaults.yaml"), 'w') as f:
+        with open(os.path.join(self.test_config_dir, "config.yaml"), 'w') as f:
             import yaml
             yaml.dump(default_config, f)
 

@@ -1,0 +1,587 @@
+<html>
+<head>
+<title>decorators.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #fede5d; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #b6b1b1;}
+.s3 { color: #fede5d;}
+.s4 { color: #03edf9;}
+.s5 { color: #ff8b39;}
+.s6 { color: #36f9f6;}
+.s7 { color: #848bbd; font-style: italic;}
+.s8 { color: #f97e72;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+decorators.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">import </span><span class="s1">inspect</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0">import </span><span class="s1">types</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">import </span><span class="s1">typing </span><span class="s0">as </span><span class="s1">t</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">from </span><span class="s1">functools </span><span class="s0">import </span><span class="s1">update_wrapper</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">from </span><span class="s1">gettext </span><span class="s0">import </span><span class="s1">gettext </span><span class="s0">as </span><span class="s1">_</span>
+<a name="l6"><span class="ln">6    </span></a>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">core </span><span class="s0">import </span><span class="s1">Argument</span>
+<a name="l8"><span class="ln">8    </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">core </span><span class="s0">import </span><span class="s1">Command</span>
+<a name="l9"><span class="ln">9    </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">core </span><span class="s0">import </span><span class="s1">Context</span>
+<a name="l10"><span class="ln">10   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">core </span><span class="s0">import </span><span class="s1">Group</span>
+<a name="l11"><span class="ln">11   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">core </span><span class="s0">import </span><span class="s1">Option</span>
+<a name="l12"><span class="ln">12   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">core </span><span class="s0">import </span><span class="s1">Parameter</span>
+<a name="l13"><span class="ln">13   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">globals </span><span class="s0">import </span><span class="s1">get_current_context</span>
+<a name="l14"><span class="ln">14   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">utils </span><span class="s0">import </span><span class="s1">echo</span>
+<a name="l15"><span class="ln">15   </span></a>
+<a name="l16"><span class="ln">16   </span></a><span class="s0">if </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TYPE_CHECKING</span><span class="s3">:</span>
+<a name="l17"><span class="ln">17   </span></a>    <span class="s0">import </span><span class="s1">typing_extensions </span><span class="s0">as </span><span class="s1">te</span>
+<a name="l18"><span class="ln">18   </span></a>
+<a name="l19"><span class="ln">19   </span></a>    <span class="s1">P </span><span class="s3">= </span><span class="s1">te</span><span class="s2">.</span><span class="s1">ParamSpec</span><span class="s4">(</span><span class="s5">&quot;P&quot;</span><span class="s4">)</span>
+<a name="l20"><span class="ln">20   </span></a>
+<a name="l21"><span class="ln">21   </span></a><span class="s1">R </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TypeVar</span><span class="s4">(</span><span class="s5">&quot;R&quot;</span><span class="s4">)</span>
+<a name="l22"><span class="ln">22   </span></a><span class="s1">T </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TypeVar</span><span class="s4">(</span><span class="s5">&quot;T&quot;</span><span class="s4">)</span>
+<a name="l23"><span class="ln">23   </span></a><span class="s1">_AnyCallable </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[</span><span class="s2">..., </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s6">]</span>
+<a name="l24"><span class="ln">24   </span></a><span class="s1">FC </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TypeVar</span><span class="s4">(</span><span class="s5">&quot;FC&quot;</span><span class="s2">, </span><span class="s1">bound</span><span class="s3">=</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">_AnyCallable</span><span class="s2">, </span><span class="s1">Command</span><span class="s6">]</span><span class="s4">)</span>
+<a name="l25"><span class="ln">25   </span></a>
+<a name="l26"><span class="ln">26   </span></a>
+<a name="l27"><span class="ln">27   </span></a><span class="s0">def </span><span class="s1">pass_context</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s5">&quot;t.Callable[te.Concatenate[Context, P], R]&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;t.Callable[P, R]&quot;</span><span class="s3">:</span>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s7">&quot;&quot;&quot;Marks a callback as wanting to receive the current context 
+<a name="l29"><span class="ln">29   </span></a>    object as first argument. 
+<a name="l30"><span class="ln">30   </span></a>    &quot;&quot;&quot;</span>
+<a name="l31"><span class="ln">31   </span></a>
+<a name="l32"><span class="ln">32   </span></a>    <span class="s0">def </span><span class="s1">new_func</span><span class="s4">(</span><span class="s3">*</span><span class="s1">args</span><span class="s3">: </span><span class="s5">&quot;P.args&quot;</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s5">&quot;P.kwargs&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;R&quot;</span><span class="s3">:</span>
+<a name="l33"><span class="ln">33   </span></a>        <span class="s0">return </span><span class="s1">f</span><span class="s4">(</span><span class="s1">get_current_context</span><span class="s4">()</span><span class="s2">, </span><span class="s3">*</span><span class="s1">args</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l34"><span class="ln">34   </span></a>
+<a name="l35"><span class="ln">35   </span></a>    <span class="s0">return </span><span class="s1">update_wrapper</span><span class="s4">(</span><span class="s1">new_func</span><span class="s2">, </span><span class="s1">f</span><span class="s4">)</span>
+<a name="l36"><span class="ln">36   </span></a>
+<a name="l37"><span class="ln">37   </span></a>
+<a name="l38"><span class="ln">38   </span></a><span class="s0">def </span><span class="s1">pass_obj</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s5">&quot;t.Callable[te.Concatenate[t.Any, P], R]&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;t.Callable[P, R]&quot;</span><span class="s3">:</span>
+<a name="l39"><span class="ln">39   </span></a>    <span class="s7">&quot;&quot;&quot;Similar to :func:`pass_context`, but only pass the object on the 
+<a name="l40"><span class="ln">40   </span></a>    context onwards (:attr:`Context.obj`).  This is useful if that object 
+<a name="l41"><span class="ln">41   </span></a>    represents the state of a nested system. 
+<a name="l42"><span class="ln">42   </span></a>    &quot;&quot;&quot;</span>
+<a name="l43"><span class="ln">43   </span></a>
+<a name="l44"><span class="ln">44   </span></a>    <span class="s0">def </span><span class="s1">new_func</span><span class="s4">(</span><span class="s3">*</span><span class="s1">args</span><span class="s3">: </span><span class="s5">&quot;P.args&quot;</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s5">&quot;P.kwargs&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;R&quot;</span><span class="s3">:</span>
+<a name="l45"><span class="ln">45   </span></a>        <span class="s0">return </span><span class="s1">f</span><span class="s4">(</span><span class="s1">get_current_context</span><span class="s4">()</span><span class="s2">.</span><span class="s1">obj</span><span class="s2">, </span><span class="s3">*</span><span class="s1">args</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l46"><span class="ln">46   </span></a>
+<a name="l47"><span class="ln">47   </span></a>    <span class="s0">return </span><span class="s1">update_wrapper</span><span class="s4">(</span><span class="s1">new_func</span><span class="s2">, </span><span class="s1">f</span><span class="s4">)</span>
+<a name="l48"><span class="ln">48   </span></a>
+<a name="l49"><span class="ln">49   </span></a>
+<a name="l50"><span class="ln">50   </span></a><span class="s0">def </span><span class="s1">make_pass_decorator</span><span class="s4">(</span>
+<a name="l51"><span class="ln">51   </span></a>    <span class="s1">object_type</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">T</span><span class="s6">]</span><span class="s2">, </span><span class="s1">ensure</span><span class="s3">: </span><span class="s1">bool </span><span class="s3">= </span><span class="s0">False</span>
+<a name="l52"><span class="ln">52   </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s5">&quot;t.Callable[te.Concatenate[T, P], R]&quot;</span><span class="s6">]</span><span class="s2">, </span><span class="s5">&quot;t.Callable[P, R]&quot;</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l53"><span class="ln">53   </span></a>    <span class="s7">&quot;&quot;&quot;Given an object type this creates a decorator that will work 
+<a name="l54"><span class="ln">54   </span></a>    similar to :func:`pass_obj` but instead of passing the object of the 
+<a name="l55"><span class="ln">55   </span></a>    current context, it will find the innermost context of type 
+<a name="l56"><span class="ln">56   </span></a>    :func:`object_type`. 
+<a name="l57"><span class="ln">57   </span></a> 
+<a name="l58"><span class="ln">58   </span></a>    This generates a decorator that works roughly like this:: 
+<a name="l59"><span class="ln">59   </span></a> 
+<a name="l60"><span class="ln">60   </span></a>        from functools import update_wrapper 
+<a name="l61"><span class="ln">61   </span></a> 
+<a name="l62"><span class="ln">62   </span></a>        def decorator(f): 
+<a name="l63"><span class="ln">63   </span></a>            @pass_context 
+<a name="l64"><span class="ln">64   </span></a>            def new_func(ctx, *args, **kwargs): 
+<a name="l65"><span class="ln">65   </span></a>                obj = ctx.find_object(object_type) 
+<a name="l66"><span class="ln">66   </span></a>                return ctx.invoke(f, obj, *args, **kwargs) 
+<a name="l67"><span class="ln">67   </span></a>            return update_wrapper(new_func, f) 
+<a name="l68"><span class="ln">68   </span></a>        return decorator 
+<a name="l69"><span class="ln">69   </span></a> 
+<a name="l70"><span class="ln">70   </span></a>    :param object_type: the type of the object to pass. 
+<a name="l71"><span class="ln">71   </span></a>    :param ensure: if set to `True`, a new object will be created and 
+<a name="l72"><span class="ln">72   </span></a>                   remembered on the context if it's not there yet. 
+<a name="l73"><span class="ln">73   </span></a>    &quot;&quot;&quot;</span>
+<a name="l74"><span class="ln">74   </span></a>
+<a name="l75"><span class="ln">75   </span></a>    <span class="s0">def </span><span class="s1">decorator</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s5">&quot;t.Callable[te.Concatenate[T, P], R]&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;t.Callable[P, R]&quot;</span><span class="s3">:</span>
+<a name="l76"><span class="ln">76   </span></a>        <span class="s0">def </span><span class="s1">new_func</span><span class="s4">(</span><span class="s3">*</span><span class="s1">args</span><span class="s3">: </span><span class="s5">&quot;P.args&quot;</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s5">&quot;P.kwargs&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;R&quot;</span><span class="s3">:</span>
+<a name="l77"><span class="ln">77   </span></a>            <span class="s1">ctx </span><span class="s3">= </span><span class="s1">get_current_context</span><span class="s4">()</span>
+<a name="l78"><span class="ln">78   </span></a>
+<a name="l79"><span class="ln">79   </span></a>            <span class="s1">obj</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">T</span><span class="s6">]</span>
+<a name="l80"><span class="ln">80   </span></a>            <span class="s0">if </span><span class="s1">ensure</span><span class="s3">:</span>
+<a name="l81"><span class="ln">81   </span></a>                <span class="s1">obj </span><span class="s3">= </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">ensure_object</span><span class="s4">(</span><span class="s1">object_type</span><span class="s4">)</span>
+<a name="l82"><span class="ln">82   </span></a>            <span class="s0">else</span><span class="s3">:</span>
+<a name="l83"><span class="ln">83   </span></a>                <span class="s1">obj </span><span class="s3">= </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">find_object</span><span class="s4">(</span><span class="s1">object_type</span><span class="s4">)</span>
+<a name="l84"><span class="ln">84   </span></a>
+<a name="l85"><span class="ln">85   </span></a>            <span class="s0">if </span><span class="s1">obj </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l86"><span class="ln">86   </span></a>                <span class="s0">raise </span><span class="s1">RuntimeError</span><span class="s4">(</span>
+<a name="l87"><span class="ln">87   </span></a>                    <span class="s5">&quot;Managed to invoke callback without a context&quot;</span>
+<a name="l88"><span class="ln">88   </span></a>                    <span class="s5">f&quot; object of type </span><span class="s6">{</span><span class="s1">object_type</span><span class="s2">.</span><span class="s1">__name__</span><span class="s6">!r}</span><span class="s5">&quot;</span>
+<a name="l89"><span class="ln">89   </span></a>                    <span class="s5">&quot; existing.&quot;</span>
+<a name="l90"><span class="ln">90   </span></a>                <span class="s4">)</span>
+<a name="l91"><span class="ln">91   </span></a>
+<a name="l92"><span class="ln">92   </span></a>            <span class="s0">return </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">invoke</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s1">obj</span><span class="s2">, </span><span class="s3">*</span><span class="s1">args</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l93"><span class="ln">93   </span></a>
+<a name="l94"><span class="ln">94   </span></a>        <span class="s0">return </span><span class="s1">update_wrapper</span><span class="s4">(</span><span class="s1">new_func</span><span class="s2">, </span><span class="s1">f</span><span class="s4">)</span>
+<a name="l95"><span class="ln">95   </span></a>
+<a name="l96"><span class="ln">96   </span></a>    <span class="s0">return </span><span class="s1">decorator  </span><span class="s7"># type: ignore[return-value]</span>
+<a name="l97"><span class="ln">97   </span></a>
+<a name="l98"><span class="ln">98   </span></a>
+<a name="l99"><span class="ln">99   </span></a><span class="s0">def </span><span class="s1">pass_meta_key</span><span class="s4">(</span>
+<a name="l100"><span class="ln">100  </span></a>    <span class="s1">key</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s3">*</span><span class="s2">, </span><span class="s1">doc_description</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span>
+<a name="l101"><span class="ln">101  </span></a><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;t.Callable[[t.Callable[te.Concatenate[t.Any, P], R]], t.Callable[P, R]]&quot;</span><span class="s3">:</span>
+<a name="l102"><span class="ln">102  </span></a>    <span class="s7">&quot;&quot;&quot;Create a decorator that passes a key from 
+<a name="l103"><span class="ln">103  </span></a>    :attr:`click.Context.meta` as the first argument to the decorated 
+<a name="l104"><span class="ln">104  </span></a>    function. 
+<a name="l105"><span class="ln">105  </span></a> 
+<a name="l106"><span class="ln">106  </span></a>    :param key: Key in ``Context.meta`` to pass. 
+<a name="l107"><span class="ln">107  </span></a>    :param doc_description: Description of the object being passed, 
+<a name="l108"><span class="ln">108  </span></a>        inserted into the decorator's docstring. Defaults to &quot;the 'key' 
+<a name="l109"><span class="ln">109  </span></a>        key from Context.meta&quot;. 
+<a name="l110"><span class="ln">110  </span></a> 
+<a name="l111"><span class="ln">111  </span></a>    .. versionadded:: 8.0 
+<a name="l112"><span class="ln">112  </span></a>    &quot;&quot;&quot;</span>
+<a name="l113"><span class="ln">113  </span></a>
+<a name="l114"><span class="ln">114  </span></a>    <span class="s0">def </span><span class="s1">decorator</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s5">&quot;t.Callable[te.Concatenate[t.Any, P], R]&quot;</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s5">&quot;t.Callable[P, R]&quot;</span><span class="s3">:</span>
+<a name="l115"><span class="ln">115  </span></a>        <span class="s0">def </span><span class="s1">new_func</span><span class="s4">(</span><span class="s3">*</span><span class="s1">args</span><span class="s3">: </span><span class="s5">&quot;P.args&quot;</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s5">&quot;P.kwargs&quot;</span><span class="s4">) </span><span class="s1">-&gt; R</span><span class="s3">:</span>
+<a name="l116"><span class="ln">116  </span></a>            <span class="s1">ctx </span><span class="s3">= </span><span class="s1">get_current_context</span><span class="s4">()</span>
+<a name="l117"><span class="ln">117  </span></a>            <span class="s1">obj </span><span class="s3">= </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">meta</span><span class="s6">[</span><span class="s1">key</span><span class="s6">]</span>
+<a name="l118"><span class="ln">118  </span></a>            <span class="s0">return </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">invoke</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s1">obj</span><span class="s2">, </span><span class="s3">*</span><span class="s1">args</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l119"><span class="ln">119  </span></a>
+<a name="l120"><span class="ln">120  </span></a>        <span class="s0">return </span><span class="s1">update_wrapper</span><span class="s4">(</span><span class="s1">new_func</span><span class="s2">, </span><span class="s1">f</span><span class="s4">)</span>
+<a name="l121"><span class="ln">121  </span></a>
+<a name="l122"><span class="ln">122  </span></a>    <span class="s0">if </span><span class="s1">doc_description </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l123"><span class="ln">123  </span></a>        <span class="s1">doc_description </span><span class="s3">= </span><span class="s5">f&quot;the </span><span class="s6">{</span><span class="s1">key</span><span class="s6">!r} </span><span class="s5">key from :attr:`click.Context.meta`&quot;</span>
+<a name="l124"><span class="ln">124  </span></a>
+<a name="l125"><span class="ln">125  </span></a>    <span class="s1">decorator</span><span class="s2">.</span><span class="s1">__doc__ </span><span class="s3">= </span><span class="s4">(</span>
+<a name="l126"><span class="ln">126  </span></a>        <span class="s5">f&quot;Decorator that passes </span><span class="s6">{</span><span class="s1">doc_description</span><span class="s6">} </span><span class="s5">as the first argument&quot;</span>
+<a name="l127"><span class="ln">127  </span></a>        <span class="s5">&quot; to the decorated function.&quot;</span>
+<a name="l128"><span class="ln">128  </span></a>    <span class="s4">)</span>
+<a name="l129"><span class="ln">129  </span></a>    <span class="s0">return </span><span class="s1">decorator  </span><span class="s7"># type: ignore[return-value]</span>
+<a name="l130"><span class="ln">130  </span></a>
+<a name="l131"><span class="ln">131  </span></a>
+<a name="l132"><span class="ln">132  </span></a><span class="s1">CmdType </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TypeVar</span><span class="s4">(</span><span class="s5">&quot;CmdType&quot;</span><span class="s2">, </span><span class="s1">bound</span><span class="s3">=</span><span class="s1">Command</span><span class="s4">)</span>
+<a name="l133"><span class="ln">133  </span></a>
+<a name="l134"><span class="ln">134  </span></a>
+<a name="l135"><span class="ln">135  </span></a><span class="s7"># variant: no call, directly as decorator for a function.</span>
+<a name="l136"><span class="ln">136  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l137"><span class="ln">137  </span></a><span class="s0">def </span><span class="s1">command</span><span class="s4">(</span><span class="s1">name</span><span class="s3">: </span><span class="s1">_AnyCallable</span><span class="s4">) </span><span class="s1">-&gt; Command</span><span class="s3">:</span>
+<a name="l138"><span class="ln">138  </span></a>    <span class="s2">...</span>
+<a name="l139"><span class="ln">139  </span></a>
+<a name="l140"><span class="ln">140  </span></a>
+<a name="l141"><span class="ln">141  </span></a><span class="s7"># variant: with positional name and with positional or keyword cls argument:</span>
+<a name="l142"><span class="ln">142  </span></a><span class="s7"># @command(namearg, CommandCls, ...) or @command(namearg, cls=CommandCls, ...)</span>
+<a name="l143"><span class="ln">143  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l144"><span class="ln">144  </span></a><span class="s0">def </span><span class="s1">command</span><span class="s4">(</span>
+<a name="l145"><span class="ln">145  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">]</span><span class="s2">,</span>
+<a name="l146"><span class="ln">146  </span></a>    <span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">CmdType</span><span class="s6">]</span><span class="s2">,</span>
+<a name="l147"><span class="ln">147  </span></a>    <span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l148"><span class="ln">148  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">CmdType</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l149"><span class="ln">149  </span></a>    <span class="s2">...</span>
+<a name="l150"><span class="ln">150  </span></a>
+<a name="l151"><span class="ln">151  </span></a>
+<a name="l152"><span class="ln">152  </span></a><span class="s7"># variant: name omitted, cls _must_ be a keyword argument, @command(cls=CommandCls, ...)</span>
+<a name="l153"><span class="ln">153  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l154"><span class="ln">154  </span></a><span class="s0">def </span><span class="s1">command</span><span class="s4">(</span>
+<a name="l155"><span class="ln">155  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s0">None </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l156"><span class="ln">156  </span></a>    <span class="s3">*</span><span class="s2">,</span>
+<a name="l157"><span class="ln">157  </span></a>    <span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">CmdType</span><span class="s6">]</span><span class="s2">,</span>
+<a name="l158"><span class="ln">158  </span></a>    <span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l159"><span class="ln">159  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">CmdType</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l160"><span class="ln">160  </span></a>    <span class="s2">...</span>
+<a name="l161"><span class="ln">161  </span></a>
+<a name="l162"><span class="ln">162  </span></a>
+<a name="l163"><span class="ln">163  </span></a><span class="s7"># variant: with optional string name, no cls argument provided.</span>
+<a name="l164"><span class="ln">164  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l165"><span class="ln">165  </span></a><span class="s0">def </span><span class="s1">command</span><span class="s4">(</span>
+<a name="l166"><span class="ln">166  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s2">..., </span><span class="s1">cls</span><span class="s3">: </span><span class="s0">None </span><span class="s3">= </span><span class="s0">None</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span>
+<a name="l167"><span class="ln">167  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">Command</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l168"><span class="ln">168  </span></a>    <span class="s2">...</span>
+<a name="l169"><span class="ln">169  </span></a>
+<a name="l170"><span class="ln">170  </span></a>
+<a name="l171"><span class="ln">171  </span></a><span class="s0">def </span><span class="s1">command</span><span class="s4">(</span>
+<a name="l172"><span class="ln">172  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">]</span><span class="s2">, </span><span class="s1">_AnyCallable</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l173"><span class="ln">173  </span></a>    <span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">CmdType</span><span class="s6">]] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l174"><span class="ln">174  </span></a>    <span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l175"><span class="ln">175  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">Command</span><span class="s2">, </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">Command</span><span class="s2">, </span><span class="s1">CmdType</span><span class="s6">]]]</span><span class="s3">:</span>
+<a name="l176"><span class="ln">176  </span></a>    <span class="s7">r&quot;&quot;&quot;Creates a new :class:`Command` and uses the decorated function as 
+<a name="l177"><span class="ln">177  </span></a>    callback.  This will also automatically attach all decorated 
+<a name="l178"><span class="ln">178  </span></a>    :func:`option`\s and :func:`argument`\s as parameters to the command. 
+<a name="l179"><span class="ln">179  </span></a> 
+<a name="l180"><span class="ln">180  </span></a>    The name of the command defaults to the name of the function with 
+<a name="l181"><span class="ln">181  </span></a>    underscores replaced by dashes.  If you want to change that, you can 
+<a name="l182"><span class="ln">182  </span></a>    pass the intended name as the first argument. 
+<a name="l183"><span class="ln">183  </span></a> 
+<a name="l184"><span class="ln">184  </span></a>    All keyword arguments are forwarded to the underlying command class. 
+<a name="l185"><span class="ln">185  </span></a>    For the ``params`` argument, any decorated params are appended to 
+<a name="l186"><span class="ln">186  </span></a>    the end of the list. 
+<a name="l187"><span class="ln">187  </span></a> 
+<a name="l188"><span class="ln">188  </span></a>    Once decorated the function turns into a :class:`Command` instance 
+<a name="l189"><span class="ln">189  </span></a>    that can be invoked as a command line utility or be attached to a 
+<a name="l190"><span class="ln">190  </span></a>    command :class:`Group`. 
+<a name="l191"><span class="ln">191  </span></a> 
+<a name="l192"><span class="ln">192  </span></a>    :param name: the name of the command.  This defaults to the function 
+<a name="l193"><span class="ln">193  </span></a>                 name with underscores replaced by dashes. 
+<a name="l194"><span class="ln">194  </span></a>    :param cls: the command class to instantiate.  This defaults to 
+<a name="l195"><span class="ln">195  </span></a>                :class:`Command`. 
+<a name="l196"><span class="ln">196  </span></a> 
+<a name="l197"><span class="ln">197  </span></a>    .. versionchanged:: 8.1 
+<a name="l198"><span class="ln">198  </span></a>        This decorator can be applied without parentheses. 
+<a name="l199"><span class="ln">199  </span></a> 
+<a name="l200"><span class="ln">200  </span></a>    .. versionchanged:: 8.1 
+<a name="l201"><span class="ln">201  </span></a>        The ``params`` argument can be used. Decorated params are 
+<a name="l202"><span class="ln">202  </span></a>        appended to the end of the list. 
+<a name="l203"><span class="ln">203  </span></a>    &quot;&quot;&quot;</span>
+<a name="l204"><span class="ln">204  </span></a>
+<a name="l205"><span class="ln">205  </span></a>    <span class="s1">func</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s6">]] </span><span class="s3">= </span><span class="s0">None</span>
+<a name="l206"><span class="ln">206  </span></a>
+<a name="l207"><span class="ln">207  </span></a>    <span class="s0">if </span><span class="s1">callable</span><span class="s4">(</span><span class="s1">name</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l208"><span class="ln">208  </span></a>        <span class="s1">func </span><span class="s3">= </span><span class="s1">name</span>
+<a name="l209"><span class="ln">209  </span></a>        <span class="s1">name </span><span class="s3">= </span><span class="s0">None</span>
+<a name="l210"><span class="ln">210  </span></a>        <span class="s0">assert </span><span class="s1">cls </span><span class="s0">is None</span><span class="s2">, </span><span class="s5">&quot;Use 'command(cls=cls)(callable)' to specify a class.&quot;</span>
+<a name="l211"><span class="ln">211  </span></a>        <span class="s0">assert not </span><span class="s1">attrs</span><span class="s2">, </span><span class="s5">&quot;Use 'command(**kwargs)(callable)' to provide arguments.&quot;</span>
+<a name="l212"><span class="ln">212  </span></a>
+<a name="l213"><span class="ln">213  </span></a>    <span class="s0">if </span><span class="s1">cls </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l214"><span class="ln">214  </span></a>        <span class="s1">cls </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">cast</span><span class="s4">(</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">CmdType</span><span class="s6">]</span><span class="s2">, </span><span class="s1">Command</span><span class="s4">)</span>
+<a name="l215"><span class="ln">215  </span></a>
+<a name="l216"><span class="ln">216  </span></a>    <span class="s0">def </span><span class="s1">decorator</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s1">_AnyCallable</span><span class="s4">) </span><span class="s1">-&gt; CmdType</span><span class="s3">:</span>
+<a name="l217"><span class="ln">217  </span></a>        <span class="s0">if </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s1">Command</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l218"><span class="ln">218  </span></a>            <span class="s0">raise </span><span class="s1">TypeError</span><span class="s4">(</span><span class="s5">&quot;Attempted to convert a callback into a command twice.&quot;</span><span class="s4">)</span>
+<a name="l219"><span class="ln">219  </span></a>
+<a name="l220"><span class="ln">220  </span></a>        <span class="s1">attr_params </span><span class="s3">= </span><span class="s1">attrs</span><span class="s2">.</span><span class="s1">pop</span><span class="s4">(</span><span class="s5">&quot;params&quot;</span><span class="s2">, </span><span class="s0">None</span><span class="s4">)</span>
+<a name="l221"><span class="ln">221  </span></a>        <span class="s1">params </span><span class="s3">= </span><span class="s1">attr_params </span><span class="s0">if </span><span class="s1">attr_params </span><span class="s0">is not None else </span><span class="s6">[]</span>
+<a name="l222"><span class="ln">222  </span></a>
+<a name="l223"><span class="ln">223  </span></a>        <span class="s0">try</span><span class="s3">:</span>
+<a name="l224"><span class="ln">224  </span></a>            <span class="s1">decorator_params </span><span class="s3">= </span><span class="s1">f</span><span class="s2">.</span><span class="s1">__click_params__  </span><span class="s7"># type: ignore</span>
+<a name="l225"><span class="ln">225  </span></a>        <span class="s0">except </span><span class="s1">AttributeError</span><span class="s3">:</span>
+<a name="l226"><span class="ln">226  </span></a>            <span class="s0">pass</span>
+<a name="l227"><span class="ln">227  </span></a>        <span class="s0">else</span><span class="s3">:</span>
+<a name="l228"><span class="ln">228  </span></a>            <span class="s0">del </span><span class="s1">f</span><span class="s2">.</span><span class="s1">__click_params__  </span><span class="s7"># type: ignore</span>
+<a name="l229"><span class="ln">229  </span></a>            <span class="s1">params</span><span class="s2">.</span><span class="s1">extend</span><span class="s4">(</span><span class="s1">reversed</span><span class="s4">(</span><span class="s1">decorator_params</span><span class="s4">))</span>
+<a name="l230"><span class="ln">230  </span></a>
+<a name="l231"><span class="ln">231  </span></a>        <span class="s0">if </span><span class="s1">attrs</span><span class="s2">.</span><span class="s1">get</span><span class="s4">(</span><span class="s5">&quot;help&quot;</span><span class="s4">) </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l232"><span class="ln">232  </span></a>            <span class="s1">attrs</span><span class="s6">[</span><span class="s5">&quot;help&quot;</span><span class="s6">] </span><span class="s3">= </span><span class="s1">f</span><span class="s2">.</span><span class="s1">__doc__</span>
+<a name="l233"><span class="ln">233  </span></a>
+<a name="l234"><span class="ln">234  </span></a>        <span class="s0">if </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TYPE_CHECKING</span><span class="s3">:</span>
+<a name="l235"><span class="ln">235  </span></a>            <span class="s0">assert </span><span class="s1">cls </span><span class="s0">is not None</span>
+<a name="l236"><span class="ln">236  </span></a>            <span class="s0">assert not </span><span class="s1">callable</span><span class="s4">(</span><span class="s1">name</span><span class="s4">)</span>
+<a name="l237"><span class="ln">237  </span></a>
+<a name="l238"><span class="ln">238  </span></a>        <span class="s1">cmd </span><span class="s3">= </span><span class="s1">cls</span><span class="s4">(</span>
+<a name="l239"><span class="ln">239  </span></a>            <span class="s1">name</span><span class="s3">=</span><span class="s1">name </span><span class="s0">or </span><span class="s1">f</span><span class="s2">.</span><span class="s1">__name__</span><span class="s2">.</span><span class="s1">lower</span><span class="s4">()</span><span class="s2">.</span><span class="s1">replace</span><span class="s4">(</span><span class="s5">&quot;_&quot;</span><span class="s2">, </span><span class="s5">&quot;-&quot;</span><span class="s4">)</span><span class="s2">,</span>
+<a name="l240"><span class="ln">240  </span></a>            <span class="s1">callback</span><span class="s3">=</span><span class="s1">f</span><span class="s2">,</span>
+<a name="l241"><span class="ln">241  </span></a>            <span class="s1">params</span><span class="s3">=</span><span class="s1">params</span><span class="s2">,</span>
+<a name="l242"><span class="ln">242  </span></a>            <span class="s3">**</span><span class="s1">attrs</span><span class="s2">,</span>
+<a name="l243"><span class="ln">243  </span></a>        <span class="s4">)</span>
+<a name="l244"><span class="ln">244  </span></a>        <span class="s1">cmd</span><span class="s2">.</span><span class="s1">__doc__ </span><span class="s3">= </span><span class="s1">f</span><span class="s2">.</span><span class="s1">__doc__</span>
+<a name="l245"><span class="ln">245  </span></a>        <span class="s0">return </span><span class="s1">cmd</span>
+<a name="l246"><span class="ln">246  </span></a>
+<a name="l247"><span class="ln">247  </span></a>    <span class="s0">if </span><span class="s1">func </span><span class="s0">is not None</span><span class="s3">:</span>
+<a name="l248"><span class="ln">248  </span></a>        <span class="s0">return </span><span class="s1">decorator</span><span class="s4">(</span><span class="s1">func</span><span class="s4">)</span>
+<a name="l249"><span class="ln">249  </span></a>
+<a name="l250"><span class="ln">250  </span></a>    <span class="s0">return </span><span class="s1">decorator</span>
+<a name="l251"><span class="ln">251  </span></a>
+<a name="l252"><span class="ln">252  </span></a>
+<a name="l253"><span class="ln">253  </span></a><span class="s1">GrpType </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">TypeVar</span><span class="s4">(</span><span class="s5">&quot;GrpType&quot;</span><span class="s2">, </span><span class="s1">bound</span><span class="s3">=</span><span class="s1">Group</span><span class="s4">)</span>
+<a name="l254"><span class="ln">254  </span></a>
+<a name="l255"><span class="ln">255  </span></a>
+<a name="l256"><span class="ln">256  </span></a><span class="s7"># variant: no call, directly as decorator for a function.</span>
+<a name="l257"><span class="ln">257  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l258"><span class="ln">258  </span></a><span class="s0">def </span><span class="s1">group</span><span class="s4">(</span><span class="s1">name</span><span class="s3">: </span><span class="s1">_AnyCallable</span><span class="s4">) </span><span class="s1">-&gt; Group</span><span class="s3">:</span>
+<a name="l259"><span class="ln">259  </span></a>    <span class="s2">...</span>
+<a name="l260"><span class="ln">260  </span></a>
+<a name="l261"><span class="ln">261  </span></a>
+<a name="l262"><span class="ln">262  </span></a><span class="s7"># variant: with positional name and with positional or keyword cls argument:</span>
+<a name="l263"><span class="ln">263  </span></a><span class="s7"># @group(namearg, GroupCls, ...) or @group(namearg, cls=GroupCls, ...)</span>
+<a name="l264"><span class="ln">264  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l265"><span class="ln">265  </span></a><span class="s0">def </span><span class="s1">group</span><span class="s4">(</span>
+<a name="l266"><span class="ln">266  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">]</span><span class="s2">,</span>
+<a name="l267"><span class="ln">267  </span></a>    <span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">GrpType</span><span class="s6">]</span><span class="s2">,</span>
+<a name="l268"><span class="ln">268  </span></a>    <span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l269"><span class="ln">269  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">GrpType</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l270"><span class="ln">270  </span></a>    <span class="s2">...</span>
+<a name="l271"><span class="ln">271  </span></a>
+<a name="l272"><span class="ln">272  </span></a>
+<a name="l273"><span class="ln">273  </span></a><span class="s7"># variant: name omitted, cls _must_ be a keyword argument, @group(cmd=GroupCls, ...)</span>
+<a name="l274"><span class="ln">274  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l275"><span class="ln">275  </span></a><span class="s0">def </span><span class="s1">group</span><span class="s4">(</span>
+<a name="l276"><span class="ln">276  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s0">None </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l277"><span class="ln">277  </span></a>    <span class="s3">*</span><span class="s2">,</span>
+<a name="l278"><span class="ln">278  </span></a>    <span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">GrpType</span><span class="s6">]</span><span class="s2">,</span>
+<a name="l279"><span class="ln">279  </span></a>    <span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l280"><span class="ln">280  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">GrpType</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l281"><span class="ln">281  </span></a>    <span class="s2">...</span>
+<a name="l282"><span class="ln">282  </span></a>
+<a name="l283"><span class="ln">283  </span></a>
+<a name="l284"><span class="ln">284  </span></a><span class="s7"># variant: with optional string name, no cls argument provided.</span>
+<a name="l285"><span class="ln">285  </span></a><span class="s3">@</span><span class="s1">t</span><span class="s2">.</span><span class="s1">overload</span>
+<a name="l286"><span class="ln">286  </span></a><span class="s0">def </span><span class="s1">group</span><span class="s4">(</span>
+<a name="l287"><span class="ln">287  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s2">..., </span><span class="s1">cls</span><span class="s3">: </span><span class="s0">None </span><span class="s3">= </span><span class="s0">None</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span>
+<a name="l288"><span class="ln">288  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">Group</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l289"><span class="ln">289  </span></a>    <span class="s2">...</span>
+<a name="l290"><span class="ln">290  </span></a>
+<a name="l291"><span class="ln">291  </span></a>
+<a name="l292"><span class="ln">292  </span></a><span class="s0">def </span><span class="s1">group</span><span class="s4">(</span>
+<a name="l293"><span class="ln">293  </span></a>    <span class="s1">name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">_AnyCallable</span><span class="s2">, </span><span class="s0">None</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l294"><span class="ln">294  </span></a>    <span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">GrpType</span><span class="s6">]] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l295"><span class="ln">295  </span></a>    <span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l296"><span class="ln">296  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">Group</span><span class="s2">, </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">_AnyCallable</span><span class="s6">]</span><span class="s2">, </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Union</span><span class="s6">[</span><span class="s1">Group</span><span class="s2">, </span><span class="s1">GrpType</span><span class="s6">]]]</span><span class="s3">:</span>
+<a name="l297"><span class="ln">297  </span></a>    <span class="s7">&quot;&quot;&quot;Creates a new :class:`Group` with a function as callback.  This 
+<a name="l298"><span class="ln">298  </span></a>    works otherwise the same as :func:`command` just that the `cls` 
+<a name="l299"><span class="ln">299  </span></a>    parameter is set to :class:`Group`. 
+<a name="l300"><span class="ln">300  </span></a> 
+<a name="l301"><span class="ln">301  </span></a>    .. versionchanged:: 8.1 
+<a name="l302"><span class="ln">302  </span></a>        This decorator can be applied without parentheses. 
+<a name="l303"><span class="ln">303  </span></a>    &quot;&quot;&quot;</span>
+<a name="l304"><span class="ln">304  </span></a>    <span class="s0">if </span><span class="s1">cls </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l305"><span class="ln">305  </span></a>        <span class="s1">cls </span><span class="s3">= </span><span class="s1">t</span><span class="s2">.</span><span class="s1">cast</span><span class="s4">(</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">GrpType</span><span class="s6">]</span><span class="s2">, </span><span class="s1">Group</span><span class="s4">)</span>
+<a name="l306"><span class="ln">306  </span></a>
+<a name="l307"><span class="ln">307  </span></a>    <span class="s0">if </span><span class="s1">callable</span><span class="s4">(</span><span class="s1">name</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l308"><span class="ln">308  </span></a>        <span class="s0">return </span><span class="s1">command</span><span class="s4">(</span><span class="s1">cls</span><span class="s3">=</span><span class="s1">cls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s4">)(</span><span class="s1">name</span><span class="s4">)</span>
+<a name="l309"><span class="ln">309  </span></a>
+<a name="l310"><span class="ln">310  </span></a>    <span class="s0">return </span><span class="s1">command</span><span class="s4">(</span><span class="s1">name</span><span class="s2">, </span><span class="s1">cls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s4">)</span>
+<a name="l311"><span class="ln">311  </span></a>
+<a name="l312"><span class="ln">312  </span></a>
+<a name="l313"><span class="ln">313  </span></a><span class="s0">def </span><span class="s1">_param_memo</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[</span><span class="s2">..., </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s6">]</span><span class="s2">, </span><span class="s1">param</span><span class="s3">: </span><span class="s1">Parameter</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s0">None</span><span class="s3">:</span>
+<a name="l314"><span class="ln">314  </span></a>    <span class="s0">if </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s1">Command</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l315"><span class="ln">315  </span></a>        <span class="s1">f</span><span class="s2">.</span><span class="s1">params</span><span class="s2">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">param</span><span class="s4">)</span>
+<a name="l316"><span class="ln">316  </span></a>    <span class="s0">else</span><span class="s3">:</span>
+<a name="l317"><span class="ln">317  </span></a>        <span class="s0">if not </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s5">&quot;__click_params__&quot;</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l318"><span class="ln">318  </span></a>            <span class="s1">f</span><span class="s2">.</span><span class="s1">__click_params__ </span><span class="s3">= </span><span class="s6">[]  </span><span class="s7"># type: ignore</span>
+<a name="l319"><span class="ln">319  </span></a>
+<a name="l320"><span class="ln">320  </span></a>        <span class="s1">f</span><span class="s2">.</span><span class="s1">__click_params__</span><span class="s2">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">param</span><span class="s4">)  </span><span class="s7"># type: ignore</span>
+<a name="l321"><span class="ln">321  </span></a>
+<a name="l322"><span class="ln">322  </span></a>
+<a name="l323"><span class="ln">323  </span></a><span class="s0">def </span><span class="s1">argument</span><span class="s4">(</span>
+<a name="l324"><span class="ln">324  </span></a>    <span class="s3">*</span><span class="s1">param_decls</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">Argument</span><span class="s6">]] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span>
+<a name="l325"><span class="ln">325  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">FC</span><span class="s6">]</span><span class="s2">, </span><span class="s1">FC</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l326"><span class="ln">326  </span></a>    <span class="s7">&quot;&quot;&quot;Attaches an argument to the command.  All positional arguments are 
+<a name="l327"><span class="ln">327  </span></a>    passed as parameter declarations to :class:`Argument`; all keyword 
+<a name="l328"><span class="ln">328  </span></a>    arguments are forwarded unchanged (except ``cls``). 
+<a name="l329"><span class="ln">329  </span></a>    This is equivalent to creating an :class:`Argument` instance manually 
+<a name="l330"><span class="ln">330  </span></a>    and attaching it to the :attr:`Command.params` list. 
+<a name="l331"><span class="ln">331  </span></a> 
+<a name="l332"><span class="ln">332  </span></a>    For the default argument class, refer to :class:`Argument` and 
+<a name="l333"><span class="ln">333  </span></a>    :class:`Parameter` for descriptions of parameters. 
+<a name="l334"><span class="ln">334  </span></a> 
+<a name="l335"><span class="ln">335  </span></a>    :param cls: the argument class to instantiate.  This defaults to 
+<a name="l336"><span class="ln">336  </span></a>                :class:`Argument`. 
+<a name="l337"><span class="ln">337  </span></a>    :param param_decls: Passed as positional arguments to the constructor of 
+<a name="l338"><span class="ln">338  </span></a>        ``cls``. 
+<a name="l339"><span class="ln">339  </span></a>    :param attrs: Passed as keyword arguments to the constructor of ``cls``. 
+<a name="l340"><span class="ln">340  </span></a>    &quot;&quot;&quot;</span>
+<a name="l341"><span class="ln">341  </span></a>    <span class="s0">if </span><span class="s1">cls </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l342"><span class="ln">342  </span></a>        <span class="s1">cls </span><span class="s3">= </span><span class="s1">Argument</span>
+<a name="l343"><span class="ln">343  </span></a>
+<a name="l344"><span class="ln">344  </span></a>    <span class="s0">def </span><span class="s1">decorator</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s1">FC</span><span class="s4">) </span><span class="s1">-&gt; FC</span><span class="s3">:</span>
+<a name="l345"><span class="ln">345  </span></a>        <span class="s1">_param_memo</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s1">cls</span><span class="s4">(</span><span class="s1">param_decls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s4">))</span>
+<a name="l346"><span class="ln">346  </span></a>        <span class="s0">return </span><span class="s1">f</span>
+<a name="l347"><span class="ln">347  </span></a>
+<a name="l348"><span class="ln">348  </span></a>    <span class="s0">return </span><span class="s1">decorator</span>
+<a name="l349"><span class="ln">349  </span></a>
+<a name="l350"><span class="ln">350  </span></a>
+<a name="l351"><span class="ln">351  </span></a><span class="s0">def </span><span class="s1">option</span><span class="s4">(</span>
+<a name="l352"><span class="ln">352  </span></a>    <span class="s3">*</span><span class="s1">param_decls</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s1">cls</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">t</span><span class="s2">.</span><span class="s1">Type</span><span class="s6">[</span><span class="s1">Option</span><span class="s6">]] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span>
+<a name="l353"><span class="ln">353  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">FC</span><span class="s6">]</span><span class="s2">, </span><span class="s1">FC</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l354"><span class="ln">354  </span></a>    <span class="s7">&quot;&quot;&quot;Attaches an option to the command.  All positional arguments are 
+<a name="l355"><span class="ln">355  </span></a>    passed as parameter declarations to :class:`Option`; all keyword 
+<a name="l356"><span class="ln">356  </span></a>    arguments are forwarded unchanged (except ``cls``). 
+<a name="l357"><span class="ln">357  </span></a>    This is equivalent to creating an :class:`Option` instance manually 
+<a name="l358"><span class="ln">358  </span></a>    and attaching it to the :attr:`Command.params` list. 
+<a name="l359"><span class="ln">359  </span></a> 
+<a name="l360"><span class="ln">360  </span></a>    For the default option class, refer to :class:`Option` and 
+<a name="l361"><span class="ln">361  </span></a>    :class:`Parameter` for descriptions of parameters. 
+<a name="l362"><span class="ln">362  </span></a> 
+<a name="l363"><span class="ln">363  </span></a>    :param cls: the option class to instantiate.  This defaults to 
+<a name="l364"><span class="ln">364  </span></a>                :class:`Option`. 
+<a name="l365"><span class="ln">365  </span></a>    :param param_decls: Passed as positional arguments to the constructor of 
+<a name="l366"><span class="ln">366  </span></a>        ``cls``. 
+<a name="l367"><span class="ln">367  </span></a>    :param attrs: Passed as keyword arguments to the constructor of ``cls``. 
+<a name="l368"><span class="ln">368  </span></a>    &quot;&quot;&quot;</span>
+<a name="l369"><span class="ln">369  </span></a>    <span class="s0">if </span><span class="s1">cls </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l370"><span class="ln">370  </span></a>        <span class="s1">cls </span><span class="s3">= </span><span class="s1">Option</span>
+<a name="l371"><span class="ln">371  </span></a>
+<a name="l372"><span class="ln">372  </span></a>    <span class="s0">def </span><span class="s1">decorator</span><span class="s4">(</span><span class="s1">f</span><span class="s3">: </span><span class="s1">FC</span><span class="s4">) </span><span class="s1">-&gt; FC</span><span class="s3">:</span>
+<a name="l373"><span class="ln">373  </span></a>        <span class="s1">_param_memo</span><span class="s4">(</span><span class="s1">f</span><span class="s2">, </span><span class="s1">cls</span><span class="s4">(</span><span class="s1">param_decls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">attrs</span><span class="s4">))</span>
+<a name="l374"><span class="ln">374  </span></a>        <span class="s0">return </span><span class="s1">f</span>
+<a name="l375"><span class="ln">375  </span></a>
+<a name="l376"><span class="ln">376  </span></a>    <span class="s0">return </span><span class="s1">decorator</span>
+<a name="l377"><span class="ln">377  </span></a>
+<a name="l378"><span class="ln">378  </span></a>
+<a name="l379"><span class="ln">379  </span></a><span class="s0">def </span><span class="s1">confirmation_option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">FC</span><span class="s6">]</span><span class="s2">, </span><span class="s1">FC</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l380"><span class="ln">380  </span></a>    <span class="s7">&quot;&quot;&quot;Add a ``--yes`` option which shows a prompt before continuing if 
+<a name="l381"><span class="ln">381  </span></a>    not passed. If the prompt is declined, the program will exit. 
+<a name="l382"><span class="ln">382  </span></a> 
+<a name="l383"><span class="ln">383  </span></a>    :param param_decls: One or more option names. Defaults to the single 
+<a name="l384"><span class="ln">384  </span></a>        value ``&quot;--yes&quot;``. 
+<a name="l385"><span class="ln">385  </span></a>    :param kwargs: Extra arguments are passed to :func:`option`. 
+<a name="l386"><span class="ln">386  </span></a>    &quot;&quot;&quot;</span>
+<a name="l387"><span class="ln">387  </span></a>
+<a name="l388"><span class="ln">388  </span></a>    <span class="s0">def </span><span class="s1">callback</span><span class="s4">(</span><span class="s1">ctx</span><span class="s3">: </span><span class="s1">Context</span><span class="s2">, </span><span class="s1">param</span><span class="s3">: </span><span class="s1">Parameter</span><span class="s2">, </span><span class="s1">value</span><span class="s3">: </span><span class="s1">bool</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s0">None</span><span class="s3">:</span>
+<a name="l389"><span class="ln">389  </span></a>        <span class="s0">if not </span><span class="s1">value</span><span class="s3">:</span>
+<a name="l390"><span class="ln">390  </span></a>            <span class="s1">ctx</span><span class="s2">.</span><span class="s1">abort</span><span class="s4">()</span>
+<a name="l391"><span class="ln">391  </span></a>
+<a name="l392"><span class="ln">392  </span></a>    <span class="s0">if not </span><span class="s1">param_decls</span><span class="s3">:</span>
+<a name="l393"><span class="ln">393  </span></a>        <span class="s1">param_decls </span><span class="s3">= </span><span class="s4">(</span><span class="s5">&quot;--yes&quot;</span><span class="s2">,</span><span class="s4">)</span>
+<a name="l394"><span class="ln">394  </span></a>
+<a name="l395"><span class="ln">395  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;is_flag&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l396"><span class="ln">396  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;callback&quot;</span><span class="s2">, </span><span class="s1">callback</span><span class="s4">)</span>
+<a name="l397"><span class="ln">397  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;expose_value&quot;</span><span class="s2">, </span><span class="s0">False</span><span class="s4">)</span>
+<a name="l398"><span class="ln">398  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;prompt&quot;</span><span class="s2">, </span><span class="s5">&quot;Do you want to continue?&quot;</span><span class="s4">)</span>
+<a name="l399"><span class="ln">399  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;help&quot;</span><span class="s2">, </span><span class="s5">&quot;Confirm the action without prompting.&quot;</span><span class="s4">)</span>
+<a name="l400"><span class="ln">400  </span></a>    <span class="s0">return </span><span class="s1">option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l401"><span class="ln">401  </span></a>
+<a name="l402"><span class="ln">402  </span></a>
+<a name="l403"><span class="ln">403  </span></a><span class="s0">def </span><span class="s1">password_option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">FC</span><span class="s6">]</span><span class="s2">, </span><span class="s1">FC</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l404"><span class="ln">404  </span></a>    <span class="s7">&quot;&quot;&quot;Add a ``--password`` option which prompts for a password, hiding 
+<a name="l405"><span class="ln">405  </span></a>    input and asking to enter the value again for confirmation. 
+<a name="l406"><span class="ln">406  </span></a> 
+<a name="l407"><span class="ln">407  </span></a>    :param param_decls: One or more option names. Defaults to the single 
+<a name="l408"><span class="ln">408  </span></a>        value ``&quot;--password&quot;``. 
+<a name="l409"><span class="ln">409  </span></a>    :param kwargs: Extra arguments are passed to :func:`option`. 
+<a name="l410"><span class="ln">410  </span></a>    &quot;&quot;&quot;</span>
+<a name="l411"><span class="ln">411  </span></a>    <span class="s0">if not </span><span class="s1">param_decls</span><span class="s3">:</span>
+<a name="l412"><span class="ln">412  </span></a>        <span class="s1">param_decls </span><span class="s3">= </span><span class="s4">(</span><span class="s5">&quot;--password&quot;</span><span class="s2">,</span><span class="s4">)</span>
+<a name="l413"><span class="ln">413  </span></a>
+<a name="l414"><span class="ln">414  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;prompt&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l415"><span class="ln">415  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;confirmation_prompt&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l416"><span class="ln">416  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;hide_input&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l417"><span class="ln">417  </span></a>    <span class="s0">return </span><span class="s1">option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l418"><span class="ln">418  </span></a>
+<a name="l419"><span class="ln">419  </span></a>
+<a name="l420"><span class="ln">420  </span></a><span class="s0">def </span><span class="s1">version_option</span><span class="s4">(</span>
+<a name="l421"><span class="ln">421  </span></a>    <span class="s1">version</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l422"><span class="ln">422  </span></a>    <span class="s3">*</span><span class="s1">param_decls</span><span class="s3">: </span><span class="s1">str</span><span class="s2">,</span>
+<a name="l423"><span class="ln">423  </span></a>    <span class="s1">package_name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l424"><span class="ln">424  </span></a>    <span class="s1">prog_name</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l425"><span class="ln">425  </span></a>    <span class="s1">message</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">str</span><span class="s6">] </span><span class="s3">= </span><span class="s0">None</span><span class="s2">,</span>
+<a name="l426"><span class="ln">426  </span></a>    <span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s2">,</span>
+<a name="l427"><span class="ln">427  </span></a><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">FC</span><span class="s6">]</span><span class="s2">, </span><span class="s1">FC</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l428"><span class="ln">428  </span></a>    <span class="s7">&quot;&quot;&quot;Add a ``--version`` option which immediately prints the version 
+<a name="l429"><span class="ln">429  </span></a>    number and exits the program. 
+<a name="l430"><span class="ln">430  </span></a> 
+<a name="l431"><span class="ln">431  </span></a>    If ``version`` is not provided, Click will try to detect it using 
+<a name="l432"><span class="ln">432  </span></a>    :func:`importlib.metadata.version` to get the version for the 
+<a name="l433"><span class="ln">433  </span></a>    ``package_name``. On Python &lt; 3.8, the ``importlib_metadata`` 
+<a name="l434"><span class="ln">434  </span></a>    backport must be installed. 
+<a name="l435"><span class="ln">435  </span></a> 
+<a name="l436"><span class="ln">436  </span></a>    If ``package_name`` is not provided, Click will try to detect it by 
+<a name="l437"><span class="ln">437  </span></a>    inspecting the stack frames. This will be used to detect the 
+<a name="l438"><span class="ln">438  </span></a>    version, so it must match the name of the installed package. 
+<a name="l439"><span class="ln">439  </span></a> 
+<a name="l440"><span class="ln">440  </span></a>    :param version: The version number to show. If not provided, Click 
+<a name="l441"><span class="ln">441  </span></a>        will try to detect it. 
+<a name="l442"><span class="ln">442  </span></a>    :param param_decls: One or more option names. Defaults to the single 
+<a name="l443"><span class="ln">443  </span></a>        value ``&quot;--version&quot;``. 
+<a name="l444"><span class="ln">444  </span></a>    :param package_name: The package name to detect the version from. If 
+<a name="l445"><span class="ln">445  </span></a>        not provided, Click will try to detect it. 
+<a name="l446"><span class="ln">446  </span></a>    :param prog_name: The name of the CLI to show in the message. If not 
+<a name="l447"><span class="ln">447  </span></a>        provided, it will be detected from the command. 
+<a name="l448"><span class="ln">448  </span></a>    :param message: The message to show. The values ``%(prog)s``, 
+<a name="l449"><span class="ln">449  </span></a>        ``%(package)s``, and ``%(version)s`` are available. Defaults to 
+<a name="l450"><span class="ln">450  </span></a>        ``&quot;%(prog)s, version %(version)s&quot;``. 
+<a name="l451"><span class="ln">451  </span></a>    :param kwargs: Extra arguments are passed to :func:`option`. 
+<a name="l452"><span class="ln">452  </span></a>    :raise RuntimeError: ``version`` could not be detected. 
+<a name="l453"><span class="ln">453  </span></a> 
+<a name="l454"><span class="ln">454  </span></a>    .. versionchanged:: 8.0 
+<a name="l455"><span class="ln">455  </span></a>        Add the ``package_name`` parameter, and the ``%(package)s`` 
+<a name="l456"><span class="ln">456  </span></a>        value for messages. 
+<a name="l457"><span class="ln">457  </span></a> 
+<a name="l458"><span class="ln">458  </span></a>    .. versionchanged:: 8.0 
+<a name="l459"><span class="ln">459  </span></a>        Use :mod:`importlib.metadata` instead of ``pkg_resources``. The 
+<a name="l460"><span class="ln">460  </span></a>        version is detected based on the package name, not the entry 
+<a name="l461"><span class="ln">461  </span></a>        point name. The Python package name must match the installed 
+<a name="l462"><span class="ln">462  </span></a>        package name, or be passed with ``package_name=``. 
+<a name="l463"><span class="ln">463  </span></a>    &quot;&quot;&quot;</span>
+<a name="l464"><span class="ln">464  </span></a>    <span class="s0">if </span><span class="s1">message </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l465"><span class="ln">465  </span></a>        <span class="s1">message </span><span class="s3">= </span><span class="s1">_</span><span class="s4">(</span><span class="s5">&quot;%(prog)s, version %(version)s&quot;</span><span class="s4">)</span>
+<a name="l466"><span class="ln">466  </span></a>
+<a name="l467"><span class="ln">467  </span></a>    <span class="s0">if </span><span class="s1">version </span><span class="s0">is None and </span><span class="s1">package_name </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l468"><span class="ln">468  </span></a>        <span class="s1">frame </span><span class="s3">= </span><span class="s1">inspect</span><span class="s2">.</span><span class="s1">currentframe</span><span class="s4">()</span>
+<a name="l469"><span class="ln">469  </span></a>        <span class="s1">f_back </span><span class="s3">= </span><span class="s1">frame</span><span class="s2">.</span><span class="s1">f_back </span><span class="s0">if </span><span class="s1">frame </span><span class="s0">is not None else None</span>
+<a name="l470"><span class="ln">470  </span></a>        <span class="s1">f_globals </span><span class="s3">= </span><span class="s1">f_back</span><span class="s2">.</span><span class="s1">f_globals </span><span class="s0">if </span><span class="s1">f_back </span><span class="s0">is not None else None</span>
+<a name="l471"><span class="ln">471  </span></a>        <span class="s7"># break reference cycle</span>
+<a name="l472"><span class="ln">472  </span></a>        <span class="s7"># https://docs.python.org/3/library/inspect.html#the-interpreter-stack</span>
+<a name="l473"><span class="ln">473  </span></a>        <span class="s0">del </span><span class="s1">frame</span>
+<a name="l474"><span class="ln">474  </span></a>
+<a name="l475"><span class="ln">475  </span></a>        <span class="s0">if </span><span class="s1">f_globals </span><span class="s0">is not None</span><span class="s3">:</span>
+<a name="l476"><span class="ln">476  </span></a>            <span class="s1">package_name </span><span class="s3">= </span><span class="s1">f_globals</span><span class="s2">.</span><span class="s1">get</span><span class="s4">(</span><span class="s5">&quot;__name__&quot;</span><span class="s4">)</span>
+<a name="l477"><span class="ln">477  </span></a>
+<a name="l478"><span class="ln">478  </span></a>            <span class="s0">if </span><span class="s1">package_name </span><span class="s3">== </span><span class="s5">&quot;__main__&quot;</span><span class="s3">:</span>
+<a name="l479"><span class="ln">479  </span></a>                <span class="s1">package_name </span><span class="s3">= </span><span class="s1">f_globals</span><span class="s2">.</span><span class="s1">get</span><span class="s4">(</span><span class="s5">&quot;__package__&quot;</span><span class="s4">)</span>
+<a name="l480"><span class="ln">480  </span></a>
+<a name="l481"><span class="ln">481  </span></a>            <span class="s0">if </span><span class="s1">package_name</span><span class="s3">:</span>
+<a name="l482"><span class="ln">482  </span></a>                <span class="s1">package_name </span><span class="s3">= </span><span class="s1">package_name</span><span class="s2">.</span><span class="s1">partition</span><span class="s4">(</span><span class="s5">&quot;.&quot;</span><span class="s4">)</span><span class="s6">[</span><span class="s8">0</span><span class="s6">]</span>
+<a name="l483"><span class="ln">483  </span></a>
+<a name="l484"><span class="ln">484  </span></a>    <span class="s0">def </span><span class="s1">callback</span><span class="s4">(</span><span class="s1">ctx</span><span class="s3">: </span><span class="s1">Context</span><span class="s2">, </span><span class="s1">param</span><span class="s3">: </span><span class="s1">Parameter</span><span class="s2">, </span><span class="s1">value</span><span class="s3">: </span><span class="s1">bool</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s0">None</span><span class="s3">:</span>
+<a name="l485"><span class="ln">485  </span></a>        <span class="s0">if not </span><span class="s1">value </span><span class="s0">or </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">resilient_parsing</span><span class="s3">:</span>
+<a name="l486"><span class="ln">486  </span></a>            <span class="s0">return</span>
+<a name="l487"><span class="ln">487  </span></a>
+<a name="l488"><span class="ln">488  </span></a>        <span class="s0">nonlocal </span><span class="s1">prog_name</span>
+<a name="l489"><span class="ln">489  </span></a>        <span class="s0">nonlocal </span><span class="s1">version</span>
+<a name="l490"><span class="ln">490  </span></a>
+<a name="l491"><span class="ln">491  </span></a>        <span class="s0">if </span><span class="s1">prog_name </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l492"><span class="ln">492  </span></a>            <span class="s1">prog_name </span><span class="s3">= </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">find_root</span><span class="s4">()</span><span class="s2">.</span><span class="s1">info_name</span>
+<a name="l493"><span class="ln">493  </span></a>
+<a name="l494"><span class="ln">494  </span></a>        <span class="s0">if </span><span class="s1">version </span><span class="s0">is None and </span><span class="s1">package_name </span><span class="s0">is not None</span><span class="s3">:</span>
+<a name="l495"><span class="ln">495  </span></a>            <span class="s1">metadata</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Optional</span><span class="s6">[</span><span class="s1">types</span><span class="s2">.</span><span class="s1">ModuleType</span><span class="s6">]</span>
+<a name="l496"><span class="ln">496  </span></a>
+<a name="l497"><span class="ln">497  </span></a>            <span class="s0">try</span><span class="s3">:</span>
+<a name="l498"><span class="ln">498  </span></a>                <span class="s0">from </span><span class="s1">importlib </span><span class="s0">import </span><span class="s1">metadata  </span><span class="s7"># type: ignore</span>
+<a name="l499"><span class="ln">499  </span></a>            <span class="s0">except </span><span class="s1">ImportError</span><span class="s3">:</span>
+<a name="l500"><span class="ln">500  </span></a>                <span class="s7"># Python &lt; 3.8</span>
+<a name="l501"><span class="ln">501  </span></a>                <span class="s0">import </span><span class="s1">importlib_metadata </span><span class="s0">as </span><span class="s1">metadata  </span><span class="s7"># type: ignore</span>
+<a name="l502"><span class="ln">502  </span></a>
+<a name="l503"><span class="ln">503  </span></a>            <span class="s0">try</span><span class="s3">:</span>
+<a name="l504"><span class="ln">504  </span></a>                <span class="s1">version </span><span class="s3">= </span><span class="s1">metadata</span><span class="s2">.</span><span class="s1">version</span><span class="s4">(</span><span class="s1">package_name</span><span class="s4">)  </span><span class="s7"># type: ignore</span>
+<a name="l505"><span class="ln">505  </span></a>            <span class="s0">except </span><span class="s1">metadata</span><span class="s2">.</span><span class="s1">PackageNotFoundError</span><span class="s3">:  </span><span class="s7"># type: ignore</span>
+<a name="l506"><span class="ln">506  </span></a>                <span class="s0">raise </span><span class="s1">RuntimeError</span><span class="s4">(</span>
+<a name="l507"><span class="ln">507  </span></a>                    <span class="s5">f&quot;</span><span class="s6">{</span><span class="s1">package_name</span><span class="s6">!r} </span><span class="s5">is not installed. Try passing&quot;</span>
+<a name="l508"><span class="ln">508  </span></a>                    <span class="s5">&quot; 'package_name' instead.&quot;</span>
+<a name="l509"><span class="ln">509  </span></a>                <span class="s4">) </span><span class="s0">from None</span>
+<a name="l510"><span class="ln">510  </span></a>
+<a name="l511"><span class="ln">511  </span></a>        <span class="s0">if </span><span class="s1">version </span><span class="s0">is None</span><span class="s3">:</span>
+<a name="l512"><span class="ln">512  </span></a>            <span class="s0">raise </span><span class="s1">RuntimeError</span><span class="s4">(</span>
+<a name="l513"><span class="ln">513  </span></a>                <span class="s5">f&quot;Could not determine the version for </span><span class="s6">{</span><span class="s1">package_name</span><span class="s6">!r} </span><span class="s5">automatically.&quot;</span>
+<a name="l514"><span class="ln">514  </span></a>            <span class="s4">)</span>
+<a name="l515"><span class="ln">515  </span></a>
+<a name="l516"><span class="ln">516  </span></a>        <span class="s1">echo</span><span class="s4">(</span>
+<a name="l517"><span class="ln">517  </span></a>            <span class="s1">message </span><span class="s3">% </span><span class="s6">{</span><span class="s5">&quot;prog&quot;</span><span class="s3">: </span><span class="s1">prog_name</span><span class="s2">, </span><span class="s5">&quot;package&quot;</span><span class="s3">: </span><span class="s1">package_name</span><span class="s2">, </span><span class="s5">&quot;version&quot;</span><span class="s3">: </span><span class="s1">version</span><span class="s6">}</span><span class="s2">,</span>
+<a name="l518"><span class="ln">518  </span></a>            <span class="s1">color</span><span class="s3">=</span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">color</span><span class="s2">,</span>
+<a name="l519"><span class="ln">519  </span></a>        <span class="s4">)</span>
+<a name="l520"><span class="ln">520  </span></a>        <span class="s1">ctx</span><span class="s2">.</span><span class="s1">exit</span><span class="s4">()</span>
+<a name="l521"><span class="ln">521  </span></a>
+<a name="l522"><span class="ln">522  </span></a>    <span class="s0">if not </span><span class="s1">param_decls</span><span class="s3">:</span>
+<a name="l523"><span class="ln">523  </span></a>        <span class="s1">param_decls </span><span class="s3">= </span><span class="s4">(</span><span class="s5">&quot;--version&quot;</span><span class="s2">,</span><span class="s4">)</span>
+<a name="l524"><span class="ln">524  </span></a>
+<a name="l525"><span class="ln">525  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;is_flag&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l526"><span class="ln">526  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;expose_value&quot;</span><span class="s2">, </span><span class="s0">False</span><span class="s4">)</span>
+<a name="l527"><span class="ln">527  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;is_eager&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l528"><span class="ln">528  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;help&quot;</span><span class="s2">, </span><span class="s1">_</span><span class="s4">(</span><span class="s5">&quot;Show the version and exit.&quot;</span><span class="s4">))</span>
+<a name="l529"><span class="ln">529  </span></a>    <span class="s1">kwargs</span><span class="s6">[</span><span class="s5">&quot;callback&quot;</span><span class="s6">] </span><span class="s3">= </span><span class="s1">callback</span>
+<a name="l530"><span class="ln">530  </span></a>    <span class="s0">return </span><span class="s1">option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l531"><span class="ln">531  </span></a>
+<a name="l532"><span class="ln">532  </span></a>
+<a name="l533"><span class="ln">533  </span></a><span class="s0">def </span><span class="s1">help_option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s3">: </span><span class="s1">t</span><span class="s2">.</span><span class="s1">Any</span><span class="s4">) </span><span class="s1">-&gt; t</span><span class="s2">.</span><span class="s1">Callable</span><span class="s6">[[</span><span class="s1">FC</span><span class="s6">]</span><span class="s2">, </span><span class="s1">FC</span><span class="s6">]</span><span class="s3">:</span>
+<a name="l534"><span class="ln">534  </span></a>    <span class="s7">&quot;&quot;&quot;Add a ``--help`` option which immediately prints the help page 
+<a name="l535"><span class="ln">535  </span></a>    and exits the program. 
+<a name="l536"><span class="ln">536  </span></a> 
+<a name="l537"><span class="ln">537  </span></a>    This is usually unnecessary, as the ``--help`` option is added to 
+<a name="l538"><span class="ln">538  </span></a>    each command automatically unless ``add_help_option=False`` is 
+<a name="l539"><span class="ln">539  </span></a>    passed. 
+<a name="l540"><span class="ln">540  </span></a> 
+<a name="l541"><span class="ln">541  </span></a>    :param param_decls: One or more option names. Defaults to the single 
+<a name="l542"><span class="ln">542  </span></a>        value ``&quot;--help&quot;``. 
+<a name="l543"><span class="ln">543  </span></a>    :param kwargs: Extra arguments are passed to :func:`option`. 
+<a name="l544"><span class="ln">544  </span></a>    &quot;&quot;&quot;</span>
+<a name="l545"><span class="ln">545  </span></a>
+<a name="l546"><span class="ln">546  </span></a>    <span class="s0">def </span><span class="s1">callback</span><span class="s4">(</span><span class="s1">ctx</span><span class="s3">: </span><span class="s1">Context</span><span class="s2">, </span><span class="s1">param</span><span class="s3">: </span><span class="s1">Parameter</span><span class="s2">, </span><span class="s1">value</span><span class="s3">: </span><span class="s1">bool</span><span class="s4">) </span><span class="s1">-&gt; </span><span class="s0">None</span><span class="s3">:</span>
+<a name="l547"><span class="ln">547  </span></a>        <span class="s0">if not </span><span class="s1">value </span><span class="s0">or </span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">resilient_parsing</span><span class="s3">:</span>
+<a name="l548"><span class="ln">548  </span></a>            <span class="s0">return</span>
+<a name="l549"><span class="ln">549  </span></a>
+<a name="l550"><span class="ln">550  </span></a>        <span class="s1">echo</span><span class="s4">(</span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">get_help</span><span class="s4">()</span><span class="s2">, </span><span class="s1">color</span><span class="s3">=</span><span class="s1">ctx</span><span class="s2">.</span><span class="s1">color</span><span class="s4">)</span>
+<a name="l551"><span class="ln">551  </span></a>        <span class="s1">ctx</span><span class="s2">.</span><span class="s1">exit</span><span class="s4">()</span>
+<a name="l552"><span class="ln">552  </span></a>
+<a name="l553"><span class="ln">553  </span></a>    <span class="s0">if not </span><span class="s1">param_decls</span><span class="s3">:</span>
+<a name="l554"><span class="ln">554  </span></a>        <span class="s1">param_decls </span><span class="s3">= </span><span class="s4">(</span><span class="s5">&quot;--help&quot;</span><span class="s2">,</span><span class="s4">)</span>
+<a name="l555"><span class="ln">555  </span></a>
+<a name="l556"><span class="ln">556  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;is_flag&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l557"><span class="ln">557  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;expose_value&quot;</span><span class="s2">, </span><span class="s0">False</span><span class="s4">)</span>
+<a name="l558"><span class="ln">558  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;is_eager&quot;</span><span class="s2">, </span><span class="s0">True</span><span class="s4">)</span>
+<a name="l559"><span class="ln">559  </span></a>    <span class="s1">kwargs</span><span class="s2">.</span><span class="s1">setdefault</span><span class="s4">(</span><span class="s5">&quot;help&quot;</span><span class="s2">, </span><span class="s1">_</span><span class="s4">(</span><span class="s5">&quot;Show this message and exit.&quot;</span><span class="s4">))</span>
+<a name="l560"><span class="ln">560  </span></a>    <span class="s1">kwargs</span><span class="s6">[</span><span class="s5">&quot;callback&quot;</span><span class="s6">] </span><span class="s3">= </span><span class="s1">callback</span>
+<a name="l561"><span class="ln">561  </span></a>    <span class="s0">return </span><span class="s1">option</span><span class="s4">(</span><span class="s3">*</span><span class="s1">param_decls</span><span class="s2">, </span><span class="s3">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l562"><span class="ln">562  </span></a></pre>
+</body>
+</html>

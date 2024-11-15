@@ -1,0 +1,745 @@
+<html>
+<head>
+<title>ecu.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #848bbd; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #fede5d; font-style: italic;}
+.s3 { color: #b6b1b1;}
+.s4 { color: #03edf9;}
+.s5 { color: #fede5d;}
+.s6 { color: #36f9f6;}
+.s7 { color: #ff8b39;}
+.s8 { color: #f97e72;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ecu.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0"># SPDX-License-Identifier: GPL-2.0-only</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0"># This file is part of Scapy</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0"># See https://scapy.net/ for more information</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0"># Copyright (C) Nils Weiss &lt;nils@we155.de&gt;</span>
+<a name="l5"><span class="ln">5    </span></a>
+<a name="l6"><span class="ln">6    </span></a><span class="s0"># scapy.contrib.description = Helper class for tracking Ecu states (Ecu)</span>
+<a name="l7"><span class="ln">7    </span></a><span class="s0"># scapy.contrib.status = loads</span>
+<a name="l8"><span class="ln">8    </span></a>
+<a name="l9"><span class="ln">9    </span></a><span class="s2">import </span><span class="s1">time</span>
+<a name="l10"><span class="ln">10   </span></a><span class="s2">import </span><span class="s1">random</span>
+<a name="l11"><span class="ln">11   </span></a><span class="s2">import </span><span class="s1">copy</span>
+<a name="l12"><span class="ln">12   </span></a><span class="s2">import </span><span class="s1">itertools</span>
+<a name="l13"><span class="ln">13   </span></a>
+<a name="l14"><span class="ln">14   </span></a><span class="s2">from </span><span class="s1">collections </span><span class="s2">import </span><span class="s1">defaultdict</span>
+<a name="l15"><span class="ln">15   </span></a><span class="s2">from </span><span class="s1">types </span><span class="s2">import </span><span class="s1">GeneratorType</span>
+<a name="l16"><span class="ln">16   </span></a><span class="s2">from </span><span class="s1">threading </span><span class="s2">import </span><span class="s1">Lock</span>
+<a name="l17"><span class="ln">17   </span></a>
+<a name="l18"><span class="ln">18   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">compat </span><span class="s2">import </span><span class="s1">orb</span>
+<a name="l19"><span class="ln">19   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">packet </span><span class="s2">import </span><span class="s1">Raw</span><span class="s3">, </span><span class="s1">Packet</span>
+<a name="l20"><span class="ln">20   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">plist </span><span class="s2">import </span><span class="s1">PacketList</span>
+<a name="l21"><span class="ln">21   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">sessions </span><span class="s2">import </span><span class="s1">DefaultSession</span>
+<a name="l22"><span class="ln">22   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">ansmachine </span><span class="s2">import </span><span class="s1">AnsweringMachine</span>
+<a name="l23"><span class="ln">23   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">supersocket </span><span class="s2">import </span><span class="s1">SuperSocket</span>
+<a name="l24"><span class="ln">24   </span></a><span class="s2">from </span><span class="s1">scapy</span><span class="s3">.</span><span class="s1">error </span><span class="s2">import </span><span class="s1">Scapy_Exception</span>
+<a name="l25"><span class="ln">25   </span></a>
+<a name="l26"><span class="ln">26   </span></a><span class="s0"># Typing imports</span>
+<a name="l27"><span class="ln">27   </span></a><span class="s2">from </span><span class="s1">typing </span><span class="s2">import </span><span class="s4">(</span>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s1">Any</span><span class="s3">,</span>
+<a name="l29"><span class="ln">29   </span></a>    <span class="s1">Union</span><span class="s3">,</span>
+<a name="l30"><span class="ln">30   </span></a>    <span class="s1">Iterable</span><span class="s3">,</span>
+<a name="l31"><span class="ln">31   </span></a>    <span class="s1">Callable</span><span class="s3">,</span>
+<a name="l32"><span class="ln">32   </span></a>    <span class="s1">List</span><span class="s3">,</span>
+<a name="l33"><span class="ln">33   </span></a>    <span class="s1">Optional</span><span class="s3">,</span>
+<a name="l34"><span class="ln">34   </span></a>    <span class="s1">Tuple</span><span class="s3">,</span>
+<a name="l35"><span class="ln">35   </span></a>    <span class="s1">Type</span><span class="s3">,</span>
+<a name="l36"><span class="ln">36   </span></a>    <span class="s1">cast</span><span class="s3">,</span>
+<a name="l37"><span class="ln">37   </span></a>    <span class="s1">Dict</span><span class="s3">,</span>
+<a name="l38"><span class="ln">38   </span></a><span class="s4">)</span>
+<a name="l39"><span class="ln">39   </span></a>
+<a name="l40"><span class="ln">40   </span></a>
+<a name="l41"><span class="ln">41   </span></a><span class="s1">__all__ </span><span class="s5">= </span><span class="s6">[</span><span class="s7">&quot;EcuState&quot;</span><span class="s3">, </span><span class="s7">&quot;Ecu&quot;</span><span class="s3">, </span><span class="s7">&quot;EcuResponse&quot;</span><span class="s3">, </span><span class="s7">&quot;EcuSession&quot;</span><span class="s3">,</span>
+<a name="l42"><span class="ln">42   </span></a>           <span class="s7">&quot;EcuAnsweringMachine&quot;</span><span class="s6">]</span>
+<a name="l43"><span class="ln">43   </span></a>
+<a name="l44"><span class="ln">44   </span></a>
+<a name="l45"><span class="ln">45   </span></a><span class="s2">class </span><span class="s1">EcuState</span><span class="s4">(</span><span class="s1">object</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l46"><span class="ln">46   </span></a>    <span class="s0">&quot;&quot;&quot; 
+<a name="l47"><span class="ln">47   </span></a>    Stores the state of an Ecu. The state is defined by a protocol, for 
+<a name="l48"><span class="ln">48   </span></a>    example UDS or GMLAN. 
+<a name="l49"><span class="ln">49   </span></a>    A EcuState supports comparison and serialization (command()). 
+<a name="l50"><span class="ln">50   </span></a>    &quot;&quot;&quot;</span>
+<a name="l51"><span class="ln">51   </span></a>    <span class="s1">__slots__ </span><span class="s5">= </span><span class="s6">[</span><span class="s7">&quot;__dict__&quot;</span><span class="s3">, </span><span class="s7">&quot;__cache__&quot;</span><span class="s6">]</span>
+<a name="l52"><span class="ln">52   </span></a>
+<a name="l53"><span class="ln">53   </span></a>    <span class="s2">def </span><span class="s1">__init__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s5">**</span><span class="s1">kwargs</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l54"><span class="ln">54   </span></a>        <span class="s0"># type: (Any) -&gt; None</span>
+<a name="l55"><span class="ln">55   </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__ </span><span class="s5">= </span><span class="s2">None  </span><span class="s0"># type: Optional[Tuple[List[EcuState], List[Any]]]  # noqa: E501</span>
+<a name="l56"><span class="ln">56   </span></a>        <span class="s2">for </span><span class="s1">k</span><span class="s3">, </span><span class="s1">v </span><span class="s2">in </span><span class="s1">kwargs</span><span class="s3">.</span><span class="s1">items</span><span class="s4">()</span><span class="s5">:</span>
+<a name="l57"><span class="ln">57   </span></a>            <span class="s2">if </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">v</span><span class="s3">, </span><span class="s1">GeneratorType</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l58"><span class="ln">58   </span></a>                <span class="s1">v </span><span class="s5">= </span><span class="s1">list</span><span class="s4">(</span><span class="s1">v</span><span class="s4">)</span>
+<a name="l59"><span class="ln">59   </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__setitem__</span><span class="s4">(</span><span class="s1">k</span><span class="s3">, </span><span class="s1">v</span><span class="s4">)</span>
+<a name="l60"><span class="ln">60   </span></a>
+<a name="l61"><span class="ln">61   </span></a>    <span class="s2">def </span><span class="s1">_expand</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l62"><span class="ln">62   </span></a>        <span class="s0"># type: () -&gt; List[EcuState]</span>
+<a name="l63"><span class="ln">63   </span></a>        <span class="s1">values </span><span class="s5">= </span><span class="s1">list</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">values</span><span class="s4">())</span>
+<a name="l64"><span class="ln">64   </span></a>        <span class="s1">keys </span><span class="s5">= </span><span class="s1">list</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span>
+<a name="l65"><span class="ln">65   </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__ </span><span class="s2">is None or </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__</span><span class="s6">[</span><span class="s8">1</span><span class="s6">] </span><span class="s5">!= </span><span class="s1">values</span><span class="s5">:</span>
+<a name="l66"><span class="ln">66   </span></a>            <span class="s1">expanded </span><span class="s5">= </span><span class="s1">list</span><span class="s4">()</span>
+<a name="l67"><span class="ln">67   </span></a>            <span class="s2">for </span><span class="s1">x </span><span class="s2">in </span><span class="s1">itertools</span><span class="s3">.</span><span class="s1">product</span><span class="s4">(</span><span class="s5">*</span><span class="s6">[</span><span class="s1">self</span><span class="s3">.</span><span class="s1">_flatten</span><span class="s4">(</span><span class="s1">v</span><span class="s4">) </span><span class="s2">for </span><span class="s1">v </span><span class="s2">in </span><span class="s1">values</span><span class="s6">]</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l68"><span class="ln">68   </span></a>                <span class="s1">kwargs </span><span class="s5">= </span><span class="s6">{}</span>
+<a name="l69"><span class="ln">69   </span></a>                <span class="s2">for </span><span class="s1">i</span><span class="s3">, </span><span class="s1">k </span><span class="s2">in </span><span class="s1">enumerate</span><span class="s4">(</span><span class="s1">keys</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l70"><span class="ln">70   </span></a>                    <span class="s2">if </span><span class="s1">x</span><span class="s6">[</span><span class="s1">i</span><span class="s6">] </span><span class="s2">is None</span><span class="s5">:</span>
+<a name="l71"><span class="ln">71   </span></a>                        <span class="s2">continue</span>
+<a name="l72"><span class="ln">72   </span></a>                    <span class="s1">kwargs</span><span class="s6">[</span><span class="s1">k</span><span class="s6">] </span><span class="s5">= </span><span class="s1">x</span><span class="s6">[</span><span class="s1">i</span><span class="s6">]</span>
+<a name="l73"><span class="ln">73   </span></a>                <span class="s1">expanded</span><span class="s3">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">EcuState</span><span class="s4">(</span><span class="s5">**</span><span class="s1">kwargs</span><span class="s4">))</span>
+<a name="l74"><span class="ln">74   </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__ </span><span class="s5">= </span><span class="s4">(</span><span class="s1">expanded</span><span class="s3">, </span><span class="s1">values</span><span class="s4">)</span>
+<a name="l75"><span class="ln">75   </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__</span><span class="s6">[</span><span class="s8">0</span><span class="s6">]</span>
+<a name="l76"><span class="ln">76   </span></a>
+<a name="l77"><span class="ln">77   </span></a>    <span class="s5">@</span><span class="s1">staticmethod</span>
+<a name="l78"><span class="ln">78   </span></a>    <span class="s2">def </span><span class="s1">_flatten</span><span class="s4">(</span><span class="s1">x</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l79"><span class="ln">79   </span></a>        <span class="s0"># type: (Any) -&gt; List[Any]</span>
+<a name="l80"><span class="ln">80   </span></a>        <span class="s2">if </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">x</span><span class="s3">, </span><span class="s4">(</span><span class="s1">str</span><span class="s3">, </span><span class="s1">bytes</span><span class="s4">))</span><span class="s5">:</span>
+<a name="l81"><span class="ln">81   </span></a>            <span class="s2">return </span><span class="s6">[</span><span class="s1">x</span><span class="s6">]</span>
+<a name="l82"><span class="ln">82   </span></a>        <span class="s2">elif </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">x</span><span class="s3">, </span><span class="s7">&quot;__iter__&quot;</span><span class="s4">) </span><span class="s2">and </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">x</span><span class="s3">, </span><span class="s7">&quot;__len__&quot;</span><span class="s4">) </span><span class="s2">and </span><span class="s1">len</span><span class="s4">(</span><span class="s1">x</span><span class="s4">) </span><span class="s5">== </span><span class="s8">1</span><span class="s5">:</span>
+<a name="l83"><span class="ln">83   </span></a>            <span class="s2">return </span><span class="s1">list</span><span class="s4">(</span><span class="s5">*</span><span class="s1">x</span><span class="s4">)</span>
+<a name="l84"><span class="ln">84   </span></a>        <span class="s2">elif not </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">x</span><span class="s3">, </span><span class="s7">&quot;__iter__&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l85"><span class="ln">85   </span></a>            <span class="s2">return </span><span class="s6">[</span><span class="s1">x</span><span class="s6">]</span>
+<a name="l86"><span class="ln">86   </span></a>        <span class="s1">flattened </span><span class="s5">= </span><span class="s1">list</span><span class="s4">()</span>
+<a name="l87"><span class="ln">87   </span></a>        <span class="s2">for </span><span class="s1">y </span><span class="s2">in </span><span class="s1">x</span><span class="s5">:</span>
+<a name="l88"><span class="ln">88   </span></a>            <span class="s2">if </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">x</span><span class="s3">, </span><span class="s7">&quot;__iter__&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l89"><span class="ln">89   </span></a>                <span class="s1">flattened </span><span class="s5">+= </span><span class="s1">EcuState</span><span class="s3">.</span><span class="s1">_flatten</span><span class="s4">(</span><span class="s1">y</span><span class="s4">)</span>
+<a name="l90"><span class="ln">90   </span></a>            <span class="s2">else</span><span class="s5">:</span>
+<a name="l91"><span class="ln">91   </span></a>                <span class="s1">flattened </span><span class="s5">+= </span><span class="s6">[</span><span class="s1">y</span><span class="s6">]</span>
+<a name="l92"><span class="ln">92   </span></a>        <span class="s2">return </span><span class="s1">flattened</span>
+<a name="l93"><span class="ln">93   </span></a>
+<a name="l94"><span class="ln">94   </span></a>    <span class="s2">def </span><span class="s1">__delitem__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">key</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l95"><span class="ln">95   </span></a>        <span class="s0"># type: (str) -&gt; None</span>
+<a name="l96"><span class="ln">96   </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__ </span><span class="s5">= </span><span class="s2">None</span>
+<a name="l97"><span class="ln">97   </span></a>        <span class="s2">del </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">key</span><span class="s6">]</span>
+<a name="l98"><span class="ln">98   </span></a>
+<a name="l99"><span class="ln">99   </span></a>    <span class="s2">def </span><span class="s1">__len__</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l100"><span class="ln">100  </span></a>        <span class="s0"># type: () -&gt; int</span>
+<a name="l101"><span class="ln">101  </span></a>        <span class="s2">return </span><span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span>
+<a name="l102"><span class="ln">102  </span></a>
+<a name="l103"><span class="ln">103  </span></a>    <span class="s2">def </span><span class="s1">__getitem__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">item</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l104"><span class="ln">104  </span></a>        <span class="s0"># type: (str) -&gt; Any</span>
+<a name="l105"><span class="ln">105  </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">item</span><span class="s6">]</span>
+<a name="l106"><span class="ln">106  </span></a>
+<a name="l107"><span class="ln">107  </span></a>    <span class="s2">def </span><span class="s1">__setitem__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">key</span><span class="s3">, </span><span class="s1">value</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l108"><span class="ln">108  </span></a>        <span class="s0"># type: (str, Any) -&gt; None</span>
+<a name="l109"><span class="ln">109  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__ </span><span class="s5">= </span><span class="s2">None</span>
+<a name="l110"><span class="ln">110  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">key</span><span class="s6">] </span><span class="s5">= </span><span class="s1">value</span>
+<a name="l111"><span class="ln">111  </span></a>
+<a name="l112"><span class="ln">112  </span></a>    <span class="s2">def </span><span class="s1">__repr__</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l113"><span class="ln">113  </span></a>        <span class="s0"># type: () -&gt; str</span>
+<a name="l114"><span class="ln">114  </span></a>        <span class="s2">return </span><span class="s7">&quot;&quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s4">(</span><span class="s1">str</span><span class="s4">(</span><span class="s1">k</span><span class="s4">) </span><span class="s5">+ </span><span class="s1">str</span><span class="s4">(</span><span class="s1">v</span><span class="s4">) </span><span class="s2">for </span><span class="s1">k</span><span class="s3">, </span><span class="s1">v </span><span class="s2">in</span>
+<a name="l115"><span class="ln">115  </span></a>                       <span class="s1">sorted</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">items</span><span class="s4">()</span><span class="s3">, </span><span class="s1">key</span><span class="s5">=</span><span class="s2">lambda </span><span class="s1">t</span><span class="s5">: </span><span class="s1">t</span><span class="s6">[</span><span class="s8">0</span><span class="s6">]</span><span class="s4">))</span>
+<a name="l116"><span class="ln">116  </span></a>
+<a name="l117"><span class="ln">117  </span></a>    <span class="s2">def </span><span class="s1">__eq__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l118"><span class="ln">118  </span></a>        <span class="s0"># type: (object) -&gt; bool</span>
+<a name="l119"><span class="ln">119  </span></a>        <span class="s1">other </span><span class="s5">= </span><span class="s1">cast</span><span class="s4">(</span><span class="s1">EcuState</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span>
+<a name="l120"><span class="ln">120  </span></a>        <span class="s2">if </span><span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s4">) </span><span class="s5">!= </span><span class="s1">len</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l121"><span class="ln">121  </span></a>            <span class="s2">return False</span>
+<a name="l122"><span class="ln">122  </span></a>        <span class="s2">try</span><span class="s5">:</span>
+<a name="l123"><span class="ln">123  </span></a>            <span class="s2">return </span><span class="s1">all</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">] </span><span class="s5">== </span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span>
+<a name="l124"><span class="ln">124  </span></a>                       <span class="s2">for </span><span class="s1">k </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span>
+<a name="l125"><span class="ln">125  </span></a>        <span class="s2">except </span><span class="s1">KeyError</span><span class="s5">:</span>
+<a name="l126"><span class="ln">126  </span></a>            <span class="s2">return False</span>
+<a name="l127"><span class="ln">127  </span></a>
+<a name="l128"><span class="ln">128  </span></a>    <span class="s2">def </span><span class="s1">__contains__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">item</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l129"><span class="ln">129  </span></a>        <span class="s0"># type: (EcuState) -&gt; bool</span>
+<a name="l130"><span class="ln">130  </span></a>        <span class="s2">if not </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">item</span><span class="s3">, </span><span class="s1">EcuState</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l131"><span class="ln">131  </span></a>            <span class="s2">return False</span>
+<a name="l132"><span class="ln">132  </span></a>        <span class="s2">return </span><span class="s1">all</span><span class="s4">(</span><span class="s1">s </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_expand</span><span class="s4">() </span><span class="s2">for </span><span class="s1">s </span><span class="s2">in </span><span class="s1">item</span><span class="s3">.</span><span class="s1">_expand</span><span class="s4">())</span>
+<a name="l133"><span class="ln">133  </span></a>
+<a name="l134"><span class="ln">134  </span></a>    <span class="s2">def </span><span class="s1">__ne__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l135"><span class="ln">135  </span></a>        <span class="s0"># type: (object) -&gt; bool</span>
+<a name="l136"><span class="ln">136  </span></a>        <span class="s2">return not </span><span class="s1">other </span><span class="s5">== </span><span class="s1">self</span>
+<a name="l137"><span class="ln">137  </span></a>
+<a name="l138"><span class="ln">138  </span></a>    <span class="s2">def </span><span class="s1">__lt__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l139"><span class="ln">139  </span></a>        <span class="s0"># type: (EcuState) -&gt; bool</span>
+<a name="l140"><span class="ln">140  </span></a>        <span class="s2">if </span><span class="s1">self </span><span class="s5">== </span><span class="s1">other</span><span class="s5">:</span>
+<a name="l141"><span class="ln">141  </span></a>            <span class="s2">return False</span>
+<a name="l142"><span class="ln">142  </span></a>
+<a name="l143"><span class="ln">143  </span></a>        <span class="s2">if </span><span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s4">) </span><span class="s5">&lt; </span><span class="s1">len</span><span class="s4">(</span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l144"><span class="ln">144  </span></a>            <span class="s2">return True</span>
+<a name="l145"><span class="ln">145  </span></a>
+<a name="l146"><span class="ln">146  </span></a>        <span class="s2">if </span><span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s4">) </span><span class="s5">&gt; </span><span class="s1">len</span><span class="s4">(</span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l147"><span class="ln">147  </span></a>            <span class="s2">return False</span>
+<a name="l148"><span class="ln">148  </span></a>
+<a name="l149"><span class="ln">149  </span></a>        <span class="s1">common </span><span class="s5">= </span><span class="s1">set</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span><span class="s3">.</span><span class="s1">intersection</span><span class="s4">(</span>
+<a name="l150"><span class="ln">150  </span></a>            <span class="s1">set</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">()))</span>
+<a name="l151"><span class="ln">151  </span></a>
+<a name="l152"><span class="ln">152  </span></a>        <span class="s2">for </span><span class="s1">k </span><span class="s2">in </span><span class="s1">sorted</span><span class="s4">(</span><span class="s1">common</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l153"><span class="ln">153  </span></a>            <span class="s2">if not </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span><span class="s3">, </span><span class="s1">type</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span><span class="s4">))</span><span class="s5">:</span>
+<a name="l154"><span class="ln">154  </span></a>                <span class="s2">raise </span><span class="s1">TypeError</span><span class="s4">(</span>
+<a name="l155"><span class="ln">155  </span></a>                    <span class="s7">&quot;Can't compare %s with %s for the EcuState element %s&quot; </span><span class="s5">%</span>
+<a name="l156"><span class="ln">156  </span></a>                    <span class="s4">(</span><span class="s1">type</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span><span class="s4">)</span><span class="s3">, </span><span class="s1">type</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span><span class="s4">)</span><span class="s3">, </span><span class="s1">k</span><span class="s4">))</span>
+<a name="l157"><span class="ln">157  </span></a>            <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">] </span><span class="s5">&lt; </span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span><span class="s5">:</span>
+<a name="l158"><span class="ln">158  </span></a>                <span class="s2">return True</span>
+<a name="l159"><span class="ln">159  </span></a>            <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">] </span><span class="s5">&gt; </span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span><span class="s5">:</span>
+<a name="l160"><span class="ln">160  </span></a>                <span class="s2">return False</span>
+<a name="l161"><span class="ln">161  </span></a>
+<a name="l162"><span class="ln">162  </span></a>        <span class="s2">if </span><span class="s1">len</span><span class="s4">(</span><span class="s1">common</span><span class="s4">) </span><span class="s5">&lt; </span><span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l163"><span class="ln">163  </span></a>            <span class="s1">self_diffs </span><span class="s5">= </span><span class="s1">set</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span><span class="s3">.</span><span class="s1">difference</span><span class="s4">(</span>
+<a name="l164"><span class="ln">164  </span></a>                <span class="s1">set</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">()))</span>
+<a name="l165"><span class="ln">165  </span></a>            <span class="s1">other_diffs </span><span class="s5">= </span><span class="s1">set</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span><span class="s3">.</span><span class="s1">difference</span><span class="s4">(</span>
+<a name="l166"><span class="ln">166  </span></a>                <span class="s1">set</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">()))</span>
+<a name="l167"><span class="ln">167  </span></a>
+<a name="l168"><span class="ln">168  </span></a>            <span class="s2">for </span><span class="s1">s</span><span class="s3">, </span><span class="s1">o </span><span class="s2">in </span><span class="s1">zip</span><span class="s4">(</span><span class="s1">self_diffs</span><span class="s3">, </span><span class="s1">other_diffs</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l169"><span class="ln">169  </span></a>                <span class="s2">if </span><span class="s1">s </span><span class="s5">&lt; </span><span class="s1">o</span><span class="s5">:</span>
+<a name="l170"><span class="ln">170  </span></a>                    <span class="s2">return True</span>
+<a name="l171"><span class="ln">171  </span></a>
+<a name="l172"><span class="ln">172  </span></a>            <span class="s2">return False</span>
+<a name="l173"><span class="ln">173  </span></a>
+<a name="l174"><span class="ln">174  </span></a>        <span class="s2">raise </span><span class="s1">TypeError</span><span class="s4">(</span><span class="s7">&quot;EcuStates should be identical. Something bad happen. &quot;</span>
+<a name="l175"><span class="ln">175  </span></a>                        <span class="s7">&quot;self: %s other: %s&quot; </span><span class="s5">% </span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">, </span><span class="s1">other</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s4">))</span>
+<a name="l176"><span class="ln">176  </span></a>
+<a name="l177"><span class="ln">177  </span></a>    <span class="s2">def </span><span class="s1">__hash__</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l178"><span class="ln">178  </span></a>        <span class="s0"># type: () -&gt; int</span>
+<a name="l179"><span class="ln">179  </span></a>        <span class="s2">return </span><span class="s1">hash</span><span class="s4">(</span><span class="s1">repr</span><span class="s4">(</span><span class="s1">self</span><span class="s4">))</span>
+<a name="l180"><span class="ln">180  </span></a>
+<a name="l181"><span class="ln">181  </span></a>    <span class="s2">def </span><span class="s1">reset</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l182"><span class="ln">182  </span></a>        <span class="s0"># type: () -&gt; None</span>
+<a name="l183"><span class="ln">183  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__cache__ </span><span class="s5">= </span><span class="s2">None</span>
+<a name="l184"><span class="ln">184  </span></a>        <span class="s1">keys </span><span class="s5">= </span><span class="s1">list</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">keys</span><span class="s4">())</span>
+<a name="l185"><span class="ln">185  </span></a>        <span class="s2">for </span><span class="s1">k </span><span class="s2">in </span><span class="s1">keys</span><span class="s5">:</span>
+<a name="l186"><span class="ln">186  </span></a>            <span class="s2">del </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s6">[</span><span class="s1">k</span><span class="s6">]</span>
+<a name="l187"><span class="ln">187  </span></a>
+<a name="l188"><span class="ln">188  </span></a>    <span class="s2">def </span><span class="s1">command</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l189"><span class="ln">189  </span></a>        <span class="s0"># type: () -&gt; str</span>
+<a name="l190"><span class="ln">190  </span></a>        <span class="s2">return </span><span class="s7">&quot;EcuState(&quot; </span><span class="s5">+ </span><span class="s7">&quot;, &quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s4">(</span>
+<a name="l191"><span class="ln">191  </span></a>            <span class="s6">[</span><span class="s7">&quot;%s=%s&quot; </span><span class="s5">% </span><span class="s4">(</span><span class="s1">k</span><span class="s3">, </span><span class="s1">repr</span><span class="s4">(</span><span class="s1">v</span><span class="s4">)) </span><span class="s2">for </span><span class="s1">k</span><span class="s3">, </span><span class="s1">v </span><span class="s2">in </span><span class="s1">sorted</span><span class="s4">(</span>
+<a name="l192"><span class="ln">192  </span></a>                <span class="s1">self</span><span class="s3">.</span><span class="s1">__dict__</span><span class="s3">.</span><span class="s1">items</span><span class="s4">()</span><span class="s3">, </span><span class="s1">key</span><span class="s5">=</span><span class="s2">lambda </span><span class="s1">t</span><span class="s5">: </span><span class="s1">t</span><span class="s6">[</span><span class="s8">0</span><span class="s6">]</span><span class="s4">)</span><span class="s6">]</span><span class="s4">) </span><span class="s5">+ </span><span class="s7">&quot;)&quot;</span>
+<a name="l193"><span class="ln">193  </span></a>
+<a name="l194"><span class="ln">194  </span></a>    <span class="s5">@</span><span class="s1">staticmethod</span>
+<a name="l195"><span class="ln">195  </span></a>    <span class="s2">def </span><span class="s1">extend_pkt_with_modifier</span><span class="s4">(</span><span class="s1">cls</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l196"><span class="ln">196  </span></a>        <span class="s0"># type: (Type[Packet]) -&gt; Callable[[Callable[[Packet, Packet, EcuState], None]], None]  # noqa: E501</span>
+<a name="l197"><span class="ln">197  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l198"><span class="ln">198  </span></a>        Decorator to add a function as 'modify_ecu_state' method to a given 
+<a name="l199"><span class="ln">199  </span></a>        class. This allows dynamic modifications and additions to a protocol. 
+<a name="l200"><span class="ln">200  </span></a>        :param cls: A packet class to be modified 
+<a name="l201"><span class="ln">201  </span></a>        :return: Decorator function 
+<a name="l202"><span class="ln">202  </span></a>        &quot;&quot;&quot;</span>
+<a name="l203"><span class="ln">203  </span></a>        <span class="s2">if </span><span class="s1">len</span><span class="s4">(</span><span class="s1">cls</span><span class="s3">.</span><span class="s1">fields_desc</span><span class="s4">) </span><span class="s5">== </span><span class="s8">0</span><span class="s5">:</span>
+<a name="l204"><span class="ln">204  </span></a>            <span class="s2">raise </span><span class="s1">Scapy_Exception</span><span class="s4">(</span><span class="s7">&quot;Packets without fields can't be extended.&quot;</span><span class="s4">)</span>
+<a name="l205"><span class="ln">205  </span></a>
+<a name="l206"><span class="ln">206  </span></a>        <span class="s2">if </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">cls</span><span class="s3">, </span><span class="s7">&quot;modify_ecu_state&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l207"><span class="ln">207  </span></a>            <span class="s2">raise </span><span class="s1">Scapy_Exception</span><span class="s4">(</span>
+<a name="l208"><span class="ln">208  </span></a>                <span class="s7">&quot;Class already extended. Can't override existing method.&quot;</span><span class="s4">)</span>
+<a name="l209"><span class="ln">209  </span></a>
+<a name="l210"><span class="ln">210  </span></a>        <span class="s2">def </span><span class="s1">decorator_function</span><span class="s4">(</span><span class="s1">f</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l211"><span class="ln">211  </span></a>            <span class="s0"># type: (Callable[[Packet, Packet, EcuState], None]) -&gt; None</span>
+<a name="l212"><span class="ln">212  </span></a>            <span class="s1">setattr</span><span class="s4">(</span><span class="s1">cls</span><span class="s3">, </span><span class="s7">&quot;modify_ecu_state&quot;</span><span class="s3">, </span><span class="s1">f</span><span class="s4">)</span>
+<a name="l213"><span class="ln">213  </span></a>
+<a name="l214"><span class="ln">214  </span></a>        <span class="s2">return </span><span class="s1">decorator_function</span>
+<a name="l215"><span class="ln">215  </span></a>
+<a name="l216"><span class="ln">216  </span></a>    <span class="s5">@</span><span class="s1">staticmethod</span>
+<a name="l217"><span class="ln">217  </span></a>    <span class="s2">def </span><span class="s1">is_modifier_pkt</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l218"><span class="ln">218  </span></a>        <span class="s0"># type: (Packet) -&gt; bool</span>
+<a name="l219"><span class="ln">219  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l220"><span class="ln">220  </span></a>        Helper function to determine if a Packet contains a layer that 
+<a name="l221"><span class="ln">221  </span></a>        modifies the EcuState. 
+<a name="l222"><span class="ln">222  </span></a>        :param pkt: Packet to be analyzed 
+<a name="l223"><span class="ln">223  </span></a>        :return: True if pkt contains layer that implements modify_ecu_state 
+<a name="l224"><span class="ln">224  </span></a>        &quot;&quot;&quot;</span>
+<a name="l225"><span class="ln">225  </span></a>        <span class="s2">return </span><span class="s1">any</span><span class="s4">(</span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">layer</span><span class="s3">, </span><span class="s7">&quot;modify_ecu_state&quot;</span><span class="s4">)</span>
+<a name="l226"><span class="ln">226  </span></a>                   <span class="s2">for </span><span class="s1">layer </span><span class="s2">in </span><span class="s1">pkt</span><span class="s3">.</span><span class="s1">layers</span><span class="s4">())</span>
+<a name="l227"><span class="ln">227  </span></a>
+<a name="l228"><span class="ln">228  </span></a>    <span class="s5">@</span><span class="s1">staticmethod</span>
+<a name="l229"><span class="ln">229  </span></a>    <span class="s2">def </span><span class="s1">get_modified_ecu_state</span><span class="s4">(</span><span class="s1">response</span><span class="s3">, </span><span class="s1">request</span><span class="s3">, </span><span class="s1">state</span><span class="s3">, </span><span class="s1">modify_in_place</span><span class="s5">=</span><span class="s2">False</span><span class="s4">)</span><span class="s5">:  </span><span class="s0"># noqa: E501</span>
+<a name="l230"><span class="ln">230  </span></a>        <span class="s0"># type: (Packet, Packet, EcuState, bool) -&gt; EcuState</span>
+<a name="l231"><span class="ln">231  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l232"><span class="ln">232  </span></a>        Helper function to get a modified EcuState from a Packet and a 
+<a name="l233"><span class="ln">233  </span></a>        previous EcuState. An EcuState is always modified after a response 
+<a name="l234"><span class="ln">234  </span></a>        Packet is received. In some protocols, the belonging request packet 
+<a name="l235"><span class="ln">235  </span></a>        is necessary to determine the precise state of the Ecu 
+<a name="l236"><span class="ln">236  </span></a> 
+<a name="l237"><span class="ln">237  </span></a>        :param response: Response packet that supports `modify_ecu_state` 
+<a name="l238"><span class="ln">238  </span></a>        :param request: Belonging request of the response that modifies Ecu 
+<a name="l239"><span class="ln">239  </span></a>        :param state: The previous/current EcuState 
+<a name="l240"><span class="ln">240  </span></a>        :param modify_in_place: If True, the given EcuState will be modified 
+<a name="l241"><span class="ln">241  </span></a>        :return: The modified EcuState or a modified copy 
+<a name="l242"><span class="ln">242  </span></a>        &quot;&quot;&quot;</span>
+<a name="l243"><span class="ln">243  </span></a>        <span class="s2">if </span><span class="s1">modify_in_place</span><span class="s5">:</span>
+<a name="l244"><span class="ln">244  </span></a>            <span class="s1">new_state </span><span class="s5">= </span><span class="s1">state</span>
+<a name="l245"><span class="ln">245  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l246"><span class="ln">246  </span></a>            <span class="s1">new_state </span><span class="s5">= </span><span class="s1">copy</span><span class="s3">.</span><span class="s1">copy</span><span class="s4">(</span><span class="s1">state</span><span class="s4">)</span>
+<a name="l247"><span class="ln">247  </span></a>
+<a name="l248"><span class="ln">248  </span></a>        <span class="s2">for </span><span class="s1">layer </span><span class="s2">in </span><span class="s1">response</span><span class="s3">.</span><span class="s1">layers</span><span class="s4">()</span><span class="s5">:</span>
+<a name="l249"><span class="ln">249  </span></a>            <span class="s2">if not </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">layer</span><span class="s3">, </span><span class="s7">&quot;modify_ecu_state&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l250"><span class="ln">250  </span></a>                <span class="s2">continue</span>
+<a name="l251"><span class="ln">251  </span></a>            <span class="s2">try</span><span class="s5">:</span>
+<a name="l252"><span class="ln">252  </span></a>                <span class="s1">layer</span><span class="s3">.</span><span class="s1">modify_ecu_state</span><span class="s4">(</span><span class="s1">response</span><span class="s3">, </span><span class="s1">request</span><span class="s3">, </span><span class="s1">new_state</span><span class="s4">)</span>
+<a name="l253"><span class="ln">253  </span></a>            <span class="s2">except </span><span class="s1">TypeError</span><span class="s5">:</span>
+<a name="l254"><span class="ln">254  </span></a>                <span class="s1">layer</span><span class="s3">.</span><span class="s1">modify_ecu_state</span><span class="s3">.</span><span class="s1">im_func</span><span class="s4">(</span><span class="s1">response</span><span class="s3">, </span><span class="s1">request</span><span class="s3">, </span><span class="s1">new_state</span><span class="s4">)</span>
+<a name="l255"><span class="ln">255  </span></a>        <span class="s2">return </span><span class="s1">new_state</span>
+<a name="l256"><span class="ln">256  </span></a>
+<a name="l257"><span class="ln">257  </span></a>
+<a name="l258"><span class="ln">258  </span></a><span class="s2">class </span><span class="s1">Ecu</span><span class="s4">(</span><span class="s1">object</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l259"><span class="ln">259  </span></a>    <span class="s7">&quot;&quot;&quot;An Ecu object can be used to 
+<a name="l260"><span class="ln">260  </span></a>        * track the states of an Ecu. 
+<a name="l261"><span class="ln">261  </span></a>        * to log all modification to an Ecu. 
+<a name="l262"><span class="ln">262  </span></a>        * to extract supported responses of a real Ecu. 
+<a name="l263"><span class="ln">263  </span></a> 
+<a name="l264"><span class="ln">264  </span></a>    Example: 
+<a name="l265"><span class="ln">265  </span></a>        &gt;&gt;&gt; print(&quot;This ecu logs, tracks and creates supported responses&quot;) 
+<a name="l266"><span class="ln">266  </span></a>        &gt;&gt;&gt; my_virtual_ecu = Ecu() 
+<a name="l267"><span class="ln">267  </span></a>        &gt;&gt;&gt; my_virtual_ecu.update(PacketList([...])) 
+<a name="l268"><span class="ln">268  </span></a>        &gt;&gt;&gt; my_virtual_ecu.supported_responses 
+<a name="l269"><span class="ln">269  </span></a>        &gt;&gt;&gt; print(&quot;Another ecu just tracks&quot;) 
+<a name="l270"><span class="ln">270  </span></a>        &gt;&gt;&gt; my_tracking_ecu = Ecu(logging=False, store_supported_responses=False) 
+<a name="l271"><span class="ln">271  </span></a>        &gt;&gt;&gt; my_tracking_ecu.update(PacketList([...])) 
+<a name="l272"><span class="ln">272  </span></a>        &gt;&gt;&gt; print(&quot;Another ecu just logs all modifications to it&quot;) 
+<a name="l273"><span class="ln">273  </span></a>        &gt;&gt;&gt; my_logging_ecu = Ecu(verbose=False, store_supported_responses=False) 
+<a name="l274"><span class="ln">274  </span></a>        &gt;&gt;&gt; my_logging_ecu.update(PacketList([...])) 
+<a name="l275"><span class="ln">275  </span></a>        &gt;&gt;&gt; my_logging_ecu.log 
+<a name="l276"><span class="ln">276  </span></a>        &gt;&gt;&gt; print(&quot;Another ecu just creates supported responses&quot;) 
+<a name="l277"><span class="ln">277  </span></a>        &gt;&gt;&gt; my_response_ecu = Ecu(verbose=False, logging=False) 
+<a name="l278"><span class="ln">278  </span></a>        &gt;&gt;&gt; my_response_ecu.update(PacketList([...])) 
+<a name="l279"><span class="ln">279  </span></a>        &gt;&gt;&gt; my_response_ecu.supported_responses 
+<a name="l280"><span class="ln">280  </span></a> 
+<a name="l281"><span class="ln">281  </span></a>    Parameters to initialize an Ecu object 
+<a name="l282"><span class="ln">282  </span></a> 
+<a name="l283"><span class="ln">283  </span></a>    :param logging: Turn logging on or off. Default is on. 
+<a name="l284"><span class="ln">284  </span></a>    :param verbose: Turn tracking on or off. Default is on. 
+<a name="l285"><span class="ln">285  </span></a>    :param store_supported_responses: Create a list of supported responses if True. 
+<a name="l286"><span class="ln">286  </span></a>    :param lookahead: Configuration for lookahead when computing supported responses 
+<a name="l287"><span class="ln">287  </span></a>    &quot;&quot;&quot;    </span><span class="s0"># noqa: E501</span>
+<a name="l288"><span class="ln">288  </span></a>    <span class="s2">def </span><span class="s1">__init__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">logging</span><span class="s5">=</span><span class="s2">True</span><span class="s3">, </span><span class="s1">verbose</span><span class="s5">=</span><span class="s2">True</span><span class="s3">,</span>
+<a name="l289"><span class="ln">289  </span></a>                 <span class="s1">store_supported_responses</span><span class="s5">=</span><span class="s2">True</span><span class="s3">, </span><span class="s1">lookahead</span><span class="s5">=</span><span class="s8">10</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l290"><span class="ln">290  </span></a>        <span class="s0"># type: (bool, bool, bool, int) -&gt; None</span>
+<a name="l291"><span class="ln">291  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">state </span><span class="s5">= </span><span class="s1">EcuState</span><span class="s4">()</span>
+<a name="l292"><span class="ln">292  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">verbose </span><span class="s5">= </span><span class="s1">verbose</span>
+<a name="l293"><span class="ln">293  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">logging </span><span class="s5">= </span><span class="s1">logging</span>
+<a name="l294"><span class="ln">294  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">store_supported_responses </span><span class="s5">= </span><span class="s1">store_supported_responses</span>
+<a name="l295"><span class="ln">295  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">lookahead </span><span class="s5">= </span><span class="s1">lookahead</span>
+<a name="l296"><span class="ln">296  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">log </span><span class="s5">= </span><span class="s1">defaultdict</span><span class="s4">(</span><span class="s1">list</span><span class="s4">)  </span><span class="s0"># type: Dict[str, List[Any]]</span>
+<a name="l297"><span class="ln">297  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__supported_responses </span><span class="s5">= </span><span class="s1">list</span><span class="s4">()  </span><span class="s0"># type: List[EcuResponse]</span>
+<a name="l298"><span class="ln">298  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__unanswered_packets </span><span class="s5">= </span><span class="s1">PacketList</span><span class="s4">()</span>
+<a name="l299"><span class="ln">299  </span></a>
+<a name="l300"><span class="ln">300  </span></a>    <span class="s2">def </span><span class="s1">reset</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l301"><span class="ln">301  </span></a>        <span class="s0"># type: () -&gt; None</span>
+<a name="l302"><span class="ln">302  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l303"><span class="ln">303  </span></a>        Resets the internal state to a default EcuState. 
+<a name="l304"><span class="ln">304  </span></a>        &quot;&quot;&quot;</span>
+<a name="l305"><span class="ln">305  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">state </span><span class="s5">= </span><span class="s1">EcuState</span><span class="s4">(</span><span class="s1">session</span><span class="s5">=</span><span class="s8">1</span><span class="s4">)</span>
+<a name="l306"><span class="ln">306  </span></a>
+<a name="l307"><span class="ln">307  </span></a>    <span class="s2">def </span><span class="s1">update</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">p</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l308"><span class="ln">308  </span></a>        <span class="s0"># type: (Union[Packet, PacketList]) -&gt; None</span>
+<a name="l309"><span class="ln">309  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l310"><span class="ln">310  </span></a>        Processes a Packet or a list of Packets, according to the chosen 
+<a name="l311"><span class="ln">311  </span></a>        configuration. 
+<a name="l312"><span class="ln">312  </span></a>        :param p: Packet or list of Packets 
+<a name="l313"><span class="ln">313  </span></a>        &quot;&quot;&quot;</span>
+<a name="l314"><span class="ln">314  </span></a>        <span class="s2">if </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">p</span><span class="s3">, </span><span class="s1">PacketList</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l315"><span class="ln">315  </span></a>            <span class="s2">for </span><span class="s1">pkt </span><span class="s2">in </span><span class="s1">p</span><span class="s5">:</span>
+<a name="l316"><span class="ln">316  </span></a>                <span class="s1">self</span><span class="s3">.</span><span class="s1">update</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l317"><span class="ln">317  </span></a>        <span class="s2">elif not </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">p</span><span class="s3">, </span><span class="s1">Packet</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l318"><span class="ln">318  </span></a>            <span class="s2">raise </span><span class="s1">TypeError</span><span class="s4">(</span><span class="s7">&quot;Provide a Packet object for an update&quot;</span><span class="s4">)</span>
+<a name="l319"><span class="ln">319  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l320"><span class="ln">320  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__update</span><span class="s4">(</span><span class="s1">p</span><span class="s4">)</span>
+<a name="l321"><span class="ln">321  </span></a>
+<a name="l322"><span class="ln">322  </span></a>    <span class="s2">def </span><span class="s1">__update</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">pkt</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l323"><span class="ln">323  </span></a>        <span class="s0"># type: (Packet) -&gt; None</span>
+<a name="l324"><span class="ln">324  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l325"><span class="ln">325  </span></a>        Processes a Packet according to the chosen configuration. 
+<a name="l326"><span class="ln">326  </span></a>        :param pkt: Packet to be processed 
+<a name="l327"><span class="ln">327  </span></a>        &quot;&quot;&quot;</span>
+<a name="l328"><span class="ln">328  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">verbose</span><span class="s5">:</span>
+<a name="l329"><span class="ln">329  </span></a>            <span class="s1">print</span><span class="s4">(</span><span class="s1">repr</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">, </span><span class="s1">repr</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">))</span>
+<a name="l330"><span class="ln">330  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">logging</span><span class="s5">:</span>
+<a name="l331"><span class="ln">331  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__update_log</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l332"><span class="ln">332  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__update_supported_responses</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l333"><span class="ln">333  </span></a>
+<a name="l334"><span class="ln">334  </span></a>    <span class="s2">def </span><span class="s1">__update_log</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">pkt</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l335"><span class="ln">335  </span></a>        <span class="s0"># type: (Packet) -&gt; None</span>
+<a name="l336"><span class="ln">336  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l337"><span class="ln">337  </span></a>        Checks if a packet or a layer of this packet supports the function 
+<a name="l338"><span class="ln">338  </span></a>        `get_log`. If `get_log` is supported, this function will be executed 
+<a name="l339"><span class="ln">339  </span></a>        and the returned log information is stored in the intern log of this 
+<a name="l340"><span class="ln">340  </span></a>        Ecu object. 
+<a name="l341"><span class="ln">341  </span></a>        :param pkt: A Packet to be processed for log information. 
+<a name="l342"><span class="ln">342  </span></a>        &quot;&quot;&quot;</span>
+<a name="l343"><span class="ln">343  </span></a>        <span class="s2">for </span><span class="s1">layer </span><span class="s2">in </span><span class="s1">pkt</span><span class="s3">.</span><span class="s1">layers</span><span class="s4">()</span><span class="s5">:</span>
+<a name="l344"><span class="ln">344  </span></a>            <span class="s2">if not </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">layer</span><span class="s3">, </span><span class="s7">&quot;get_log&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l345"><span class="ln">345  </span></a>                <span class="s2">continue</span>
+<a name="l346"><span class="ln">346  </span></a>            <span class="s2">try</span><span class="s5">:</span>
+<a name="l347"><span class="ln">347  </span></a>                <span class="s1">log_key</span><span class="s3">, </span><span class="s1">log_value </span><span class="s5">= </span><span class="s1">layer</span><span class="s3">.</span><span class="s1">get_log</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l348"><span class="ln">348  </span></a>            <span class="s2">except </span><span class="s1">TypeError</span><span class="s5">:</span>
+<a name="l349"><span class="ln">349  </span></a>                <span class="s1">log_key</span><span class="s3">, </span><span class="s1">log_value </span><span class="s5">= </span><span class="s1">layer</span><span class="s3">.</span><span class="s1">get_log</span><span class="s3">.</span><span class="s1">im_func</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l350"><span class="ln">350  </span></a>
+<a name="l351"><span class="ln">351  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">log</span><span class="s6">[</span><span class="s1">log_key</span><span class="s6">]</span><span class="s3">.</span><span class="s1">append</span><span class="s4">((</span><span class="s1">pkt</span><span class="s3">.</span><span class="s1">time</span><span class="s3">, </span><span class="s1">log_value</span><span class="s4">))</span>
+<a name="l352"><span class="ln">352  </span></a>
+<a name="l353"><span class="ln">353  </span></a>    <span class="s2">def </span><span class="s1">__update_supported_responses</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">pkt</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l354"><span class="ln">354  </span></a>        <span class="s0"># type: (Packet) -&gt; None</span>
+<a name="l355"><span class="ln">355  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l356"><span class="ln">356  </span></a>        Stores a given packet as supported response, if a matching request 
+<a name="l357"><span class="ln">357  </span></a>        packet is found in a list of the latest unanswered packets. For 
+<a name="l358"><span class="ln">358  </span></a>        performance improvements, this list of unanswered packets only contains 
+<a name="l359"><span class="ln">359  </span></a>        a fixed number of packets, defined by the `lookahead` parameter of 
+<a name="l360"><span class="ln">360  </span></a>        this Ecu. 
+<a name="l361"><span class="ln">361  </span></a>        :param pkt: Packet to be processed. 
+<a name="l362"><span class="ln">362  </span></a>        &quot;&quot;&quot;</span>
+<a name="l363"><span class="ln">363  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__unanswered_packets</span><span class="s3">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l364"><span class="ln">364  </span></a>        <span class="s1">reduced_plist </span><span class="s5">= </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__unanswered_packets</span><span class="s6">[</span><span class="s5">-</span><span class="s1">self</span><span class="s3">.</span><span class="s1">lookahead</span><span class="s5">:</span><span class="s6">]</span>
+<a name="l365"><span class="ln">365  </span></a>        <span class="s1">answered</span><span class="s3">, </span><span class="s1">unanswered </span><span class="s5">= </span><span class="s1">reduced_plist</span><span class="s3">.</span><span class="s1">sr</span><span class="s4">(</span><span class="s1">lookahead</span><span class="s5">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">lookahead</span><span class="s4">)</span>
+<a name="l366"><span class="ln">366  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__unanswered_packets </span><span class="s5">= </span><span class="s1">unanswered</span>
+<a name="l367"><span class="ln">367  </span></a>
+<a name="l368"><span class="ln">368  </span></a>        <span class="s2">for </span><span class="s1">req</span><span class="s3">, </span><span class="s1">resp </span><span class="s2">in </span><span class="s1">answered</span><span class="s5">:</span>
+<a name="l369"><span class="ln">369  </span></a>            <span class="s1">added </span><span class="s5">= </span><span class="s2">False</span>
+<a name="l370"><span class="ln">370  </span></a>            <span class="s1">current_state </span><span class="s5">= </span><span class="s1">copy</span><span class="s3">.</span><span class="s1">copy</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">state</span><span class="s4">)</span>
+<a name="l371"><span class="ln">371  </span></a>            <span class="s1">EcuState</span><span class="s3">.</span><span class="s1">get_modified_ecu_state</span><span class="s4">(</span><span class="s1">resp</span><span class="s3">, </span><span class="s1">req</span><span class="s3">, </span><span class="s1">self</span><span class="s3">.</span><span class="s1">state</span><span class="s3">, </span><span class="s2">True</span><span class="s4">)</span>
+<a name="l372"><span class="ln">372  </span></a>
+<a name="l373"><span class="ln">373  </span></a>            <span class="s2">if not </span><span class="s1">self</span><span class="s3">.</span><span class="s1">store_supported_responses</span><span class="s5">:</span>
+<a name="l374"><span class="ln">374  </span></a>                <span class="s2">continue</span>
+<a name="l375"><span class="ln">375  </span></a>
+<a name="l376"><span class="ln">376  </span></a>            <span class="s2">for </span><span class="s1">sup_resp </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__supported_responses</span><span class="s5">:</span>
+<a name="l377"><span class="ln">377  </span></a>                <span class="s2">if </span><span class="s1">resp </span><span class="s5">== </span><span class="s1">sup_resp</span><span class="s3">.</span><span class="s1">key_response</span><span class="s5">:</span>
+<a name="l378"><span class="ln">378  </span></a>                    <span class="s2">if </span><span class="s1">sup_resp</span><span class="s3">.</span><span class="s1">states </span><span class="s2">is not None and </span><span class="s1">\</span>
+<a name="l379"><span class="ln">379  </span></a>                            <span class="s1">self</span><span class="s3">.</span><span class="s1">state </span><span class="s2">not in </span><span class="s1">sup_resp</span><span class="s3">.</span><span class="s1">states</span><span class="s5">:</span>
+<a name="l380"><span class="ln">380  </span></a>                        <span class="s1">sup_resp</span><span class="s3">.</span><span class="s1">states</span><span class="s3">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">current_state</span><span class="s4">)</span>
+<a name="l381"><span class="ln">381  </span></a>                    <span class="s1">added </span><span class="s5">= </span><span class="s2">True</span>
+<a name="l382"><span class="ln">382  </span></a>                    <span class="s2">break</span>
+<a name="l383"><span class="ln">383  </span></a>
+<a name="l384"><span class="ln">384  </span></a>            <span class="s2">if </span><span class="s1">added</span><span class="s5">:</span>
+<a name="l385"><span class="ln">385  </span></a>                <span class="s2">continue</span>
+<a name="l386"><span class="ln">386  </span></a>
+<a name="l387"><span class="ln">387  </span></a>            <span class="s1">ecu_resp </span><span class="s5">= </span><span class="s1">EcuResponse</span><span class="s4">(</span><span class="s1">current_state</span><span class="s3">, </span><span class="s1">responses</span><span class="s5">=</span><span class="s1">resp</span><span class="s4">)</span>
+<a name="l388"><span class="ln">388  </span></a>            <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">verbose</span><span class="s5">:</span>
+<a name="l389"><span class="ln">389  </span></a>                <span class="s1">print</span><span class="s4">(</span><span class="s7">&quot;[+] &quot;</span><span class="s3">, </span><span class="s1">repr</span><span class="s4">(</span><span class="s1">ecu_resp</span><span class="s4">))</span>
+<a name="l390"><span class="ln">390  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__supported_responses</span><span class="s3">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">ecu_resp</span><span class="s4">)</span>
+<a name="l391"><span class="ln">391  </span></a>
+<a name="l392"><span class="ln">392  </span></a>    <span class="s5">@</span><span class="s1">staticmethod</span>
+<a name="l393"><span class="ln">393  </span></a>    <span class="s2">def </span><span class="s1">sort_key_func</span><span class="s4">(</span><span class="s1">resp</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l394"><span class="ln">394  </span></a>        <span class="s0"># type: (EcuResponse) -&gt; Tuple[bool, int, int, int]</span>
+<a name="l395"><span class="ln">395  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l396"><span class="ln">396  </span></a>        This sorts responses in the following order: 
+<a name="l397"><span class="ln">397  </span></a>        1. Positive responses first 
+<a name="l398"><span class="ln">398  </span></a>        2. Lower ServiceIDs first 
+<a name="l399"><span class="ln">399  </span></a>        3. Less supported states first 
+<a name="l400"><span class="ln">400  </span></a>        4. Longer (more specific) responses first 
+<a name="l401"><span class="ln">401  </span></a>        :param resp: EcuResponse to be sorted 
+<a name="l402"><span class="ln">402  </span></a>        :return: Tuple as sort key 
+<a name="l403"><span class="ln">403  </span></a>        &quot;&quot;&quot;</span>
+<a name="l404"><span class="ln">404  </span></a>        <span class="s1">first_layer </span><span class="s5">= </span><span class="s1">cast</span><span class="s4">(</span><span class="s1">Packet</span><span class="s3">, </span><span class="s1">resp</span><span class="s3">.</span><span class="s1">key_response</span><span class="s6">[</span><span class="s8">0</span><span class="s6">]</span><span class="s4">)  </span><span class="s0"># type: ignore</span>
+<a name="l405"><span class="ln">405  </span></a>        <span class="s1">service </span><span class="s5">= </span><span class="s1">orb</span><span class="s4">(</span><span class="s1">bytes</span><span class="s4">(</span><span class="s1">first_layer</span><span class="s4">)</span><span class="s6">[</span><span class="s8">0</span><span class="s6">]</span><span class="s4">)</span>
+<a name="l406"><span class="ln">406  </span></a>        <span class="s2">return </span><span class="s4">(</span><span class="s1">service </span><span class="s5">== </span><span class="s8">0x7f</span><span class="s3">,</span>
+<a name="l407"><span class="ln">407  </span></a>                <span class="s1">service</span><span class="s3">,</span>
+<a name="l408"><span class="ln">408  </span></a>                <span class="s8">0xffffffff </span><span class="s5">- </span><span class="s1">len</span><span class="s4">(</span><span class="s1">resp</span><span class="s3">.</span><span class="s1">states </span><span class="s2">or </span><span class="s6">[]</span><span class="s4">)</span><span class="s3">,</span>
+<a name="l409"><span class="ln">409  </span></a>                <span class="s8">0xffffffff </span><span class="s5">- </span><span class="s1">len</span><span class="s4">(</span><span class="s1">resp</span><span class="s3">.</span><span class="s1">key_response</span><span class="s4">))</span>
+<a name="l410"><span class="ln">410  </span></a>
+<a name="l411"><span class="ln">411  </span></a>    <span class="s5">@</span><span class="s1">property</span>
+<a name="l412"><span class="ln">412  </span></a>    <span class="s2">def </span><span class="s1">supported_responses</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l413"><span class="ln">413  </span></a>        <span class="s0"># type: () -&gt; List[EcuResponse]</span>
+<a name="l414"><span class="ln">414  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l415"><span class="ln">415  </span></a>        Returns a sorted list of supported responses. The sort is done in a way 
+<a name="l416"><span class="ln">416  </span></a>        to provide the best possible results, if this list of supported 
+<a name="l417"><span class="ln">417  </span></a>        responses is used to simulate an real world Ecu with the 
+<a name="l418"><span class="ln">418  </span></a>        EcuAnsweringMachine object. 
+<a name="l419"><span class="ln">419  </span></a>        :return: A sorted list of EcuResponse objects 
+<a name="l420"><span class="ln">420  </span></a>        &quot;&quot;&quot;</span>
+<a name="l421"><span class="ln">421  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__supported_responses</span><span class="s3">.</span><span class="s1">sort</span><span class="s4">(</span><span class="s1">key</span><span class="s5">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">sort_key_func</span><span class="s4">)</span>
+<a name="l422"><span class="ln">422  </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__supported_responses</span>
+<a name="l423"><span class="ln">423  </span></a>
+<a name="l424"><span class="ln">424  </span></a>    <span class="s5">@</span><span class="s1">property</span>
+<a name="l425"><span class="ln">425  </span></a>    <span class="s2">def </span><span class="s1">unanswered_packets</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l426"><span class="ln">426  </span></a>        <span class="s0"># type: () -&gt; PacketList</span>
+<a name="l427"><span class="ln">427  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l428"><span class="ln">428  </span></a>        A list of all unanswered packets, which were processed by this Ecu 
+<a name="l429"><span class="ln">429  </span></a>        object. 
+<a name="l430"><span class="ln">430  </span></a>        :return: PacketList of unanswered packets 
+<a name="l431"><span class="ln">431  </span></a>        &quot;&quot;&quot;</span>
+<a name="l432"><span class="ln">432  </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__unanswered_packets</span>
+<a name="l433"><span class="ln">433  </span></a>
+<a name="l434"><span class="ln">434  </span></a>    <span class="s2">def </span><span class="s1">__repr__</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l435"><span class="ln">435  </span></a>        <span class="s0"># type: () -&gt; str</span>
+<a name="l436"><span class="ln">436  </span></a>        <span class="s2">return </span><span class="s1">repr</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">state</span><span class="s4">)</span>
+<a name="l437"><span class="ln">437  </span></a>
+<a name="l438"><span class="ln">438  </span></a>    <span class="s5">@</span><span class="s1">staticmethod</span>
+<a name="l439"><span class="ln">439  </span></a>    <span class="s2">def </span><span class="s1">extend_pkt_with_logging</span><span class="s4">(</span><span class="s1">cls</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l440"><span class="ln">440  </span></a>        <span class="s0"># type: (Type[Packet]) -&gt; Callable[[Callable[[Packet], Tuple[str, Any]]], None]  # noqa: E501</span>
+<a name="l441"><span class="ln">441  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l442"><span class="ln">442  </span></a>        Decorator to add a function as 'get_log' method to a given 
+<a name="l443"><span class="ln">443  </span></a>        class. This allows dynamic modifications and additions to a protocol. 
+<a name="l444"><span class="ln">444  </span></a>        :param cls: A packet class to be modified 
+<a name="l445"><span class="ln">445  </span></a>        :return: Decorator function 
+<a name="l446"><span class="ln">446  </span></a>        &quot;&quot;&quot;</span>
+<a name="l447"><span class="ln">447  </span></a>
+<a name="l448"><span class="ln">448  </span></a>        <span class="s2">def </span><span class="s1">decorator_function</span><span class="s4">(</span><span class="s1">f</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l449"><span class="ln">449  </span></a>            <span class="s0"># type: (Callable[[Packet], Tuple[str, Any]]) -&gt; None</span>
+<a name="l450"><span class="ln">450  </span></a>            <span class="s1">setattr</span><span class="s4">(</span><span class="s1">cls</span><span class="s3">, </span><span class="s7">&quot;get_log&quot;</span><span class="s3">, </span><span class="s1">f</span><span class="s4">)</span>
+<a name="l451"><span class="ln">451  </span></a>
+<a name="l452"><span class="ln">452  </span></a>        <span class="s2">return </span><span class="s1">decorator_function</span>
+<a name="l453"><span class="ln">453  </span></a>
+<a name="l454"><span class="ln">454  </span></a>
+<a name="l455"><span class="ln">455  </span></a><span class="s2">class </span><span class="s1">EcuSession</span><span class="s4">(</span><span class="s1">DefaultSession</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l456"><span class="ln">456  </span></a>    <span class="s0">&quot;&quot;&quot; 
+<a name="l457"><span class="ln">457  </span></a>    Tracks modification to an Ecu object 'on-the-flow'. 
+<a name="l458"><span class="ln">458  </span></a> 
+<a name="l459"><span class="ln">459  </span></a>    The parameters for the internal Ecu object are obtained from the kwargs 
+<a name="l460"><span class="ln">460  </span></a>    dict. 
+<a name="l461"><span class="ln">461  </span></a> 
+<a name="l462"><span class="ln">462  </span></a>    `logging`: Turn logging on or off. Default is on. 
+<a name="l463"><span class="ln">463  </span></a>    `verbose`: Turn tracking on or off. Default is on. 
+<a name="l464"><span class="ln">464  </span></a>    `store_supported_responses`: Create a list of supported responses, if True. 
+<a name="l465"><span class="ln">465  </span></a> 
+<a name="l466"><span class="ln">466  </span></a>    Example: 
+<a name="l467"><span class="ln">467  </span></a>        &gt;&gt;&gt; sniff(session=EcuSession) 
+<a name="l468"><span class="ln">468  </span></a> 
+<a name="l469"><span class="ln">469  </span></a>    &quot;&quot;&quot;</span>
+<a name="l470"><span class="ln">470  </span></a>    <span class="s2">def </span><span class="s1">__init__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s5">*</span><span class="s1">args</span><span class="s3">, </span><span class="s5">**</span><span class="s1">kwargs</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l471"><span class="ln">471  </span></a>        <span class="s0"># type: (Any, Any) -&gt; None</span>
+<a name="l472"><span class="ln">472  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">ecu </span><span class="s5">= </span><span class="s1">Ecu</span><span class="s4">(</span><span class="s1">logging</span><span class="s5">=</span><span class="s1">kwargs</span><span class="s3">.</span><span class="s1">pop</span><span class="s4">(</span><span class="s7">&quot;logging&quot;</span><span class="s3">, </span><span class="s2">True</span><span class="s4">)</span><span class="s3">,</span>
+<a name="l473"><span class="ln">473  </span></a>                       <span class="s1">verbose</span><span class="s5">=</span><span class="s1">kwargs</span><span class="s3">.</span><span class="s1">pop</span><span class="s4">(</span><span class="s7">&quot;verbose&quot;</span><span class="s3">, </span><span class="s2">True</span><span class="s4">)</span><span class="s3">,</span>
+<a name="l474"><span class="ln">474  </span></a>                       <span class="s1">store_supported_responses</span><span class="s5">=</span><span class="s1">kwargs</span><span class="s3">.</span><span class="s1">pop</span><span class="s4">(</span><span class="s7">&quot;store_supported_responses&quot;</span><span class="s3">, </span><span class="s2">True</span><span class="s4">))  </span><span class="s0"># noqa: E501</span>
+<a name="l475"><span class="ln">475  </span></a>        <span class="s1">super</span><span class="s4">(</span><span class="s1">EcuSession</span><span class="s3">, </span><span class="s1">self</span><span class="s4">)</span><span class="s3">.</span><span class="s1">__init__</span><span class="s4">(</span><span class="s5">*</span><span class="s1">args</span><span class="s3">, </span><span class="s5">**</span><span class="s1">kwargs</span><span class="s4">)</span>
+<a name="l476"><span class="ln">476  </span></a>
+<a name="l477"><span class="ln">477  </span></a>    <span class="s2">def </span><span class="s1">process</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">pkt</span><span class="s5">: </span><span class="s1">Packet</span><span class="s4">) </span><span class="s1">-&gt; Optional</span><span class="s6">[</span><span class="s1">Packet</span><span class="s6">]</span><span class="s5">:</span>
+<a name="l478"><span class="ln">478  </span></a>        <span class="s2">if not </span><span class="s1">pkt</span><span class="s5">:</span>
+<a name="l479"><span class="ln">479  </span></a>            <span class="s2">return None</span>
+<a name="l480"><span class="ln">480  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">ecu</span><span class="s3">.</span><span class="s1">update</span><span class="s4">(</span><span class="s1">pkt</span><span class="s4">)</span>
+<a name="l481"><span class="ln">481  </span></a>        <span class="s2">return </span><span class="s1">pkt</span>
+<a name="l482"><span class="ln">482  </span></a>
+<a name="l483"><span class="ln">483  </span></a>
+<a name="l484"><span class="ln">484  </span></a><span class="s2">class </span><span class="s1">EcuResponse</span><span class="s5">:</span>
+<a name="l485"><span class="ln">485  </span></a>    <span class="s7">&quot;&quot;&quot;Encapsulates responses and the according EcuStates. 
+<a name="l486"><span class="ln">486  </span></a>    A list of this objects can be used to configure an EcuAnsweringMachine. 
+<a name="l487"><span class="ln">487  </span></a>    This is useful, if you want to clone the behaviour of a real Ecu. 
+<a name="l488"><span class="ln">488  </span></a> 
+<a name="l489"><span class="ln">489  </span></a>    Example: 
+<a name="l490"><span class="ln">490  </span></a>        &gt;&gt;&gt; EcuResponse(EcuState(session=2, security_level=2), responses=UDS()/UDS_RDBIPR(dataIdentifier=2)/Raw(b&quot;deadbeef1&quot;)) 
+<a name="l491"><span class="ln">491  </span></a>        &gt;&gt;&gt; EcuResponse([EcuState(session=range(2, 5), security_level=2), EcuState(session=3, security_level=5)], responses=UDS()/UDS_RDBIPR(dataIdentifier=9)/Raw(b&quot;deadbeef4&quot;)) 
+<a name="l492"><span class="ln">492  </span></a> 
+<a name="l493"><span class="ln">493  </span></a>    Initialize an EcuResponse capsule 
+<a name="l494"><span class="ln">494  </span></a> 
+<a name="l495"><span class="ln">495  </span></a>    :param state: EcuState or list of EcuStates in which this response 
+<a name="l496"><span class="ln">496  </span></a>                  is allowed to be sent. If no state provided, the response 
+<a name="l497"><span class="ln">497  </span></a>                  packet will always be send. 
+<a name="l498"><span class="ln">498  </span></a>    :param responses: A Packet or a list of Packet objects. By default the 
+<a name="l499"><span class="ln">499  </span></a>                      last packet is asked if it answers an incoming 
+<a name="l500"><span class="ln">500  </span></a>                      packet. This allows to send for example 
+<a name="l501"><span class="ln">501  </span></a>                      `requestCorrectlyReceived-ResponsePending` packets. 
+<a name="l502"><span class="ln">502  </span></a>    :param answers: Optional argument to provide a custom answer here: 
+<a name="l503"><span class="ln">503  </span></a>                    `lambda resp, req: return resp.answers(req)` 
+<a name="l504"><span class="ln">504  </span></a>                    This allows the modification of a response depending 
+<a name="l505"><span class="ln">505  </span></a>                    on a request. Custom SecurityAccess mechanisms can 
+<a name="l506"><span class="ln">506  </span></a>                    be implemented in this way or generic NegativeResponse 
+<a name="l507"><span class="ln">507  </span></a>                    messages which answers to everything can be realized 
+<a name="l508"><span class="ln">508  </span></a>                    in this way. 
+<a name="l509"><span class="ln">509  </span></a>    &quot;&quot;&quot;   </span><span class="s0"># noqa: E501</span>
+<a name="l510"><span class="ln">510  </span></a>    <span class="s2">def </span><span class="s1">__init__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">state</span><span class="s5">=</span><span class="s2">None</span><span class="s3">, </span><span class="s1">responses</span><span class="s5">=</span><span class="s1">Raw</span><span class="s4">(</span><span class="s7">b&quot;</span><span class="s6">\x7f\x10</span><span class="s7">&quot;</span><span class="s4">)</span><span class="s3">, </span><span class="s1">answers</span><span class="s5">=</span><span class="s2">None</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l511"><span class="ln">511  </span></a>        <span class="s0"># type: (Optional[Union[EcuState, Iterable[EcuState]]], Union[Iterable[Packet], PacketList, Packet], Optional[Callable[[Packet, Packet], bool]]) -&gt; None  # noqa: E501</span>
+<a name="l512"><span class="ln">512  </span></a>        <span class="s2">if </span><span class="s1">state </span><span class="s2">is None</span><span class="s5">:</span>
+<a name="l513"><span class="ln">513  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__states </span><span class="s5">= </span><span class="s2">None  </span><span class="s0"># type: Optional[List[EcuState]]</span>
+<a name="l514"><span class="ln">514  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l515"><span class="ln">515  </span></a>            <span class="s2">if </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">state</span><span class="s3">, </span><span class="s7">&quot;__iter__&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l516"><span class="ln">516  </span></a>                <span class="s1">state </span><span class="s5">= </span><span class="s1">cast</span><span class="s4">(</span><span class="s1">List</span><span class="s6">[</span><span class="s1">EcuState</span><span class="s6">]</span><span class="s3">, </span><span class="s1">state</span><span class="s4">)</span>
+<a name="l517"><span class="ln">517  </span></a>                <span class="s1">self</span><span class="s3">.</span><span class="s1">__states </span><span class="s5">= </span><span class="s1">state</span>
+<a name="l518"><span class="ln">518  </span></a>            <span class="s2">else</span><span class="s5">:</span>
+<a name="l519"><span class="ln">519  </span></a>                <span class="s1">self</span><span class="s3">.</span><span class="s1">__states </span><span class="s5">= </span><span class="s6">[</span><span class="s1">state</span><span class="s6">]</span>
+<a name="l520"><span class="ln">520  </span></a>
+<a name="l521"><span class="ln">521  </span></a>        <span class="s2">if </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">responses</span><span class="s3">, </span><span class="s1">PacketList</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l522"><span class="ln">522  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__responses </span><span class="s5">= </span><span class="s1">responses  </span><span class="s0"># type: PacketList</span>
+<a name="l523"><span class="ln">523  </span></a>        <span class="s2">elif </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">responses</span><span class="s3">, </span><span class="s1">Packet</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l524"><span class="ln">524  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__responses </span><span class="s5">= </span><span class="s1">PacketList</span><span class="s4">(</span><span class="s6">[</span><span class="s1">responses</span><span class="s6">]</span><span class="s4">)</span>
+<a name="l525"><span class="ln">525  </span></a>        <span class="s2">elif </span><span class="s1">hasattr</span><span class="s4">(</span><span class="s1">responses</span><span class="s3">, </span><span class="s7">&quot;__iter__&quot;</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l526"><span class="ln">526  </span></a>            <span class="s1">responses </span><span class="s5">= </span><span class="s1">cast</span><span class="s4">(</span><span class="s1">List</span><span class="s6">[</span><span class="s1">Packet</span><span class="s6">]</span><span class="s3">, </span><span class="s1">responses</span><span class="s4">)</span>
+<a name="l527"><span class="ln">527  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">__responses </span><span class="s5">= </span><span class="s1">PacketList</span><span class="s4">(</span><span class="s1">responses</span><span class="s4">)</span>
+<a name="l528"><span class="ln">528  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l529"><span class="ln">529  </span></a>            <span class="s2">raise </span><span class="s1">TypeError</span><span class="s4">(</span>
+<a name="l530"><span class="ln">530  </span></a>                <span class="s7">&quot;Can't handle type %s as response&quot; </span><span class="s5">% </span><span class="s1">type</span><span class="s4">(</span><span class="s1">responses</span><span class="s4">))</span>
+<a name="l531"><span class="ln">531  </span></a>
+<a name="l532"><span class="ln">532  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">__custom_answers </span><span class="s5">= </span><span class="s1">answers</span>
+<a name="l533"><span class="ln">533  </span></a>
+<a name="l534"><span class="ln">534  </span></a>    <span class="s5">@</span><span class="s1">property</span>
+<a name="l535"><span class="ln">535  </span></a>    <span class="s2">def </span><span class="s1">states</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l536"><span class="ln">536  </span></a>        <span class="s0"># type: () -&gt; Optional[List[EcuState]]</span>
+<a name="l537"><span class="ln">537  </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states</span>
+<a name="l538"><span class="ln">538  </span></a>
+<a name="l539"><span class="ln">539  </span></a>    <span class="s5">@</span><span class="s1">property</span>
+<a name="l540"><span class="ln">540  </span></a>    <span class="s2">def </span><span class="s1">responses</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l541"><span class="ln">541  </span></a>        <span class="s0"># type: () -&gt; PacketList</span>
+<a name="l542"><span class="ln">542  </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__responses</span>
+<a name="l543"><span class="ln">543  </span></a>
+<a name="l544"><span class="ln">544  </span></a>    <span class="s5">@</span><span class="s1">property</span>
+<a name="l545"><span class="ln">545  </span></a>    <span class="s2">def </span><span class="s1">key_response</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l546"><span class="ln">546  </span></a>        <span class="s0"># type: () -&gt; Packet</span>
+<a name="l547"><span class="ln">547  </span></a>        <span class="s1">pkt </span><span class="s5">= </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__responses</span><span class="s6">[</span><span class="s5">-</span><span class="s8">1</span><span class="s6">]  </span><span class="s0"># type: Packet</span>
+<a name="l548"><span class="ln">548  </span></a>        <span class="s2">return </span><span class="s1">pkt</span>
+<a name="l549"><span class="ln">549  </span></a>
+<a name="l550"><span class="ln">550  </span></a>    <span class="s2">def </span><span class="s1">supports_state</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">state</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l551"><span class="ln">551  </span></a>        <span class="s0"># type: (EcuState) -&gt; bool</span>
+<a name="l552"><span class="ln">552  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states </span><span class="s2">is None or </span><span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states</span><span class="s4">) </span><span class="s5">== </span><span class="s8">0</span><span class="s5">:</span>
+<a name="l553"><span class="ln">553  </span></a>            <span class="s2">return True</span>
+<a name="l554"><span class="ln">554  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l555"><span class="ln">555  </span></a>            <span class="s2">return </span><span class="s1">any</span><span class="s4">(</span><span class="s1">s </span><span class="s5">== </span><span class="s1">state </span><span class="s2">or </span><span class="s1">state </span><span class="s2">in </span><span class="s1">s </span><span class="s2">for </span><span class="s1">s </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states</span><span class="s4">)</span>
+<a name="l556"><span class="ln">556  </span></a>
+<a name="l557"><span class="ln">557  </span></a>    <span class="s2">def </span><span class="s1">answers</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l558"><span class="ln">558  </span></a>        <span class="s0"># type: (Packet) -&gt; Union[int, bool]</span>
+<a name="l559"><span class="ln">559  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__custom_answers </span><span class="s2">is not None</span><span class="s5">:</span>
+<a name="l560"><span class="ln">560  </span></a>            <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__custom_answers</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">key_response</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span>
+<a name="l561"><span class="ln">561  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l562"><span class="ln">562  </span></a>            <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">key_response</span><span class="s3">.</span><span class="s1">answers</span><span class="s4">(</span><span class="s1">other</span><span class="s4">)</span>
+<a name="l563"><span class="ln">563  </span></a>
+<a name="l564"><span class="ln">564  </span></a>    <span class="s2">def </span><span class="s1">__repr__</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l565"><span class="ln">565  </span></a>        <span class="s0"># type: () -&gt; str</span>
+<a name="l566"><span class="ln">566  </span></a>        <span class="s2">return </span><span class="s7">&quot;%s, responses=%s&quot; </span><span class="s5">% </span><span class="s1">\</span>
+<a name="l567"><span class="ln">567  </span></a>               <span class="s4">(</span><span class="s1">repr</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states</span><span class="s4">)</span><span class="s3">,</span>
+<a name="l568"><span class="ln">568  </span></a>                <span class="s6">[</span><span class="s1">resp</span><span class="s3">.</span><span class="s1">summary</span><span class="s4">() </span><span class="s2">for </span><span class="s1">resp </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__responses</span><span class="s6">]</span><span class="s4">)</span>
+<a name="l569"><span class="ln">569  </span></a>
+<a name="l570"><span class="ln">570  </span></a>    <span class="s2">def </span><span class="s1">__eq__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l571"><span class="ln">571  </span></a>        <span class="s0"># type: (object) -&gt; bool</span>
+<a name="l572"><span class="ln">572  </span></a>        <span class="s1">other </span><span class="s5">= </span><span class="s1">cast</span><span class="s4">(</span><span class="s1">EcuResponse</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span>
+<a name="l573"><span class="ln">573  </span></a>
+<a name="l574"><span class="ln">574  </span></a>        <span class="s1">responses_equal </span><span class="s5">= </span><span class="s1">\</span>
+<a name="l575"><span class="ln">575  </span></a>            <span class="s1">len</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">responses</span><span class="s4">) </span><span class="s5">== </span><span class="s1">len</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">responses</span><span class="s4">) </span><span class="s2">and </span><span class="s1">\</span>
+<a name="l576"><span class="ln">576  </span></a>            <span class="s1">all</span><span class="s4">(</span><span class="s1">bytes</span><span class="s4">(</span><span class="s1">x</span><span class="s4">) </span><span class="s5">== </span><span class="s1">bytes</span><span class="s4">(</span><span class="s1">y</span><span class="s4">) </span><span class="s2">for </span><span class="s1">x</span><span class="s3">, </span><span class="s1">y </span><span class="s2">in </span><span class="s1">zip</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">responses</span><span class="s3">,</span>
+<a name="l577"><span class="ln">577  </span></a>                                                     <span class="s1">other</span><span class="s3">.</span><span class="s1">responses</span><span class="s4">))</span>
+<a name="l578"><span class="ln">578  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states </span><span class="s2">is None</span><span class="s5">:</span>
+<a name="l579"><span class="ln">579  </span></a>            <span class="s2">return </span><span class="s1">responses_equal</span>
+<a name="l580"><span class="ln">580  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l581"><span class="ln">581  </span></a>            <span class="s2">return </span><span class="s1">any</span><span class="s4">(</span><span class="s1">other</span><span class="s3">.</span><span class="s1">supports_state</span><span class="s4">(</span><span class="s1">s</span><span class="s4">) </span><span class="s2">for </span><span class="s1">s </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states</span><span class="s4">) </span><span class="s2">and </span><span class="s1">\</span>
+<a name="l582"><span class="ln">582  </span></a>                <span class="s1">responses_equal</span>
+<a name="l583"><span class="ln">583  </span></a>
+<a name="l584"><span class="ln">584  </span></a>    <span class="s2">def </span><span class="s1">__ne__</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">other</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l585"><span class="ln">585  </span></a>        <span class="s0"># type: (object) -&gt; bool</span>
+<a name="l586"><span class="ln">586  </span></a>        <span class="s0"># Python 2.7 compat</span>
+<a name="l587"><span class="ln">587  </span></a>        <span class="s2">return not </span><span class="s1">self </span><span class="s5">== </span><span class="s1">other</span>
+<a name="l588"><span class="ln">588  </span></a>
+<a name="l589"><span class="ln">589  </span></a>    <span class="s2">def </span><span class="s1">command</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l590"><span class="ln">590  </span></a>        <span class="s0"># type: () -&gt; str</span>
+<a name="l591"><span class="ln">591  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states </span><span class="s2">is not None</span><span class="s5">:</span>
+<a name="l592"><span class="ln">592  </span></a>            <span class="s2">return </span><span class="s7">&quot;EcuResponse(%s, responses=%s)&quot; </span><span class="s5">% </span><span class="s4">(</span>
+<a name="l593"><span class="ln">593  </span></a>                <span class="s7">&quot;[&quot; </span><span class="s5">+ </span><span class="s7">&quot;, &quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s4">(</span><span class="s1">s</span><span class="s3">.</span><span class="s1">command</span><span class="s4">() </span><span class="s2">for </span><span class="s1">s </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__states</span><span class="s4">) </span><span class="s5">+ </span><span class="s7">&quot;]&quot;</span><span class="s3">,</span>
+<a name="l594"><span class="ln">594  </span></a>                <span class="s7">&quot;[&quot; </span><span class="s5">+ </span><span class="s7">&quot;, &quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s4">(</span><span class="s1">p</span><span class="s3">.</span><span class="s1">command</span><span class="s4">() </span><span class="s2">for </span><span class="s1">p </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__responses</span><span class="s4">) </span><span class="s5">+ </span><span class="s7">&quot;]&quot;</span><span class="s4">)</span>
+<a name="l595"><span class="ln">595  </span></a>        <span class="s2">else</span><span class="s5">:</span>
+<a name="l596"><span class="ln">596  </span></a>            <span class="s2">return </span><span class="s7">&quot;EcuResponse(responses=%s)&quot; </span><span class="s5">% </span><span class="s7">&quot;[&quot; </span><span class="s5">+ </span><span class="s7">&quot;, &quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s4">(</span>
+<a name="l597"><span class="ln">597  </span></a>                <span class="s1">p</span><span class="s3">.</span><span class="s1">command</span><span class="s4">() </span><span class="s2">for </span><span class="s1">p </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">__responses</span><span class="s4">) </span><span class="s5">+ </span><span class="s7">&quot;]&quot;</span>
+<a name="l598"><span class="ln">598  </span></a>
+<a name="l599"><span class="ln">599  </span></a>    <span class="s1">__hash__ </span><span class="s5">= </span><span class="s2">None  </span><span class="s0"># type: ignore</span>
+<a name="l600"><span class="ln">600  </span></a>
+<a name="l601"><span class="ln">601  </span></a>
+<a name="l602"><span class="ln">602  </span></a><span class="s2">class </span><span class="s1">EcuAnsweringMachine</span><span class="s4">(</span><span class="s1">AnsweringMachine</span><span class="s6">[</span><span class="s1">PacketList</span><span class="s6">]</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l603"><span class="ln">603  </span></a>    <span class="s7">&quot;&quot;&quot;AnsweringMachine which emulates the basic behaviour of a real world ECU. 
+<a name="l604"><span class="ln">604  </span></a>    Provide a list of ``EcuResponse`` objects to configure the behaviour of a 
+<a name="l605"><span class="ln">605  </span></a>    AnsweringMachine. 
+<a name="l606"><span class="ln">606  </span></a> 
+<a name="l607"><span class="ln">607  </span></a>    Usage: 
+<a name="l608"><span class="ln">608  </span></a>        &gt;&gt;&gt; resp = EcuResponse(session=range(0,255), security_level=0, responses=UDS() / UDS_NR(negativeResponseCode=0x7f, requestServiceId=0x10)) 
+<a name="l609"><span class="ln">609  </span></a>        &gt;&gt;&gt; sock = ISOTPSocket(can_iface, tx_id=0x700, rx_id=0x600, basecls=UDS) 
+<a name="l610"><span class="ln">610  </span></a>        &gt;&gt;&gt; answering_machine = EcuAnsweringMachine(supported_responses=[resp], main_socket=sock, basecls=UDS) 
+<a name="l611"><span class="ln">611  </span></a>        &gt;&gt;&gt; sim = threading.Thread(target=answering_machine, kwargs={'count': 4, 'timeout':5}) 
+<a name="l612"><span class="ln">612  </span></a>        &gt;&gt;&gt; sim.start() 
+<a name="l613"><span class="ln">613  </span></a>    &quot;&quot;&quot;  </span><span class="s0"># noqa: E501</span>
+<a name="l614"><span class="ln">614  </span></a>    <span class="s1">function_name </span><span class="s5">= </span><span class="s7">&quot;EcuAnsweringMachine&quot;</span>
+<a name="l615"><span class="ln">615  </span></a>    <span class="s1">sniff_options_list </span><span class="s5">= </span><span class="s6">[</span><span class="s7">&quot;store&quot;</span><span class="s3">, </span><span class="s7">&quot;opened_socket&quot;</span><span class="s3">, </span><span class="s7">&quot;count&quot;</span><span class="s3">, </span><span class="s7">&quot;filter&quot;</span><span class="s3">, </span><span class="s7">&quot;prn&quot;</span><span class="s3">,</span>
+<a name="l616"><span class="ln">616  </span></a>                          <span class="s7">&quot;stop_filter&quot;</span><span class="s3">, </span><span class="s7">&quot;timeout&quot;</span><span class="s6">]</span>
+<a name="l617"><span class="ln">617  </span></a>
+<a name="l618"><span class="ln">618  </span></a>    <span class="s2">def </span><span class="s1">parse_options</span><span class="s4">(</span>
+<a name="l619"><span class="ln">619  </span></a>            <span class="s1">self</span><span class="s3">,</span>
+<a name="l620"><span class="ln">620  </span></a>            <span class="s1">supported_responses</span><span class="s5">=</span><span class="s2">None</span><span class="s3">,  </span><span class="s0"># type: Optional[List[EcuResponse]]</span>
+<a name="l621"><span class="ln">621  </span></a>            <span class="s1">main_socket</span><span class="s5">=</span><span class="s2">None</span><span class="s3">,  </span><span class="s0"># type: Optional[SuperSocket]</span>
+<a name="l622"><span class="ln">622  </span></a>            <span class="s1">broadcast_socket</span><span class="s5">=</span><span class="s2">None</span><span class="s3">,  </span><span class="s0"># type: Optional[SuperSocket]</span>
+<a name="l623"><span class="ln">623  </span></a>            <span class="s1">basecls</span><span class="s5">=</span><span class="s1">Raw</span><span class="s3">,  </span><span class="s0"># type: Type[Packet]</span>
+<a name="l624"><span class="ln">624  </span></a>            <span class="s1">timeout</span><span class="s5">=</span><span class="s2">None</span><span class="s3">,  </span><span class="s0"># type: Optional[Union[int, float]]</span>
+<a name="l625"><span class="ln">625  </span></a>            <span class="s1">initial_ecu_state</span><span class="s5">=</span><span class="s2">None  </span><span class="s0"># type: Optional[EcuState]</span>
+<a name="l626"><span class="ln">626  </span></a>    <span class="s4">)</span><span class="s5">:</span>
+<a name="l627"><span class="ln">627  </span></a>        <span class="s0"># type: (...) -&gt; None</span>
+<a name="l628"><span class="ln">628  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l629"><span class="ln">629  </span></a>        :param supported_responses: List of ``EcuResponse`` objects to define 
+<a name="l630"><span class="ln">630  </span></a>                                    the behaviour. The default response is 
+<a name="l631"><span class="ln">631  </span></a>                                    ``generalReject``. 
+<a name="l632"><span class="ln">632  </span></a>        :param main_socket: Defines the object of the socket to send 
+<a name="l633"><span class="ln">633  </span></a>                            and receive packets. 
+<a name="l634"><span class="ln">634  </span></a>        :param broadcast_socket: Defines the object of the broadcast socket. 
+<a name="l635"><span class="ln">635  </span></a>                                 Listen-only, responds with the main_socket. 
+<a name="l636"><span class="ln">636  </span></a>                                 `None` to disable broadcast capabilities. 
+<a name="l637"><span class="ln">637  </span></a>        :param basecls: Provide a basecls of the used protocol 
+<a name="l638"><span class="ln">638  </span></a>        :param timeout: Specifies the timeout for sniffing in seconds. 
+<a name="l639"><span class="ln">639  </span></a>        &quot;&quot;&quot;</span>
+<a name="l640"><span class="ln">640  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_main_socket </span><span class="s5">= </span><span class="s1">main_socket  </span><span class="s0"># type: Optional[SuperSocket]</span>
+<a name="l641"><span class="ln">641  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_sockets </span><span class="s5">= </span><span class="s6">[</span><span class="s1">self</span><span class="s3">.</span><span class="s1">_main_socket</span><span class="s6">]</span>
+<a name="l642"><span class="ln">642  </span></a>
+<a name="l643"><span class="ln">643  </span></a>        <span class="s2">if </span><span class="s1">broadcast_socket </span><span class="s2">is not None</span><span class="s5">:</span>
+<a name="l644"><span class="ln">644  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">_sockets</span><span class="s3">.</span><span class="s1">append</span><span class="s4">(</span><span class="s1">broadcast_socket</span><span class="s4">)</span>
+<a name="l645"><span class="ln">645  </span></a>
+<a name="l646"><span class="ln">646  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_initial_ecu_state </span><span class="s5">= </span><span class="s1">initial_ecu_state </span><span class="s2">or </span><span class="s1">EcuState</span><span class="s4">(</span><span class="s1">session</span><span class="s5">=</span><span class="s8">1</span><span class="s4">)</span>
+<a name="l647"><span class="ln">647  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state_mutex </span><span class="s5">= </span><span class="s1">Lock</span><span class="s4">()</span>
+<a name="l648"><span class="ln">648  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state </span><span class="s5">= </span><span class="s1">copy</span><span class="s3">.</span><span class="s1">copy</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">_initial_ecu_state</span><span class="s4">)</span>
+<a name="l649"><span class="ln">649  </span></a>
+<a name="l650"><span class="ln">650  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_basecls </span><span class="s5">= </span><span class="s1">basecls  </span><span class="s0"># type: Type[Packet]</span>
+<a name="l651"><span class="ln">651  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">_supported_responses </span><span class="s5">= </span><span class="s1">supported_responses</span>
+<a name="l652"><span class="ln">652  </span></a>
+<a name="l653"><span class="ln">653  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">sniff_options</span><span class="s6">[</span><span class="s7">&quot;timeout&quot;</span><span class="s6">] </span><span class="s5">= </span><span class="s1">timeout</span>
+<a name="l654"><span class="ln">654  </span></a>        <span class="s1">self</span><span class="s3">.</span><span class="s1">sniff_options</span><span class="s6">[</span><span class="s7">&quot;opened_socket&quot;</span><span class="s6">] </span><span class="s5">= </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_sockets</span>
+<a name="l655"><span class="ln">655  </span></a>
+<a name="l656"><span class="ln">656  </span></a>    <span class="s5">@</span><span class="s1">property</span>
+<a name="l657"><span class="ln">657  </span></a>    <span class="s2">def </span><span class="s1">state</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l658"><span class="ln">658  </span></a>        <span class="s0"># type: () -&gt; EcuState</span>
+<a name="l659"><span class="ln">659  </span></a>        <span class="s2">return </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state</span>
+<a name="l660"><span class="ln">660  </span></a>
+<a name="l661"><span class="ln">661  </span></a>    <span class="s2">def </span><span class="s1">reset_state</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l662"><span class="ln">662  </span></a>        <span class="s0"># type: () -&gt; None</span>
+<a name="l663"><span class="ln">663  </span></a>        <span class="s2">with </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state_mutex</span><span class="s5">:</span>
+<a name="l664"><span class="ln">664  </span></a>            <span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state </span><span class="s5">= </span><span class="s1">copy</span><span class="s3">.</span><span class="s1">copy</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">_initial_ecu_state</span><span class="s4">)</span>
+<a name="l665"><span class="ln">665  </span></a>
+<a name="l666"><span class="ln">666  </span></a>    <span class="s2">def </span><span class="s1">is_request</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">req</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l667"><span class="ln">667  </span></a>        <span class="s0"># type: (Packet) -&gt; bool</span>
+<a name="l668"><span class="ln">668  </span></a>        <span class="s2">return </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">req</span><span class="s3">, </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_basecls</span><span class="s4">)</span>
+<a name="l669"><span class="ln">669  </span></a>
+<a name="l670"><span class="ln">670  </span></a>    <span class="s2">def </span><span class="s1">make_reply</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">req</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l671"><span class="ln">671  </span></a>        <span class="s0"># type: (Packet) -&gt; PacketList</span>
+<a name="l672"><span class="ln">672  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l673"><span class="ln">673  </span></a>        Checks if a given request can be answered by the internal list of 
+<a name="l674"><span class="ln">674  </span></a>        EcuResponses. First, it's evaluated if the internal EcuState of this 
+<a name="l675"><span class="ln">675  </span></a>        AnsweringMachine is supported by an EcuResponse, next it's evaluated if 
+<a name="l676"><span class="ln">676  </span></a>        a request answers the key_response of this EcuResponse object. The 
+<a name="l677"><span class="ln">677  </span></a>        first fitting EcuResponse is used. If this EcuResponse modified the 
+<a name="l678"><span class="ln">678  </span></a>        EcuState, the internal EcuState of this AnsweringMachine is updated, 
+<a name="l679"><span class="ln">679  </span></a>        and the list of response Packets of the selected EcuResponse is 
+<a name="l680"><span class="ln">680  </span></a>        returned. If no EcuResponse if found, a PacketList with a generic 
+<a name="l681"><span class="ln">681  </span></a>        NegativeResponse is returned. 
+<a name="l682"><span class="ln">682  </span></a>        :param req: A request packet 
+<a name="l683"><span class="ln">683  </span></a>        :return: A list of response packets 
+<a name="l684"><span class="ln">684  </span></a>        &quot;&quot;&quot;</span>
+<a name="l685"><span class="ln">685  </span></a>        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_supported_responses </span><span class="s2">is not None</span><span class="s5">:</span>
+<a name="l686"><span class="ln">686  </span></a>            <span class="s2">for </span><span class="s1">resp </span><span class="s2">in </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_supported_responses</span><span class="s5">:</span>
+<a name="l687"><span class="ln">687  </span></a>                <span class="s2">if not </span><span class="s1">isinstance</span><span class="s4">(</span><span class="s1">resp</span><span class="s3">, </span><span class="s1">EcuResponse</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l688"><span class="ln">688  </span></a>                    <span class="s2">raise </span><span class="s1">TypeError</span><span class="s4">(</span><span class="s7">&quot;Unsupported type for response. &quot;</span>
+<a name="l689"><span class="ln">689  </span></a>                                    <span class="s7">&quot;Please use `EcuResponse` objects.&quot;</span><span class="s4">)</span>
+<a name="l690"><span class="ln">690  </span></a>
+<a name="l691"><span class="ln">691  </span></a>                <span class="s2">with </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state_mutex</span><span class="s5">:</span>
+<a name="l692"><span class="ln">692  </span></a>                    <span class="s2">if not </span><span class="s1">resp</span><span class="s3">.</span><span class="s1">supports_state</span><span class="s4">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l693"><span class="ln">693  </span></a>                        <span class="s2">continue</span>
+<a name="l694"><span class="ln">694  </span></a>
+<a name="l695"><span class="ln">695  </span></a>                    <span class="s2">if not </span><span class="s1">resp</span><span class="s3">.</span><span class="s1">answers</span><span class="s4">(</span><span class="s1">req</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l696"><span class="ln">696  </span></a>                        <span class="s2">continue</span>
+<a name="l697"><span class="ln">697  </span></a>
+<a name="l698"><span class="ln">698  </span></a>                    <span class="s1">EcuState</span><span class="s3">.</span><span class="s1">get_modified_ecu_state</span><span class="s4">(</span>
+<a name="l699"><span class="ln">699  </span></a>                        <span class="s1">resp</span><span class="s3">.</span><span class="s1">key_response</span><span class="s3">, </span><span class="s1">req</span><span class="s3">, </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_ecu_state</span><span class="s3">, </span><span class="s2">True</span><span class="s4">)</span>
+<a name="l700"><span class="ln">700  </span></a>
+<a name="l701"><span class="ln">701  </span></a>                    <span class="s2">return </span><span class="s1">resp</span><span class="s3">.</span><span class="s1">responses</span>
+<a name="l702"><span class="ln">702  </span></a>
+<a name="l703"><span class="ln">703  </span></a>        <span class="s2">return </span><span class="s1">PacketList</span><span class="s4">(</span><span class="s6">[</span><span class="s1">self</span><span class="s3">.</span><span class="s1">_basecls</span><span class="s4">(</span>
+<a name="l704"><span class="ln">704  </span></a>            <span class="s7">b&quot;</span><span class="s6">\x7f</span><span class="s7">&quot; </span><span class="s5">+ </span><span class="s1">bytes</span><span class="s4">(</span><span class="s1">req</span><span class="s4">)</span><span class="s6">[</span><span class="s8">0</span><span class="s5">:</span><span class="s8">1</span><span class="s6">] </span><span class="s5">+ </span><span class="s7">b&quot;</span><span class="s6">\x10</span><span class="s7">&quot;</span><span class="s4">)</span><span class="s6">]</span><span class="s4">)</span>
+<a name="l705"><span class="ln">705  </span></a>
+<a name="l706"><span class="ln">706  </span></a>    <span class="s2">def </span><span class="s1">send_reply</span><span class="s4">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">reply</span><span class="s3">, </span><span class="s1">send_function</span><span class="s5">=</span><span class="s2">None</span><span class="s4">)</span><span class="s5">:</span>
+<a name="l707"><span class="ln">707  </span></a>        <span class="s0"># type: (PacketList, Optional[Any]) -&gt; None</span>
+<a name="l708"><span class="ln">708  </span></a>        <span class="s0">&quot;&quot;&quot; 
+<a name="l709"><span class="ln">709  </span></a>        Sends all Packets of a EcuResponse object. This allows to send multiple 
+<a name="l710"><span class="ln">710  </span></a>        packets up on a request. If the list contains more than one packet, 
+<a name="l711"><span class="ln">711  </span></a>        a random time between each packet is waited until the next packet will 
+<a name="l712"><span class="ln">712  </span></a>        be sent. 
+<a name="l713"><span class="ln">713  </span></a>        :param reply: List of packets to be sent. 
+<a name="l714"><span class="ln">714  </span></a>        &quot;&quot;&quot;</span>
+<a name="l715"><span class="ln">715  </span></a>        <span class="s2">for </span><span class="s1">p </span><span class="s2">in </span><span class="s1">reply</span><span class="s5">:</span>
+<a name="l716"><span class="ln">716  </span></a>            <span class="s2">if </span><span class="s1">len</span><span class="s4">(</span><span class="s1">reply</span><span class="s4">) </span><span class="s5">&gt; </span><span class="s8">1</span><span class="s5">:</span>
+<a name="l717"><span class="ln">717  </span></a>                <span class="s1">time</span><span class="s3">.</span><span class="s1">sleep</span><span class="s4">(</span><span class="s1">random</span><span class="s3">.</span><span class="s1">uniform</span><span class="s4">(</span><span class="s8">0.01</span><span class="s3">, </span><span class="s8">0.5</span><span class="s4">))</span>
+<a name="l718"><span class="ln">718  </span></a>            <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">_main_socket</span><span class="s5">:</span>
+<a name="l719"><span class="ln">719  </span></a>                <span class="s1">self</span><span class="s3">.</span><span class="s1">_main_socket</span><span class="s3">.</span><span class="s1">send</span><span class="s4">(</span><span class="s1">p</span><span class="s4">)</span>
+<a name="l720"><span class="ln">720  </span></a></pre>
+</body>
+</html>

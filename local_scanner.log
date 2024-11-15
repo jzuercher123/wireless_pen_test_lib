@@ -1,0 +1,29 @@
+[2024-11-12 23:50:51,076] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 23:50:51,191] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 23:50:51,192] INFO - LocalScanner - LocalScanner initialized with scan duration: 10 seconds.
+[2024-11-12 23:51:16,769] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-12 23:51:16,811] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-12 23:51:18,198] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 23:51:18,230] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 23:51:18,254] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 23:51:18,291] DEBUG - LocalScanner - Active interface found: eth0 with IP 172.24.156.84 and netmask None
+[2024-11-12 23:51:18,341] DEBUG - LocalScanner - Calculating network range for interface: eth0
+[2024-11-12 23:51:18,368] ERROR - LocalScanner - IP address or netmask not found for interface eth0.
+[2024-11-12 23:51:18,378] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface eth0.
+[2024-11-12 23:51:18,391] INFO - LocalScanner - Network scan completed.
+[2024-11-12 23:51:49,855] INFO - LocalScanner - Initiating network scan.
+[2024-11-12 23:51:49,862] INFO - LocalScanner - Starting local network scan.
+[2024-11-12 23:51:49,873] DEBUG - LocalScanner - Retrieving active network interfaces.
+[2024-11-12 23:51:49,881] DEBUG - LocalScanner - Active interface found: eth0 with IP 172.24.156.84 and netmask None
+[2024-11-12 23:51:49,882] DEBUG - LocalScanner - Calculating network range for interface: eth0
+[2024-11-12 23:51:49,883] ERROR - LocalScanner - IP address or netmask not found for interface eth0.
+[2024-11-12 23:51:49,885] ERROR - LocalScanner - An error occurred during the network scan: IP address or netmask not found for interface eth0.
+[2024-11-12 23:51:49,886] INFO - LocalScanner - Network scan completed.
+[2024-11-13 22:59:34,129] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-13 22:59:34,207] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-13 23:02:38,749] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-13 23:02:38,760] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-13 23:03:50,281] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-13 23:03:50,288] DEBUG - LocalScanner - Nmap is installed.
+[2024-11-13 23:11:25,137] DEBUG - LocalScanner - MAC vendor database updated.
+[2024-11-13 23:11:25,185] DEBUG - LocalScanner - Nmap is installed.

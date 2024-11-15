@@ -1,0 +1,423 @@
+<html>
+<head>
+<title>_known_annotated_metadata.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #fede5d; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #b6b1b1;}
+.s3 { color: #fede5d;}
+.s4 { color: #36f9f6;}
+.s5 { color: #ff8b39;}
+.s6 { color: #03edf9;}
+.s7 { color: #848bbd; font-style: italic;}
+.s8 { color: #f97e72;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+_known_annotated_metadata.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">from </span><span class="s1">__future__ </span><span class="s0">import </span><span class="s1">annotations</span>
+<a name="l2"><span class="ln">2    </span></a>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">from </span><span class="s1">collections </span><span class="s0">import </span><span class="s1">defaultdict</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">from </span><span class="s1">copy </span><span class="s0">import </span><span class="s1">copy</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">from </span><span class="s1">functools </span><span class="s0">import </span><span class="s1">lru_cache</span><span class="s2">, </span><span class="s1">partial</span>
+<a name="l6"><span class="ln">6    </span></a><span class="s0">from </span><span class="s1">typing </span><span class="s0">import </span><span class="s1">TYPE_CHECKING</span><span class="s2">, </span><span class="s1">Any</span><span class="s2">, </span><span class="s1">Callable</span><span class="s2">, </span><span class="s1">Iterable</span>
+<a name="l7"><span class="ln">7    </span></a>
+<a name="l8"><span class="ln">8    </span></a><span class="s0">from </span><span class="s1">pydantic_core </span><span class="s0">import </span><span class="s1">CoreSchema</span><span class="s2">, </span><span class="s1">PydanticCustomError</span><span class="s2">, </span><span class="s1">ValidationError</span><span class="s2">, </span><span class="s1">to_jsonable_python</span>
+<a name="l9"><span class="ln">9    </span></a><span class="s0">from </span><span class="s1">pydantic_core </span><span class="s0">import </span><span class="s1">core_schema </span><span class="s0">as </span><span class="s1">cs</span>
+<a name="l10"><span class="ln">10   </span></a>
+<a name="l11"><span class="ln">11   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">_fields </span><span class="s0">import </span><span class="s1">PydanticMetadata</span>
+<a name="l12"><span class="ln">12   </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">_import_utils </span><span class="s0">import </span><span class="s1">import_cached_field_info</span>
+<a name="l13"><span class="ln">13   </span></a>
+<a name="l14"><span class="ln">14   </span></a><span class="s0">if </span><span class="s1">TYPE_CHECKING</span><span class="s3">:</span>
+<a name="l15"><span class="ln">15   </span></a>    <span class="s0">from </span><span class="s2">..</span><span class="s1">annotated_handlers </span><span class="s0">import </span><span class="s1">GetJsonSchemaHandler</span>
+<a name="l16"><span class="ln">16   </span></a>
+<a name="l17"><span class="ln">17   </span></a><span class="s1">STRICT </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'strict'</span><span class="s4">}</span>
+<a name="l18"><span class="ln">18   </span></a><span class="s1">FAIL_FAST </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'fail_fast'</span><span class="s4">}</span>
+<a name="l19"><span class="ln">19   </span></a><span class="s1">LENGTH_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'min_length'</span><span class="s2">, </span><span class="s5">'max_length'</span><span class="s4">}</span>
+<a name="l20"><span class="ln">20   </span></a><span class="s1">INEQUALITY </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'le'</span><span class="s2">, </span><span class="s5">'ge'</span><span class="s2">, </span><span class="s5">'lt'</span><span class="s2">, </span><span class="s5">'gt'</span><span class="s4">}</span>
+<a name="l21"><span class="ln">21   </span></a><span class="s1">NUMERIC_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'multiple_of'</span><span class="s2">, </span><span class="s3">*</span><span class="s1">INEQUALITY</span><span class="s4">}</span>
+<a name="l22"><span class="ln">22   </span></a><span class="s1">ALLOW_INF_NAN </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'allow_inf_nan'</span><span class="s4">}</span>
+<a name="l23"><span class="ln">23   </span></a>
+<a name="l24"><span class="ln">24   </span></a><span class="s1">STR_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span>
+<a name="l25"><span class="ln">25   </span></a>    <span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">,</span>
+<a name="l26"><span class="ln">26   </span></a>    <span class="s3">*</span><span class="s1">STRICT</span><span class="s2">,</span>
+<a name="l27"><span class="ln">27   </span></a>    <span class="s5">'strip_whitespace'</span><span class="s2">,</span>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s5">'to_lower'</span><span class="s2">,</span>
+<a name="l29"><span class="ln">29   </span></a>    <span class="s5">'to_upper'</span><span class="s2">,</span>
+<a name="l30"><span class="ln">30   </span></a>    <span class="s5">'pattern'</span><span class="s2">,</span>
+<a name="l31"><span class="ln">31   </span></a>    <span class="s5">'coerce_numbers_to_str'</span><span class="s2">,</span>
+<a name="l32"><span class="ln">32   </span></a><span class="s4">}</span>
+<a name="l33"><span class="ln">33   </span></a><span class="s1">BYTES_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l34"><span class="ln">34   </span></a>
+<a name="l35"><span class="ln">35   </span></a><span class="s1">LIST_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s2">, </span><span class="s3">*</span><span class="s1">FAIL_FAST</span><span class="s4">}</span>
+<a name="l36"><span class="ln">36   </span></a><span class="s1">TUPLE_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s2">, </span><span class="s3">*</span><span class="s1">FAIL_FAST</span><span class="s4">}</span>
+<a name="l37"><span class="ln">37   </span></a><span class="s1">SET_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s2">, </span><span class="s3">*</span><span class="s1">FAIL_FAST</span><span class="s4">}</span>
+<a name="l38"><span class="ln">38   </span></a><span class="s1">DICT_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l39"><span class="ln">39   </span></a><span class="s1">GENERATOR_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l40"><span class="ln">40   </span></a><span class="s1">SEQUENCE_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">FAIL_FAST</span><span class="s4">}</span>
+<a name="l41"><span class="ln">41   </span></a>
+<a name="l42"><span class="ln">42   </span></a><span class="s1">FLOAT_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">ALLOW_INF_NAN</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l43"><span class="ln">43   </span></a><span class="s1">DECIMAL_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'max_digits'</span><span class="s2">, </span><span class="s5">'decimal_places'</span><span class="s2">, </span><span class="s3">*</span><span class="s1">FLOAT_CONSTRAINTS</span><span class="s4">}</span>
+<a name="l44"><span class="ln">44   </span></a><span class="s1">INT_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">ALLOW_INF_NAN</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l45"><span class="ln">45   </span></a><span class="s1">BOOL_CONSTRAINTS </span><span class="s3">= </span><span class="s1">STRICT</span>
+<a name="l46"><span class="ln">46   </span></a><span class="s1">UUID_CONSTRAINTS </span><span class="s3">= </span><span class="s1">STRICT</span>
+<a name="l47"><span class="ln">47   </span></a>
+<a name="l48"><span class="ln">48   </span></a><span class="s1">DATE_TIME_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l49"><span class="ln">49   </span></a><span class="s1">TIMEDELTA_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l50"><span class="ln">50   </span></a><span class="s1">TIME_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s3">*</span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">STRICT</span><span class="s4">}</span>
+<a name="l51"><span class="ln">51   </span></a><span class="s1">LAX_OR_STRICT_CONSTRAINTS </span><span class="s3">= </span><span class="s1">STRICT</span>
+<a name="l52"><span class="ln">52   </span></a><span class="s1">ENUM_CONSTRAINTS </span><span class="s3">= </span><span class="s1">STRICT</span>
+<a name="l53"><span class="ln">53   </span></a><span class="s1">COMPLEX_CONSTRAINTS </span><span class="s3">= </span><span class="s1">STRICT</span>
+<a name="l54"><span class="ln">54   </span></a>
+<a name="l55"><span class="ln">55   </span></a><span class="s1">UNION_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'union_mode'</span><span class="s4">}</span>
+<a name="l56"><span class="ln">56   </span></a><span class="s1">URL_CONSTRAINTS </span><span class="s3">= </span><span class="s4">{</span>
+<a name="l57"><span class="ln">57   </span></a>    <span class="s5">'max_length'</span><span class="s2">,</span>
+<a name="l58"><span class="ln">58   </span></a>    <span class="s5">'allowed_schemes'</span><span class="s2">,</span>
+<a name="l59"><span class="ln">59   </span></a>    <span class="s5">'host_required'</span><span class="s2">,</span>
+<a name="l60"><span class="ln">60   </span></a>    <span class="s5">'default_host'</span><span class="s2">,</span>
+<a name="l61"><span class="ln">61   </span></a>    <span class="s5">'default_port'</span><span class="s2">,</span>
+<a name="l62"><span class="ln">62   </span></a>    <span class="s5">'default_path'</span><span class="s2">,</span>
+<a name="l63"><span class="ln">63   </span></a><span class="s4">}</span>
+<a name="l64"><span class="ln">64   </span></a>
+<a name="l65"><span class="ln">65   </span></a><span class="s1">TEXT_SCHEMA_TYPES </span><span class="s3">= </span><span class="s6">(</span><span class="s5">'str'</span><span class="s2">, </span><span class="s5">'bytes'</span><span class="s2">, </span><span class="s5">'url'</span><span class="s2">, </span><span class="s5">'multi-host-url'</span><span class="s6">)</span>
+<a name="l66"><span class="ln">66   </span></a><span class="s1">SEQUENCE_SCHEMA_TYPES </span><span class="s3">= </span><span class="s6">(</span><span class="s5">'list'</span><span class="s2">, </span><span class="s5">'tuple'</span><span class="s2">, </span><span class="s5">'set'</span><span class="s2">, </span><span class="s5">'frozenset'</span><span class="s2">, </span><span class="s5">'generator'</span><span class="s2">, </span><span class="s3">*</span><span class="s1">TEXT_SCHEMA_TYPES</span><span class="s6">)</span>
+<a name="l67"><span class="ln">67   </span></a><span class="s1">NUMERIC_SCHEMA_TYPES </span><span class="s3">= </span><span class="s6">(</span><span class="s5">'float'</span><span class="s2">, </span><span class="s5">'int'</span><span class="s2">, </span><span class="s5">'date'</span><span class="s2">, </span><span class="s5">'time'</span><span class="s2">, </span><span class="s5">'timedelta'</span><span class="s2">, </span><span class="s5">'datetime'</span><span class="s6">)</span>
+<a name="l68"><span class="ln">68   </span></a>
+<a name="l69"><span class="ln">69   </span></a><span class="s1">CONSTRAINTS_TO_ALLOWED_SCHEMAS</span><span class="s3">: </span><span class="s1">dict</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">set</span><span class="s4">[</span><span class="s1">str</span><span class="s4">]] </span><span class="s3">= </span><span class="s1">defaultdict</span><span class="s6">(</span><span class="s1">set</span><span class="s6">)</span>
+<a name="l70"><span class="ln">70   </span></a>
+<a name="l71"><span class="ln">71   </span></a><span class="s1">constraint_schema_pairings</span><span class="s3">: </span><span class="s1">list</span><span class="s4">[</span><span class="s1">tuple</span><span class="s4">[</span><span class="s1">set</span><span class="s4">[</span><span class="s1">str</span><span class="s4">]</span><span class="s2">, </span><span class="s1">tuple</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, ...</span><span class="s4">]]] </span><span class="s3">= </span><span class="s4">[</span>
+<a name="l72"><span class="ln">72   </span></a>    <span class="s6">(</span><span class="s1">STR_CONSTRAINTS</span><span class="s2">, </span><span class="s1">TEXT_SCHEMA_TYPES</span><span class="s6">)</span><span class="s2">,</span>
+<a name="l73"><span class="ln">73   </span></a>    <span class="s6">(</span><span class="s1">BYTES_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'bytes'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l74"><span class="ln">74   </span></a>    <span class="s6">(</span><span class="s1">LIST_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'list'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l75"><span class="ln">75   </span></a>    <span class="s6">(</span><span class="s1">TUPLE_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'tuple'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l76"><span class="ln">76   </span></a>    <span class="s6">(</span><span class="s1">SET_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'set'</span><span class="s2">, </span><span class="s5">'frozenset'</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l77"><span class="ln">77   </span></a>    <span class="s6">(</span><span class="s1">DICT_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'dict'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l78"><span class="ln">78   </span></a>    <span class="s6">(</span><span class="s1">GENERATOR_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'generator'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l79"><span class="ln">79   </span></a>    <span class="s6">(</span><span class="s1">FLOAT_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'float'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l80"><span class="ln">80   </span></a>    <span class="s6">(</span><span class="s1">INT_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'int'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l81"><span class="ln">81   </span></a>    <span class="s6">(</span><span class="s1">DATE_TIME_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'date'</span><span class="s2">, </span><span class="s5">'time'</span><span class="s2">, </span><span class="s5">'datetime'</span><span class="s2">, </span><span class="s5">'timedelta'</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l82"><span class="ln">82   </span></a>    <span class="s7"># TODO: this is a bit redundant, we could probably avoid some of these</span>
+<a name="l83"><span class="ln">83   </span></a>    <span class="s6">(</span><span class="s1">STRICT</span><span class="s2">, </span><span class="s6">(</span><span class="s3">*</span><span class="s1">TEXT_SCHEMA_TYPES</span><span class="s2">, </span><span class="s3">*</span><span class="s1">SEQUENCE_SCHEMA_TYPES</span><span class="s2">, </span><span class="s3">*</span><span class="s1">NUMERIC_SCHEMA_TYPES</span><span class="s2">, </span><span class="s5">'typed-dict'</span><span class="s2">, </span><span class="s5">'model'</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l84"><span class="ln">84   </span></a>    <span class="s6">(</span><span class="s1">UNION_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'union'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l85"><span class="ln">85   </span></a>    <span class="s6">(</span><span class="s1">URL_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'url'</span><span class="s2">, </span><span class="s5">'multi-host-url'</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l86"><span class="ln">86   </span></a>    <span class="s6">(</span><span class="s1">BOOL_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'bool'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l87"><span class="ln">87   </span></a>    <span class="s6">(</span><span class="s1">UUID_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'uuid'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l88"><span class="ln">88   </span></a>    <span class="s6">(</span><span class="s1">LAX_OR_STRICT_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'lax-or-strict'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l89"><span class="ln">89   </span></a>    <span class="s6">(</span><span class="s1">ENUM_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'enum'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l90"><span class="ln">90   </span></a>    <span class="s6">(</span><span class="s1">DECIMAL_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'decimal'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l91"><span class="ln">91   </span></a>    <span class="s6">(</span><span class="s1">COMPLEX_CONSTRAINTS</span><span class="s2">, </span><span class="s6">(</span><span class="s5">'complex'</span><span class="s2">,</span><span class="s6">))</span><span class="s2">,</span>
+<a name="l92"><span class="ln">92   </span></a><span class="s4">]</span>
+<a name="l93"><span class="ln">93   </span></a>
+<a name="l94"><span class="ln">94   </span></a><span class="s0">for </span><span class="s1">constraints</span><span class="s2">, </span><span class="s1">schemas </span><span class="s0">in </span><span class="s1">constraint_schema_pairings</span><span class="s3">:</span>
+<a name="l95"><span class="ln">95   </span></a>    <span class="s0">for </span><span class="s1">c </span><span class="s0">in </span><span class="s1">constraints</span><span class="s3">:</span>
+<a name="l96"><span class="ln">96   </span></a>        <span class="s1">CONSTRAINTS_TO_ALLOWED_SCHEMAS</span><span class="s4">[</span><span class="s1">c</span><span class="s4">]</span><span class="s2">.</span><span class="s1">update</span><span class="s6">(</span><span class="s1">schemas</span><span class="s6">)</span>
+<a name="l97"><span class="ln">97   </span></a>
+<a name="l98"><span class="ln">98   </span></a>
+<a name="l99"><span class="ln">99   </span></a><span class="s0">def </span><span class="s1">add_js_update_schema</span><span class="s6">(</span><span class="s1">s</span><span class="s3">: </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">CoreSchema</span><span class="s2">, </span><span class="s1">f</span><span class="s3">: </span><span class="s1">Callable</span><span class="s4">[[]</span><span class="s2">, </span><span class="s1">dict</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">Any</span><span class="s4">]]</span><span class="s6">) </span><span class="s1">-&gt; </span><span class="s0">None</span><span class="s3">:</span>
+<a name="l100"><span class="ln">100  </span></a>    <span class="s0">def </span><span class="s1">update_js_schema</span><span class="s6">(</span><span class="s1">s</span><span class="s3">: </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">CoreSchema</span><span class="s2">, </span><span class="s1">handler</span><span class="s3">: </span><span class="s1">GetJsonSchemaHandler</span><span class="s6">) </span><span class="s1">-&gt; dict</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">Any</span><span class="s4">]</span><span class="s3">:</span>
+<a name="l101"><span class="ln">101  </span></a>        <span class="s1">js_schema </span><span class="s3">= </span><span class="s1">handler</span><span class="s6">(</span><span class="s1">s</span><span class="s6">)</span>
+<a name="l102"><span class="ln">102  </span></a>        <span class="s1">js_schema</span><span class="s2">.</span><span class="s1">update</span><span class="s6">(</span><span class="s1">f</span><span class="s6">())</span>
+<a name="l103"><span class="ln">103  </span></a>        <span class="s0">return </span><span class="s1">js_schema</span>
+<a name="l104"><span class="ln">104  </span></a>
+<a name="l105"><span class="ln">105  </span></a>    <span class="s0">if </span><span class="s5">'metadata' </span><span class="s0">in </span><span class="s1">s</span><span class="s3">:</span>
+<a name="l106"><span class="ln">106  </span></a>        <span class="s1">metadata </span><span class="s3">= </span><span class="s1">s</span><span class="s4">[</span><span class="s5">'metadata'</span><span class="s4">]</span>
+<a name="l107"><span class="ln">107  </span></a>        <span class="s0">if </span><span class="s5">'pydantic_js_functions' </span><span class="s0">in </span><span class="s1">s</span><span class="s3">:</span>
+<a name="l108"><span class="ln">108  </span></a>            <span class="s1">metadata</span><span class="s4">[</span><span class="s5">'pydantic_js_functions'</span><span class="s4">]</span><span class="s2">.</span><span class="s1">append</span><span class="s6">(</span><span class="s1">update_js_schema</span><span class="s6">)</span>
+<a name="l109"><span class="ln">109  </span></a>        <span class="s0">else</span><span class="s3">:</span>
+<a name="l110"><span class="ln">110  </span></a>            <span class="s1">metadata</span><span class="s4">[</span><span class="s5">'pydantic_js_functions'</span><span class="s4">] </span><span class="s3">= </span><span class="s4">[</span><span class="s1">update_js_schema</span><span class="s4">]</span>
+<a name="l111"><span class="ln">111  </span></a>    <span class="s0">else</span><span class="s3">:</span>
+<a name="l112"><span class="ln">112  </span></a>        <span class="s1">s</span><span class="s4">[</span><span class="s5">'metadata'</span><span class="s4">] </span><span class="s3">= </span><span class="s4">{</span><span class="s5">'pydantic_js_functions'</span><span class="s3">: </span><span class="s4">[</span><span class="s1">update_js_schema</span><span class="s4">]}</span>
+<a name="l113"><span class="ln">113  </span></a>
+<a name="l114"><span class="ln">114  </span></a>
+<a name="l115"><span class="ln">115  </span></a><span class="s0">def </span><span class="s1">as_jsonable_value</span><span class="s6">(</span><span class="s1">v</span><span class="s3">: </span><span class="s1">Any</span><span class="s6">) </span><span class="s1">-&gt; Any</span><span class="s3">:</span>
+<a name="l116"><span class="ln">116  </span></a>    <span class="s0">if </span><span class="s1">type</span><span class="s6">(</span><span class="s1">v</span><span class="s6">) </span><span class="s0">not in </span><span class="s6">(</span><span class="s1">int</span><span class="s2">, </span><span class="s1">str</span><span class="s2">, </span><span class="s1">float</span><span class="s2">, </span><span class="s1">bytes</span><span class="s2">, </span><span class="s1">bool</span><span class="s2">, </span><span class="s1">type</span><span class="s6">(</span><span class="s0">None</span><span class="s6">))</span><span class="s3">:</span>
+<a name="l117"><span class="ln">117  </span></a>        <span class="s0">return </span><span class="s1">to_jsonable_python</span><span class="s6">(</span><span class="s1">v</span><span class="s6">)</span>
+<a name="l118"><span class="ln">118  </span></a>    <span class="s0">return </span><span class="s1">v</span>
+<a name="l119"><span class="ln">119  </span></a>
+<a name="l120"><span class="ln">120  </span></a>
+<a name="l121"><span class="ln">121  </span></a><span class="s0">def </span><span class="s1">expand_grouped_metadata</span><span class="s6">(</span><span class="s1">annotations</span><span class="s3">: </span><span class="s1">Iterable</span><span class="s4">[</span><span class="s1">Any</span><span class="s4">]</span><span class="s6">) </span><span class="s1">-&gt; Iterable</span><span class="s4">[</span><span class="s1">Any</span><span class="s4">]</span><span class="s3">:</span>
+<a name="l122"><span class="ln">122  </span></a>    <span class="s7">&quot;&quot;&quot;Expand the annotations. 
+<a name="l123"><span class="ln">123  </span></a> 
+<a name="l124"><span class="ln">124  </span></a>    Args: 
+<a name="l125"><span class="ln">125  </span></a>        annotations: An iterable of annotations. 
+<a name="l126"><span class="ln">126  </span></a> 
+<a name="l127"><span class="ln">127  </span></a>    Returns: 
+<a name="l128"><span class="ln">128  </span></a>        An iterable of expanded annotations. 
+<a name="l129"><span class="ln">129  </span></a> 
+<a name="l130"><span class="ln">130  </span></a>    Example: 
+<a name="l131"><span class="ln">131  </span></a>        ```py 
+<a name="l132"><span class="ln">132  </span></a>        from annotated_types import Ge, Len 
+<a name="l133"><span class="ln">133  </span></a> 
+<a name="l134"><span class="ln">134  </span></a>        from pydantic._internal._known_annotated_metadata import expand_grouped_metadata 
+<a name="l135"><span class="ln">135  </span></a> 
+<a name="l136"><span class="ln">136  </span></a>        print(list(expand_grouped_metadata([Ge(4), Len(5)]))) 
+<a name="l137"><span class="ln">137  </span></a>        #&gt; [Ge(ge=4), MinLen(min_length=5)] 
+<a name="l138"><span class="ln">138  </span></a>        ``` 
+<a name="l139"><span class="ln">139  </span></a>    &quot;&quot;&quot;</span>
+<a name="l140"><span class="ln">140  </span></a>    <span class="s0">import </span><span class="s1">annotated_types </span><span class="s0">as </span><span class="s1">at</span>
+<a name="l141"><span class="ln">141  </span></a>
+<a name="l142"><span class="ln">142  </span></a>    <span class="s1">FieldInfo </span><span class="s3">= </span><span class="s1">import_cached_field_info</span><span class="s6">()</span>
+<a name="l143"><span class="ln">143  </span></a>
+<a name="l144"><span class="ln">144  </span></a>    <span class="s0">for </span><span class="s1">annotation </span><span class="s0">in </span><span class="s1">annotations</span><span class="s3">:</span>
+<a name="l145"><span class="ln">145  </span></a>        <span class="s0">if </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">at</span><span class="s2">.</span><span class="s1">GroupedMetadata</span><span class="s6">)</span><span class="s3">:</span>
+<a name="l146"><span class="ln">146  </span></a>            <span class="s0">yield from </span><span class="s1">annotation</span>
+<a name="l147"><span class="ln">147  </span></a>        <span class="s0">elif </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">FieldInfo</span><span class="s6">)</span><span class="s3">:</span>
+<a name="l148"><span class="ln">148  </span></a>            <span class="s0">yield from </span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">metadata</span>
+<a name="l149"><span class="ln">149  </span></a>            <span class="s7"># this is a bit problematic in that it results in duplicate metadata</span>
+<a name="l150"><span class="ln">150  </span></a>            <span class="s7"># all of our &quot;consumers&quot; can handle it, but it is not ideal</span>
+<a name="l151"><span class="ln">151  </span></a>            <span class="s7"># we probably should split up FieldInfo into:</span>
+<a name="l152"><span class="ln">152  </span></a>            <span class="s7"># - annotated types metadata</span>
+<a name="l153"><span class="ln">153  </span></a>            <span class="s7"># - individual metadata known only to Pydantic</span>
+<a name="l154"><span class="ln">154  </span></a>            <span class="s1">annotation </span><span class="s3">= </span><span class="s1">copy</span><span class="s6">(</span><span class="s1">annotation</span><span class="s6">)</span>
+<a name="l155"><span class="ln">155  </span></a>            <span class="s1">annotation</span><span class="s2">.</span><span class="s1">metadata </span><span class="s3">= </span><span class="s4">[]</span>
+<a name="l156"><span class="ln">156  </span></a>            <span class="s0">yield </span><span class="s1">annotation</span>
+<a name="l157"><span class="ln">157  </span></a>        <span class="s0">else</span><span class="s3">:</span>
+<a name="l158"><span class="ln">158  </span></a>            <span class="s0">yield </span><span class="s1">annotation</span>
+<a name="l159"><span class="ln">159  </span></a>
+<a name="l160"><span class="ln">160  </span></a>
+<a name="l161"><span class="ln">161  </span></a><span class="s3">@</span><span class="s1">lru_cache</span>
+<a name="l162"><span class="ln">162  </span></a><span class="s0">def </span><span class="s1">_get_at_to_constraint_map</span><span class="s6">() </span><span class="s1">-&gt; dict</span><span class="s4">[</span><span class="s1">type</span><span class="s2">, </span><span class="s1">str</span><span class="s4">]</span><span class="s3">:</span>
+<a name="l163"><span class="ln">163  </span></a>    <span class="s7">&quot;&quot;&quot;Return a mapping of annotated types to constraints. 
+<a name="l164"><span class="ln">164  </span></a> 
+<a name="l165"><span class="ln">165  </span></a>    Normally, we would define a mapping like this in the module scope, but we can't do that 
+<a name="l166"><span class="ln">166  </span></a>    because we don't permit module level imports of `annotated_types`, in an attempt to speed up 
+<a name="l167"><span class="ln">167  </span></a>    the import time of `pydantic`. We still only want to have this dictionary defined in one place, 
+<a name="l168"><span class="ln">168  </span></a>    so we use this function to cache the result. 
+<a name="l169"><span class="ln">169  </span></a>    &quot;&quot;&quot;</span>
+<a name="l170"><span class="ln">170  </span></a>    <span class="s0">import </span><span class="s1">annotated_types </span><span class="s0">as </span><span class="s1">at</span>
+<a name="l171"><span class="ln">171  </span></a>
+<a name="l172"><span class="ln">172  </span></a>    <span class="s0">return </span><span class="s4">{</span>
+<a name="l173"><span class="ln">173  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">Gt</span><span class="s3">: </span><span class="s5">'gt'</span><span class="s2">,</span>
+<a name="l174"><span class="ln">174  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">Ge</span><span class="s3">: </span><span class="s5">'ge'</span><span class="s2">,</span>
+<a name="l175"><span class="ln">175  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">Lt</span><span class="s3">: </span><span class="s5">'lt'</span><span class="s2">,</span>
+<a name="l176"><span class="ln">176  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">Le</span><span class="s3">: </span><span class="s5">'le'</span><span class="s2">,</span>
+<a name="l177"><span class="ln">177  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">MultipleOf</span><span class="s3">: </span><span class="s5">'multiple_of'</span><span class="s2">,</span>
+<a name="l178"><span class="ln">178  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">MinLen</span><span class="s3">: </span><span class="s5">'min_length'</span><span class="s2">,</span>
+<a name="l179"><span class="ln">179  </span></a>        <span class="s1">at</span><span class="s2">.</span><span class="s1">MaxLen</span><span class="s3">: </span><span class="s5">'max_length'</span><span class="s2">,</span>
+<a name="l180"><span class="ln">180  </span></a>    <span class="s4">}</span>
+<a name="l181"><span class="ln">181  </span></a>
+<a name="l182"><span class="ln">182  </span></a>
+<a name="l183"><span class="ln">183  </span></a><span class="s0">def </span><span class="s1">apply_known_metadata</span><span class="s6">(</span><span class="s1">annotation</span><span class="s3">: </span><span class="s1">Any</span><span class="s2">, </span><span class="s1">schema</span><span class="s3">: </span><span class="s1">CoreSchema</span><span class="s6">) </span><span class="s1">-&gt; CoreSchema </span><span class="s3">| </span><span class="s0">None</span><span class="s3">:  </span><span class="s7"># noqa: C901</span>
+<a name="l184"><span class="ln">184  </span></a>    <span class="s7">&quot;&quot;&quot;Apply `annotation` to `schema` if it is an annotation we know about (Gt, Le, etc.). 
+<a name="l185"><span class="ln">185  </span></a>    Otherwise return `None`. 
+<a name="l186"><span class="ln">186  </span></a> 
+<a name="l187"><span class="ln">187  </span></a>    This does not handle all known annotations. If / when it does, it can always 
+<a name="l188"><span class="ln">188  </span></a>    return a CoreSchema and return the unmodified schema if the annotation should be ignored. 
+<a name="l189"><span class="ln">189  </span></a> 
+<a name="l190"><span class="ln">190  </span></a>    Assumes that GroupedMetadata has already been expanded via `expand_grouped_metadata`. 
+<a name="l191"><span class="ln">191  </span></a> 
+<a name="l192"><span class="ln">192  </span></a>    Args: 
+<a name="l193"><span class="ln">193  </span></a>        annotation: The annotation. 
+<a name="l194"><span class="ln">194  </span></a>        schema: The schema. 
+<a name="l195"><span class="ln">195  </span></a> 
+<a name="l196"><span class="ln">196  </span></a>    Returns: 
+<a name="l197"><span class="ln">197  </span></a>        An updated schema with annotation if it is an annotation we know about, `None` otherwise. 
+<a name="l198"><span class="ln">198  </span></a> 
+<a name="l199"><span class="ln">199  </span></a>    Raises: 
+<a name="l200"><span class="ln">200  </span></a>        PydanticCustomError: If `Predicate` fails. 
+<a name="l201"><span class="ln">201  </span></a>    &quot;&quot;&quot;</span>
+<a name="l202"><span class="ln">202  </span></a>    <span class="s0">import </span><span class="s1">annotated_types </span><span class="s0">as </span><span class="s1">at</span>
+<a name="l203"><span class="ln">203  </span></a>
+<a name="l204"><span class="ln">204  </span></a>    <span class="s0">from </span><span class="s2">.</span><span class="s1">_validators </span><span class="s0">import </span><span class="s1">forbid_inf_nan_check</span><span class="s2">, </span><span class="s1">get_constraint_validator</span>
+<a name="l205"><span class="ln">205  </span></a>
+<a name="l206"><span class="ln">206  </span></a>    <span class="s1">schema </span><span class="s3">= </span><span class="s1">schema</span><span class="s2">.</span><span class="s1">copy</span><span class="s6">()</span>
+<a name="l207"><span class="ln">207  </span></a>    <span class="s1">schema_update</span><span class="s2">, </span><span class="s1">other_metadata </span><span class="s3">= </span><span class="s1">collect_known_metadata</span><span class="s6">(</span><span class="s4">[</span><span class="s1">annotation</span><span class="s4">]</span><span class="s6">)</span>
+<a name="l208"><span class="ln">208  </span></a>    <span class="s1">schema_type </span><span class="s3">= </span><span class="s1">schema</span><span class="s4">[</span><span class="s5">'type'</span><span class="s4">]</span>
+<a name="l209"><span class="ln">209  </span></a>
+<a name="l210"><span class="ln">210  </span></a>    <span class="s1">chain_schema_constraints</span><span class="s3">: </span><span class="s1">set</span><span class="s4">[</span><span class="s1">str</span><span class="s4">] </span><span class="s3">= </span><span class="s4">{</span>
+<a name="l211"><span class="ln">211  </span></a>        <span class="s5">'pattern'</span><span class="s2">,</span>
+<a name="l212"><span class="ln">212  </span></a>        <span class="s5">'strip_whitespace'</span><span class="s2">,</span>
+<a name="l213"><span class="ln">213  </span></a>        <span class="s5">'to_lower'</span><span class="s2">,</span>
+<a name="l214"><span class="ln">214  </span></a>        <span class="s5">'to_upper'</span><span class="s2">,</span>
+<a name="l215"><span class="ln">215  </span></a>        <span class="s5">'coerce_numbers_to_str'</span><span class="s2">,</span>
+<a name="l216"><span class="ln">216  </span></a>    <span class="s4">}</span>
+<a name="l217"><span class="ln">217  </span></a>    <span class="s1">chain_schema_steps</span><span class="s3">: </span><span class="s1">list</span><span class="s4">[</span><span class="s1">CoreSchema</span><span class="s4">] </span><span class="s3">= </span><span class="s4">[]</span>
+<a name="l218"><span class="ln">218  </span></a>
+<a name="l219"><span class="ln">219  </span></a>    <span class="s0">for </span><span class="s1">constraint</span><span class="s2">, </span><span class="s1">value </span><span class="s0">in </span><span class="s1">schema_update</span><span class="s2">.</span><span class="s1">items</span><span class="s6">()</span><span class="s3">:</span>
+<a name="l220"><span class="ln">220  </span></a>        <span class="s0">if </span><span class="s1">constraint </span><span class="s0">not in </span><span class="s1">CONSTRAINTS_TO_ALLOWED_SCHEMAS</span><span class="s3">:</span>
+<a name="l221"><span class="ln">221  </span></a>            <span class="s0">raise </span><span class="s1">ValueError</span><span class="s6">(</span><span class="s5">f'Unknown constraint </span><span class="s4">{</span><span class="s1">constraint</span><span class="s4">}</span><span class="s5">'</span><span class="s6">)</span>
+<a name="l222"><span class="ln">222  </span></a>        <span class="s1">allowed_schemas </span><span class="s3">= </span><span class="s1">CONSTRAINTS_TO_ALLOWED_SCHEMAS</span><span class="s4">[</span><span class="s1">constraint</span><span class="s4">]</span>
+<a name="l223"><span class="ln">223  </span></a>
+<a name="l224"><span class="ln">224  </span></a>        <span class="s7"># if it becomes necessary to handle more than one constraint</span>
+<a name="l225"><span class="ln">225  </span></a>        <span class="s7"># in this recursive case with function-after or function-wrap, we should refactor</span>
+<a name="l226"><span class="ln">226  </span></a>        <span class="s7"># this is a bit challenging because we sometimes want to apply constraints to the inner schema,</span>
+<a name="l227"><span class="ln">227  </span></a>        <span class="s7"># whereas other times we want to wrap the existing schema with a new one that enforces a new constraint.</span>
+<a name="l228"><span class="ln">228  </span></a>        <span class="s0">if </span><span class="s1">schema_type </span><span class="s0">in </span><span class="s4">{</span><span class="s5">'function-before'</span><span class="s2">, </span><span class="s5">'function-wrap'</span><span class="s2">, </span><span class="s5">'function-after'</span><span class="s4">} </span><span class="s0">and </span><span class="s1">constraint </span><span class="s3">== </span><span class="s5">'strict'</span><span class="s3">:</span>
+<a name="l229"><span class="ln">229  </span></a>            <span class="s1">schema</span><span class="s4">[</span><span class="s5">'schema'</span><span class="s4">] </span><span class="s3">= </span><span class="s1">apply_known_metadata</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">schema</span><span class="s4">[</span><span class="s5">'schema'</span><span class="s4">]</span><span class="s6">)  </span><span class="s7"># type: ignore  # schema is function schema</span>
+<a name="l230"><span class="ln">230  </span></a>            <span class="s0">return </span><span class="s1">schema</span>
+<a name="l231"><span class="ln">231  </span></a>
+<a name="l232"><span class="ln">232  </span></a>        <span class="s7"># if we're allowed to apply constraint directly to the schema, like le to int, do that</span>
+<a name="l233"><span class="ln">233  </span></a>        <span class="s0">if </span><span class="s1">schema_type </span><span class="s0">in </span><span class="s1">allowed_schemas</span><span class="s3">:</span>
+<a name="l234"><span class="ln">234  </span></a>            <span class="s0">if </span><span class="s1">constraint </span><span class="s3">== </span><span class="s5">'union_mode' </span><span class="s0">and </span><span class="s1">schema_type </span><span class="s3">== </span><span class="s5">'union'</span><span class="s3">:</span>
+<a name="l235"><span class="ln">235  </span></a>                <span class="s1">schema</span><span class="s4">[</span><span class="s5">'mode'</span><span class="s4">] </span><span class="s3">= </span><span class="s1">value  </span><span class="s7"># type: ignore  # schema is UnionSchema</span>
+<a name="l236"><span class="ln">236  </span></a>            <span class="s0">else</span><span class="s3">:</span>
+<a name="l237"><span class="ln">237  </span></a>                <span class="s1">schema</span><span class="s4">[</span><span class="s1">constraint</span><span class="s4">] </span><span class="s3">= </span><span class="s1">value</span>
+<a name="l238"><span class="ln">238  </span></a>            <span class="s0">continue</span>
+<a name="l239"><span class="ln">239  </span></a>
+<a name="l240"><span class="ln">240  </span></a>        <span class="s7">#  else, apply a function after validator to the schema to enforce the corresponding constraint</span>
+<a name="l241"><span class="ln">241  </span></a>        <span class="s0">if </span><span class="s1">constraint </span><span class="s0">in </span><span class="s1">chain_schema_constraints</span><span class="s3">:</span>
+<a name="l242"><span class="ln">242  </span></a>
+<a name="l243"><span class="ln">243  </span></a>            <span class="s0">def </span><span class="s1">_apply_constraint_with_incompatibility_info</span><span class="s6">(</span>
+<a name="l244"><span class="ln">244  </span></a>                <span class="s1">value</span><span class="s3">: </span><span class="s1">Any</span><span class="s2">, </span><span class="s1">handler</span><span class="s3">: </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">ValidatorFunctionWrapHandler</span>
+<a name="l245"><span class="ln">245  </span></a>            <span class="s6">) </span><span class="s1">-&gt; Any</span><span class="s3">:</span>
+<a name="l246"><span class="ln">246  </span></a>                <span class="s0">try</span><span class="s3">:</span>
+<a name="l247"><span class="ln">247  </span></a>                    <span class="s1">x </span><span class="s3">= </span><span class="s1">handler</span><span class="s6">(</span><span class="s1">value</span><span class="s6">)</span>
+<a name="l248"><span class="ln">248  </span></a>                <span class="s0">except </span><span class="s1">ValidationError </span><span class="s0">as </span><span class="s1">ve</span><span class="s3">:</span>
+<a name="l249"><span class="ln">249  </span></a>                    <span class="s7"># if the error is about the type, it's likely that the constraint is incompatible the type of the field</span>
+<a name="l250"><span class="ln">250  </span></a>                    <span class="s7"># for example, the following invalid schema wouldn't be caught during schema build, but rather at this point</span>
+<a name="l251"><span class="ln">251  </span></a>                    <span class="s7"># with a cryptic 'string_type' error coming from the string validator,</span>
+<a name="l252"><span class="ln">252  </span></a>                    <span class="s7"># that we'd rather express as a constraint incompatibility error (TypeError)</span>
+<a name="l253"><span class="ln">253  </span></a>                    <span class="s7"># Annotated[list[int], Field(pattern='abc')]</span>
+<a name="l254"><span class="ln">254  </span></a>                    <span class="s0">if </span><span class="s5">'type' </span><span class="s0">in </span><span class="s1">ve</span><span class="s2">.</span><span class="s1">errors</span><span class="s6">()</span><span class="s4">[</span><span class="s8">0</span><span class="s4">][</span><span class="s5">'type'</span><span class="s4">]</span><span class="s3">:</span>
+<a name="l255"><span class="ln">255  </span></a>                        <span class="s0">raise </span><span class="s1">TypeError</span><span class="s6">(</span>
+<a name="l256"><span class="ln">256  </span></a>                            <span class="s5">f&quot;Unable to apply constraint '</span><span class="s4">{</span><span class="s1">constraint</span><span class="s4">}</span><span class="s5">' to supplied value </span><span class="s4">{</span><span class="s1">value</span><span class="s4">} </span><span class="s5">for schema of type '</span><span class="s4">{</span><span class="s1">schema_type</span><span class="s4">}</span><span class="s5">'&quot;  </span><span class="s7"># noqa: B023</span>
+<a name="l257"><span class="ln">257  </span></a>                        <span class="s6">)</span>
+<a name="l258"><span class="ln">258  </span></a>                    <span class="s0">raise </span><span class="s1">ve</span>
+<a name="l259"><span class="ln">259  </span></a>                <span class="s0">return </span><span class="s1">x</span>
+<a name="l260"><span class="ln">260  </span></a>
+<a name="l261"><span class="ln">261  </span></a>            <span class="s1">chain_schema_steps</span><span class="s2">.</span><span class="s1">append</span><span class="s6">(</span>
+<a name="l262"><span class="ln">262  </span></a>                <span class="s1">cs</span><span class="s2">.</span><span class="s1">no_info_wrap_validator_function</span><span class="s6">(</span>
+<a name="l263"><span class="ln">263  </span></a>                    <span class="s1">_apply_constraint_with_incompatibility_info</span><span class="s2">, </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">str_schema</span><span class="s6">(</span><span class="s3">**</span><span class="s4">{</span><span class="s1">constraint</span><span class="s3">: </span><span class="s1">value</span><span class="s4">}</span><span class="s6">)</span>
+<a name="l264"><span class="ln">264  </span></a>                <span class="s6">)</span>
+<a name="l265"><span class="ln">265  </span></a>            <span class="s6">)</span>
+<a name="l266"><span class="ln">266  </span></a>        <span class="s0">elif </span><span class="s1">constraint </span><span class="s0">in </span><span class="s4">{</span><span class="s3">*</span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s2">, </span><span class="s3">*</span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s4">}</span><span class="s3">:</span>
+<a name="l267"><span class="ln">267  </span></a>            <span class="s0">if </span><span class="s1">constraint </span><span class="s0">in </span><span class="s1">NUMERIC_CONSTRAINTS</span><span class="s3">:</span>
+<a name="l268"><span class="ln">268  </span></a>                <span class="s1">json_schema_constraint </span><span class="s3">= </span><span class="s1">constraint</span>
+<a name="l269"><span class="ln">269  </span></a>            <span class="s0">elif </span><span class="s1">constraint </span><span class="s0">in </span><span class="s1">LENGTH_CONSTRAINTS</span><span class="s3">:</span>
+<a name="l270"><span class="ln">270  </span></a>                <span class="s1">inner_schema </span><span class="s3">= </span><span class="s1">schema</span>
+<a name="l271"><span class="ln">271  </span></a>                <span class="s0">while </span><span class="s1">inner_schema</span><span class="s4">[</span><span class="s5">'type'</span><span class="s4">] </span><span class="s0">in </span><span class="s4">{</span><span class="s5">'function-before'</span><span class="s2">, </span><span class="s5">'function-wrap'</span><span class="s2">, </span><span class="s5">'function-after'</span><span class="s4">}</span><span class="s3">:</span>
+<a name="l272"><span class="ln">272  </span></a>                    <span class="s1">inner_schema </span><span class="s3">= </span><span class="s1">inner_schema</span><span class="s4">[</span><span class="s5">'schema'</span><span class="s4">]  </span><span class="s7"># type: ignore</span>
+<a name="l273"><span class="ln">273  </span></a>                <span class="s1">inner_schema_type </span><span class="s3">= </span><span class="s1">inner_schema</span><span class="s4">[</span><span class="s5">'type'</span><span class="s4">]</span>
+<a name="l274"><span class="ln">274  </span></a>                <span class="s0">if </span><span class="s1">inner_schema_type </span><span class="s3">== </span><span class="s5">'list' </span><span class="s0">or </span><span class="s6">(</span>
+<a name="l275"><span class="ln">275  </span></a>                    <span class="s1">inner_schema_type </span><span class="s3">== </span><span class="s5">'json-or-python' </span><span class="s0">and </span><span class="s1">inner_schema</span><span class="s4">[</span><span class="s5">'json_schema'</span><span class="s4">][</span><span class="s5">'type'</span><span class="s4">] </span><span class="s3">== </span><span class="s5">'list'  </span><span class="s7"># type: ignore</span>
+<a name="l276"><span class="ln">276  </span></a>                <span class="s6">)</span><span class="s3">:</span>
+<a name="l277"><span class="ln">277  </span></a>                    <span class="s1">json_schema_constraint </span><span class="s3">= </span><span class="s5">'minItems' </span><span class="s0">if </span><span class="s1">constraint </span><span class="s3">== </span><span class="s5">'min_length' </span><span class="s0">else </span><span class="s5">'maxItems'</span>
+<a name="l278"><span class="ln">278  </span></a>                <span class="s0">else</span><span class="s3">:</span>
+<a name="l279"><span class="ln">279  </span></a>                    <span class="s1">json_schema_constraint </span><span class="s3">= </span><span class="s5">'minLength' </span><span class="s0">if </span><span class="s1">constraint </span><span class="s3">== </span><span class="s5">'min_length' </span><span class="s0">else </span><span class="s5">'maxLength'</span>
+<a name="l280"><span class="ln">280  </span></a>
+<a name="l281"><span class="ln">281  </span></a>            <span class="s1">schema </span><span class="s3">= </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">no_info_after_validator_function</span><span class="s6">(</span>
+<a name="l282"><span class="ln">282  </span></a>                <span class="s1">partial</span><span class="s6">(</span><span class="s1">get_constraint_validator</span><span class="s6">(</span><span class="s1">constraint</span><span class="s6">)</span><span class="s2">, </span><span class="s3">**</span><span class="s4">{</span><span class="s5">'constraint_value'</span><span class="s3">: </span><span class="s1">value</span><span class="s4">}</span><span class="s6">)</span><span class="s2">, </span><span class="s1">schema</span>
+<a name="l283"><span class="ln">283  </span></a>            <span class="s6">)</span>
+<a name="l284"><span class="ln">284  </span></a>            <span class="s1">add_js_update_schema</span><span class="s6">(</span><span class="s1">schema</span><span class="s2">, </span><span class="s0">lambda</span><span class="s3">: </span><span class="s4">{</span><span class="s1">json_schema_constraint</span><span class="s3">: </span><span class="s1">as_jsonable_value</span><span class="s6">(</span><span class="s1">value</span><span class="s6">)</span><span class="s4">}</span><span class="s6">)  </span><span class="s7"># noqa: B023</span>
+<a name="l285"><span class="ln">285  </span></a>        <span class="s0">elif </span><span class="s1">constraint </span><span class="s3">== </span><span class="s5">'allow_inf_nan' </span><span class="s0">and </span><span class="s1">value </span><span class="s0">is False</span><span class="s3">:</span>
+<a name="l286"><span class="ln">286  </span></a>            <span class="s1">schema </span><span class="s3">= </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">no_info_after_validator_function</span><span class="s6">(</span>
+<a name="l287"><span class="ln">287  </span></a>                <span class="s1">forbid_inf_nan_check</span><span class="s2">,</span>
+<a name="l288"><span class="ln">288  </span></a>                <span class="s1">schema</span><span class="s2">,</span>
+<a name="l289"><span class="ln">289  </span></a>            <span class="s6">)</span>
+<a name="l290"><span class="ln">290  </span></a>        <span class="s0">else</span><span class="s3">:</span>
+<a name="l291"><span class="ln">291  </span></a>            <span class="s7"># It's rare that we'd get here, but it's possible if we add a new constraint and forget to handle it</span>
+<a name="l292"><span class="ln">292  </span></a>            <span class="s7"># Most constraint errors are caught at runtime during attempted application</span>
+<a name="l293"><span class="ln">293  </span></a>            <span class="s0">raise </span><span class="s1">RuntimeError</span><span class="s6">(</span><span class="s5">f&quot;Unable to apply constraint '</span><span class="s4">{</span><span class="s1">constraint</span><span class="s4">}</span><span class="s5">' to schema of type '</span><span class="s4">{</span><span class="s1">schema_type</span><span class="s4">}</span><span class="s5">'&quot;</span><span class="s6">)</span>
+<a name="l294"><span class="ln">294  </span></a>
+<a name="l295"><span class="ln">295  </span></a>    <span class="s0">for </span><span class="s1">annotation </span><span class="s0">in </span><span class="s1">other_metadata</span><span class="s3">:</span>
+<a name="l296"><span class="ln">296  </span></a>        <span class="s0">if </span><span class="s6">(</span><span class="s1">annotation_type </span><span class="s3">:= </span><span class="s1">type</span><span class="s6">(</span><span class="s1">annotation</span><span class="s6">)) </span><span class="s0">in </span><span class="s6">(</span><span class="s1">at_to_constraint_map </span><span class="s3">:= </span><span class="s1">_get_at_to_constraint_map</span><span class="s6">())</span><span class="s3">:</span>
+<a name="l297"><span class="ln">297  </span></a>            <span class="s1">constraint </span><span class="s3">= </span><span class="s1">at_to_constraint_map</span><span class="s4">[</span><span class="s1">annotation_type</span><span class="s4">]</span>
+<a name="l298"><span class="ln">298  </span></a>            <span class="s1">schema </span><span class="s3">= </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">no_info_after_validator_function</span><span class="s6">(</span>
+<a name="l299"><span class="ln">299  </span></a>                <span class="s1">partial</span><span class="s6">(</span><span class="s1">get_constraint_validator</span><span class="s6">(</span><span class="s1">constraint</span><span class="s6">)</span><span class="s2">, </span><span class="s4">{</span><span class="s1">constraint</span><span class="s3">: </span><span class="s1">getattr</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">constraint</span><span class="s6">)</span><span class="s4">}</span><span class="s6">)</span><span class="s2">, </span><span class="s1">schema</span>
+<a name="l300"><span class="ln">300  </span></a>            <span class="s6">)</span>
+<a name="l301"><span class="ln">301  </span></a>            <span class="s0">continue</span>
+<a name="l302"><span class="ln">302  </span></a>        <span class="s0">elif </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s6">(</span><span class="s1">at</span><span class="s2">.</span><span class="s1">Predicate</span><span class="s2">, </span><span class="s1">at</span><span class="s2">.</span><span class="s1">Not</span><span class="s6">))</span><span class="s3">:</span>
+<a name="l303"><span class="ln">303  </span></a>            <span class="s1">predicate_name </span><span class="s3">= </span><span class="s5">f'</span><span class="s4">{</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">func</span><span class="s2">.</span><span class="s1">__qualname__</span><span class="s4">}</span><span class="s5">' </span><span class="s0">if </span><span class="s1">hasattr</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">func</span><span class="s2">, </span><span class="s5">'__qualname__'</span><span class="s6">) </span><span class="s0">else </span><span class="s5">''</span>
+<a name="l304"><span class="ln">304  </span></a>
+<a name="l305"><span class="ln">305  </span></a>            <span class="s0">def </span><span class="s1">val_func</span><span class="s6">(</span><span class="s1">v</span><span class="s3">: </span><span class="s1">Any</span><span class="s6">) </span><span class="s1">-&gt; Any</span><span class="s3">:</span>
+<a name="l306"><span class="ln">306  </span></a>                <span class="s1">predicate_satisfied </span><span class="s3">= </span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">func</span><span class="s6">(</span><span class="s1">v</span><span class="s6">)  </span><span class="s7"># noqa: B023</span>
+<a name="l307"><span class="ln">307  </span></a>
+<a name="l308"><span class="ln">308  </span></a>                <span class="s7"># annotation.func may also raise an exception, let it pass through</span>
+<a name="l309"><span class="ln">309  </span></a>                <span class="s0">if </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">at</span><span class="s2">.</span><span class="s1">Predicate</span><span class="s6">)</span><span class="s3">:  </span><span class="s7"># noqa: B023</span>
+<a name="l310"><span class="ln">310  </span></a>                    <span class="s0">if not </span><span class="s1">predicate_satisfied</span><span class="s3">:</span>
+<a name="l311"><span class="ln">311  </span></a>                        <span class="s0">raise </span><span class="s1">PydanticCustomError</span><span class="s6">(</span>
+<a name="l312"><span class="ln">312  </span></a>                            <span class="s5">'predicate_failed'</span><span class="s2">,</span>
+<a name="l313"><span class="ln">313  </span></a>                            <span class="s5">f'Predicate </span><span class="s4">{</span><span class="s1">predicate_name</span><span class="s4">} </span><span class="s5">failed'</span><span class="s2">,  </span><span class="s7"># type: ignore  # noqa: B023</span>
+<a name="l314"><span class="ln">314  </span></a>                        <span class="s6">)</span>
+<a name="l315"><span class="ln">315  </span></a>                <span class="s0">else</span><span class="s3">:</span>
+<a name="l316"><span class="ln">316  </span></a>                    <span class="s0">if </span><span class="s1">predicate_satisfied</span><span class="s3">:</span>
+<a name="l317"><span class="ln">317  </span></a>                        <span class="s0">raise </span><span class="s1">PydanticCustomError</span><span class="s6">(</span>
+<a name="l318"><span class="ln">318  </span></a>                            <span class="s5">'not_operation_failed'</span><span class="s2">,</span>
+<a name="l319"><span class="ln">319  </span></a>                            <span class="s5">f'Not of </span><span class="s4">{</span><span class="s1">predicate_name</span><span class="s4">} </span><span class="s5">failed'</span><span class="s2">,  </span><span class="s7"># type: ignore  # noqa: B023</span>
+<a name="l320"><span class="ln">320  </span></a>                        <span class="s6">)</span>
+<a name="l321"><span class="ln">321  </span></a>
+<a name="l322"><span class="ln">322  </span></a>                <span class="s0">return </span><span class="s1">v</span>
+<a name="l323"><span class="ln">323  </span></a>
+<a name="l324"><span class="ln">324  </span></a>            <span class="s1">schema </span><span class="s3">= </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">no_info_after_validator_function</span><span class="s6">(</span><span class="s1">val_func</span><span class="s2">, </span><span class="s1">schema</span><span class="s6">)</span>
+<a name="l325"><span class="ln">325  </span></a>        <span class="s0">else</span><span class="s3">:</span>
+<a name="l326"><span class="ln">326  </span></a>            <span class="s7"># ignore any other unknown metadata</span>
+<a name="l327"><span class="ln">327  </span></a>            <span class="s0">return None</span>
+<a name="l328"><span class="ln">328  </span></a>
+<a name="l329"><span class="ln">329  </span></a>    <span class="s0">if </span><span class="s1">chain_schema_steps</span><span class="s3">:</span>
+<a name="l330"><span class="ln">330  </span></a>        <span class="s1">chain_schema_steps </span><span class="s3">= </span><span class="s4">[</span><span class="s1">schema</span><span class="s4">] </span><span class="s3">+ </span><span class="s1">chain_schema_steps</span>
+<a name="l331"><span class="ln">331  </span></a>        <span class="s0">return </span><span class="s1">cs</span><span class="s2">.</span><span class="s1">chain_schema</span><span class="s6">(</span><span class="s1">chain_schema_steps</span><span class="s6">)</span>
+<a name="l332"><span class="ln">332  </span></a>
+<a name="l333"><span class="ln">333  </span></a>    <span class="s0">return </span><span class="s1">schema</span>
+<a name="l334"><span class="ln">334  </span></a>
+<a name="l335"><span class="ln">335  </span></a>
+<a name="l336"><span class="ln">336  </span></a><span class="s0">def </span><span class="s1">collect_known_metadata</span><span class="s6">(</span><span class="s1">annotations</span><span class="s3">: </span><span class="s1">Iterable</span><span class="s4">[</span><span class="s1">Any</span><span class="s4">]</span><span class="s6">) </span><span class="s1">-&gt; tuple</span><span class="s4">[</span><span class="s1">dict</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">Any</span><span class="s4">]</span><span class="s2">, </span><span class="s1">list</span><span class="s4">[</span><span class="s1">Any</span><span class="s4">]]</span><span class="s3">:</span>
+<a name="l337"><span class="ln">337  </span></a>    <span class="s7">&quot;&quot;&quot;Split `annotations` into known metadata and unknown annotations. 
+<a name="l338"><span class="ln">338  </span></a> 
+<a name="l339"><span class="ln">339  </span></a>    Args: 
+<a name="l340"><span class="ln">340  </span></a>        annotations: An iterable of annotations. 
+<a name="l341"><span class="ln">341  </span></a> 
+<a name="l342"><span class="ln">342  </span></a>    Returns: 
+<a name="l343"><span class="ln">343  </span></a>        A tuple contains a dict of known metadata and a list of unknown annotations. 
+<a name="l344"><span class="ln">344  </span></a> 
+<a name="l345"><span class="ln">345  </span></a>    Example: 
+<a name="l346"><span class="ln">346  </span></a>        ```py 
+<a name="l347"><span class="ln">347  </span></a>        from annotated_types import Gt, Len 
+<a name="l348"><span class="ln">348  </span></a> 
+<a name="l349"><span class="ln">349  </span></a>        from pydantic._internal._known_annotated_metadata import collect_known_metadata 
+<a name="l350"><span class="ln">350  </span></a> 
+<a name="l351"><span class="ln">351  </span></a>        print(collect_known_metadata([Gt(1), Len(42), ...])) 
+<a name="l352"><span class="ln">352  </span></a>        #&gt; ({'gt': 1, 'min_length': 42}, [Ellipsis]) 
+<a name="l353"><span class="ln">353  </span></a>        ``` 
+<a name="l354"><span class="ln">354  </span></a>    &quot;&quot;&quot;</span>
+<a name="l355"><span class="ln">355  </span></a>    <span class="s1">annotations </span><span class="s3">= </span><span class="s1">expand_grouped_metadata</span><span class="s6">(</span><span class="s1">annotations</span><span class="s6">)</span>
+<a name="l356"><span class="ln">356  </span></a>
+<a name="l357"><span class="ln">357  </span></a>    <span class="s1">res</span><span class="s3">: </span><span class="s1">dict</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">Any</span><span class="s4">] </span><span class="s3">= </span><span class="s4">{}</span>
+<a name="l358"><span class="ln">358  </span></a>    <span class="s1">remaining</span><span class="s3">: </span><span class="s1">list</span><span class="s4">[</span><span class="s1">Any</span><span class="s4">] </span><span class="s3">= </span><span class="s4">[]</span>
+<a name="l359"><span class="ln">359  </span></a>
+<a name="l360"><span class="ln">360  </span></a>    <span class="s0">for </span><span class="s1">annotation </span><span class="s0">in </span><span class="s1">annotations</span><span class="s3">:</span>
+<a name="l361"><span class="ln">361  </span></a>        <span class="s7"># isinstance(annotation, PydanticMetadata) also covers ._fields:_PydanticGeneralMetadata</span>
+<a name="l362"><span class="ln">362  </span></a>        <span class="s0">if </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">PydanticMetadata</span><span class="s6">)</span><span class="s3">:</span>
+<a name="l363"><span class="ln">363  </span></a>            <span class="s1">res</span><span class="s2">.</span><span class="s1">update</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">__dict__</span><span class="s6">)</span>
+<a name="l364"><span class="ln">364  </span></a>        <span class="s7"># we don't use dataclasses.asdict because that recursively calls asdict on the field values</span>
+<a name="l365"><span class="ln">365  </span></a>        <span class="s0">elif </span><span class="s6">(</span><span class="s1">annotation_type </span><span class="s3">:= </span><span class="s1">type</span><span class="s6">(</span><span class="s1">annotation</span><span class="s6">)) </span><span class="s0">in </span><span class="s6">(</span><span class="s1">at_to_constraint_map </span><span class="s3">:= </span><span class="s1">_get_at_to_constraint_map</span><span class="s6">())</span><span class="s3">:</span>
+<a name="l366"><span class="ln">366  </span></a>            <span class="s1">constraint </span><span class="s3">= </span><span class="s1">at_to_constraint_map</span><span class="s4">[</span><span class="s1">annotation_type</span><span class="s4">]</span>
+<a name="l367"><span class="ln">367  </span></a>            <span class="s1">res</span><span class="s4">[</span><span class="s1">constraint</span><span class="s4">] </span><span class="s3">= </span><span class="s1">getattr</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">constraint</span><span class="s6">)</span>
+<a name="l368"><span class="ln">368  </span></a>        <span class="s0">elif </span><span class="s1">isinstance</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">type</span><span class="s6">) </span><span class="s0">and </span><span class="s1">issubclass</span><span class="s6">(</span><span class="s1">annotation</span><span class="s2">, </span><span class="s1">PydanticMetadata</span><span class="s6">)</span><span class="s3">:</span>
+<a name="l369"><span class="ln">369  </span></a>            <span class="s7"># also support PydanticMetadata classes being used without initialisation,</span>
+<a name="l370"><span class="ln">370  </span></a>            <span class="s7"># e.g. `Annotated[int, Strict]` as well as `Annotated[int, Strict()]`</span>
+<a name="l371"><span class="ln">371  </span></a>            <span class="s1">res</span><span class="s2">.</span><span class="s1">update</span><span class="s6">(</span><span class="s4">{</span><span class="s1">k</span><span class="s3">: </span><span class="s1">v </span><span class="s0">for </span><span class="s1">k</span><span class="s2">, </span><span class="s1">v </span><span class="s0">in </span><span class="s1">vars</span><span class="s6">(</span><span class="s1">annotation</span><span class="s6">)</span><span class="s2">.</span><span class="s1">items</span><span class="s6">() </span><span class="s0">if not </span><span class="s1">k</span><span class="s2">.</span><span class="s1">startswith</span><span class="s6">(</span><span class="s5">'_'</span><span class="s6">)</span><span class="s4">}</span><span class="s6">)</span>
+<a name="l372"><span class="ln">372  </span></a>        <span class="s0">else</span><span class="s3">:</span>
+<a name="l373"><span class="ln">373  </span></a>            <span class="s1">remaining</span><span class="s2">.</span><span class="s1">append</span><span class="s6">(</span><span class="s1">annotation</span><span class="s6">)</span>
+<a name="l374"><span class="ln">374  </span></a>    <span class="s7"># Nones can sneak in but pydantic-core will reject them</span>
+<a name="l375"><span class="ln">375  </span></a>    <span class="s7"># it'd be nice to clean things up so we don't put in None (we probably don't _need_ to, it was just easier)</span>
+<a name="l376"><span class="ln">376  </span></a>    <span class="s7"># but this is simple enough to kick that can down the road</span>
+<a name="l377"><span class="ln">377  </span></a>    <span class="s1">res </span><span class="s3">= </span><span class="s4">{</span><span class="s1">k</span><span class="s3">: </span><span class="s1">v </span><span class="s0">for </span><span class="s1">k</span><span class="s2">, </span><span class="s1">v </span><span class="s0">in </span><span class="s1">res</span><span class="s2">.</span><span class="s1">items</span><span class="s6">() </span><span class="s0">if </span><span class="s1">v </span><span class="s0">is not None</span><span class="s4">}</span>
+<a name="l378"><span class="ln">378  </span></a>    <span class="s0">return </span><span class="s1">res</span><span class="s2">, </span><span class="s1">remaining</span>
+<a name="l379"><span class="ln">379  </span></a>
+<a name="l380"><span class="ln">380  </span></a>
+<a name="l381"><span class="ln">381  </span></a><span class="s0">def </span><span class="s1">check_metadata</span><span class="s6">(</span><span class="s1">metadata</span><span class="s3">: </span><span class="s1">dict</span><span class="s4">[</span><span class="s1">str</span><span class="s2">, </span><span class="s1">Any</span><span class="s4">]</span><span class="s2">, </span><span class="s1">allowed</span><span class="s3">: </span><span class="s1">Iterable</span><span class="s4">[</span><span class="s1">str</span><span class="s4">]</span><span class="s2">, </span><span class="s1">source_type</span><span class="s3">: </span><span class="s1">Any</span><span class="s6">) </span><span class="s1">-&gt; </span><span class="s0">None</span><span class="s3">:</span>
+<a name="l382"><span class="ln">382  </span></a>    <span class="s7">&quot;&quot;&quot;A small utility function to validate that the given metadata can be applied to the target. 
+<a name="l383"><span class="ln">383  </span></a>    More than saving lines of code, this gives us a consistent error message for all of our internal implementations. 
+<a name="l384"><span class="ln">384  </span></a> 
+<a name="l385"><span class="ln">385  </span></a>    Args: 
+<a name="l386"><span class="ln">386  </span></a>        metadata: A dict of metadata. 
+<a name="l387"><span class="ln">387  </span></a>        allowed: An iterable of allowed metadata. 
+<a name="l388"><span class="ln">388  </span></a>        source_type: The source type. 
+<a name="l389"><span class="ln">389  </span></a> 
+<a name="l390"><span class="ln">390  </span></a>    Raises: 
+<a name="l391"><span class="ln">391  </span></a>        TypeError: If there is metadatas that can't be applied on source type. 
+<a name="l392"><span class="ln">392  </span></a>    &quot;&quot;&quot;</span>
+<a name="l393"><span class="ln">393  </span></a>    <span class="s1">unknown </span><span class="s3">= </span><span class="s1">metadata</span><span class="s2">.</span><span class="s1">keys</span><span class="s6">() </span><span class="s3">- </span><span class="s1">set</span><span class="s6">(</span><span class="s1">allowed</span><span class="s6">)</span>
+<a name="l394"><span class="ln">394  </span></a>    <span class="s0">if </span><span class="s1">unknown</span><span class="s3">:</span>
+<a name="l395"><span class="ln">395  </span></a>        <span class="s0">raise </span><span class="s1">TypeError</span><span class="s6">(</span>
+<a name="l396"><span class="ln">396  </span></a>            <span class="s5">f'The following constraints cannot be applied to </span><span class="s4">{</span><span class="s1">source_type</span><span class="s4">!r}</span><span class="s5">: </span><span class="s4">{</span><span class="s5">&quot;, &quot;</span><span class="s2">.</span><span class="s1">join</span><span class="s6">(</span><span class="s4">[</span><span class="s5">f&quot;</span><span class="s4">{</span><span class="s1">k</span><span class="s4">!r}</span><span class="s5">&quot; </span><span class="s0">for </span><span class="s1">k </span><span class="s0">in </span><span class="s1">unknown</span><span class="s4">]</span><span class="s6">)</span><span class="s4">}</span><span class="s5">'</span>
+<a name="l397"><span class="ln">397  </span></a>        <span class="s6">)</span>
+<a name="l398"><span class="ln">398  </span></a></pre>
+</body>
+</html>

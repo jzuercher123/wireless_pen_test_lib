@@ -1,128 +1,118 @@
-import tkinter as tk
-from tkinter import ttk
-from threading import Thread, Event
-import time
-from typing import List, Dict, Any
+# ui/live_network_frame.py
+
+import threading
 import queue
+from typing import List, Dict, Any
+import tkinter as tk
+from tkinter import ttk, messagebox
+from scanners.local_scanner import LocalScanner  # Ensure this import is correct
+from scanners.dos_scanner import DosScanner      # Ensure this import is correct
 
-from scanners.local_scanner import LocalScanner
-from scanners.dos_scanner import DosScanner  # Assuming DosScanner is available
-
-
-class LiveNetworkFrame(tk.Frame):
-    def __init__(self, parent, core_framework, scan_interval=30, *args, **kwargs):
+class LiveNetworkFrame(ttk.Frame):
+    def __init__(self, parent: tk.Tk, core_framework, scan_interval: int = 5, *args, **kwargs):
         """
-        Initialize the LiveNetworkFrame with network and DoS scanning capabilities.
+        Initializes the LiveNetworkFrame.
 
         Args:
-            parent (tk.Widget): Parent widget.
-            core_framework: Instance of CoreFramework.
-            scan_interval (int): Time interval between scans in seconds.
-            *args, **kwargs: Additional arguments.
+            parent (tk.Tk): The parent Tkinter widget.
+            core_framework (CoreFramework): An instance of CoreFramework.
+            scan_interval (int): Interval between scans in seconds.
         """
         super().__init__(parent, *args, **kwargs)
-        self.core_framework = core_framework
-        self.scan_interval = scan_interval
+        self.parent = parent
+        self.pack(fill='both', expand=True)
+        self.core_framework = core_framework  # Assign the CoreFramework instance
+
+        # Initialize Scanners with CoreFramework
+        self.scanner = LocalScanner(core_framework=self.core_framework, interface="eth0")
+        self.dos_scanner = DosScanner(core_framework=self.core_framework, vulnerability_db={})
+        self.scan_interval = scan_interval  # Scan interval in seconds
+
+        # Initialize Queue for Scan Results
         self.device_queue = queue.Queue()
-        self.stop_monitoring_event = Event()
 
-        # Initialize LocalScanner for network discovery and DosScanner for DoS testing
-        self.scanner = LocalScanner(core_framework=self.core_framework)
-        self.dos_scanner = DosScanner(core_framework=self.core_framework,
-                                      vulnerability_db={},
-                                      gui_update_callback=self.update_feedback)
+        # Setup Logger
+        self.logger = self.scanner.logger  # Assuming LocalScanner has a logger
 
+        # Setup GUI Components
         self.create_widgets()
-        self.start_scanning()
+
+        # Start processing the scan queue
+        self.process_scan_queue()
 
     def create_widgets(self):
         """
-        Create and layout the widgets.
+        Creates and arranges all GUI components.
         """
-        # Title Label
-        title = tk.Label(self, text="Live Network Details", font=("Helvetica", 16))
-        title.pack(pady=10)
+        # Frame for Scan Controls
+        control_frame = ttk.LabelFrame(self, text="Network Scan Controls")
+        control_frame.pack(padx=10, pady=10, fill='x')
 
-        # Treeview for Devices
+        # Manual Scan Button
+        scan_button = ttk.Button(control_frame, text="Perform Manual Scan", command=self.perform_manual_scan)
+        scan_button.pack(side='left', padx=5, pady=5)
+
+        # DoS Scan Button
+        dos_button = ttk.Button(control_frame, text="Start DoS Scan", command=self.initiate_dos_scan)
+        dos_button.pack(side='left', padx=5, pady=5)
+
+        # Treeview for Displaying Devices
         columns = ("IP Address", "MAC Address", "Hostname", "SSID", "BSSID")
-        self.tree = ttk.Treeview(self, columns=columns, show="headings")
+        self.tree = ttk.Treeview(self, columns=columns, show='headings')
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=150, anchor=tk.CENTER)
-        self.tree.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+            self.tree.column(col, width=150)
+        self.tree.pack(padx=10, pady=10, fill='both', expand=True)
 
-        # Feedback Box for real-time feedback
-        self.feedback_box = tk.Text(self, height=6, wrap='word', state='disabled')
-        self.feedback_box.pack(fill=tk.X, padx=20, pady=10)
+        # Scrollbar for Treeview
+        scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side='right', fill='y')
 
-        # Refresh and DoS Scan Buttons
-        refresh_button = tk.Button(self, text="Refresh Now", command=self.refresh_scan)
-        refresh_button.pack(pady=5)
+        # Feedback Label
+        self.feedback_label = ttk.Label(self, text="Welcome to Network Scanner GUI", foreground="blue")
+        self.feedback_label.pack(pady=5)
 
-        dos_button = tk.Button(self, text="Start DoS Scan", command=self.start_dos_scan)
-        dos_button.pack(pady=5)
-
-    def update_feedback(self, message):
+    def perform_manual_scan(self):
         """
-        Updates the feedback box with the latest status message.
+        Initiates a manual network scan and updates the Treeview with the scan results.
         """
-        self.feedback_box.config(state='normal')
-        self.feedback_box.insert('end', f"{message}\n")
-        self.feedback_box.see('end')  # Scroll to the end
-        self.feedback_box.config(state='disabled')
-
-    def start_scanning(self):
-        """
-        Start the scanning thread for continuous network scanning.
-        """
-        scan_thread = Thread(target=self.scan_loop, daemon=True)
-        scan_thread.start()
-        self.after(100, self.process_queue)
-
-    def scan_loop(self):
-        """
-        Continuously scan the network at specified intervals.
-        """
-        while True:
-            self.logger = self.scanner.logger  # Access the scanner's logger
-            self.logger.info("Initiating network scan.")
-            scan_results = self.scanner.scan()
-            self.device_queue.put(scan_results)
-            self.logger.info("Network scan completed.")
-            time.sleep(self.scan_interval)
-
-    def refresh_scan(self):
-        """
-        Manually trigger a network scan.
-        """
-        Thread(target=self.manual_scan, daemon=True).start()
-
-    def manual_scan(self):
-        """
-        Perform a manual network scan and update the Treeview.
-        """
-        self.logger = self.scanner.logger
         self.logger.info("Manual network scan initiated.")
-        scan_results = self.scanner.scan()
-        self.device_queue.put(scan_results)
-        self.logger.info("Manual network scan completed.")
+        self.update_feedback("Manual network scan started.")
 
-    def process_queue(self):
+        def scan():
+            try:
+                scan_results = self.scanner.scan()  # Implement the actual scan method
+                self.device_queue.put(scan_results)
+                self.logger.info("Manual network scan completed.")
+                self.update_feedback("Manual network scan completed.")
+            except Exception as e:
+                self.logger.error(f"Error during manual network scan: {e}")
+                self.update_feedback(f"Error during manual network scan: {e}")
+
+        threading.Thread(target=scan, daemon=True).start()
+
+    def process_scan_queue(self):
         """
-        Process scan results from the queue and update the Treeview.
+        Processes scan results from the device_queue and updates the Treeview.
+        Schedules itself to run every second.
         """
         try:
             while not self.device_queue.empty():
                 scan_results = self.device_queue.get_nowait()
-                self.update_treeview(scan_results.get("devices", []))
+                devices = scan_results.get("devices", [])
+                self.update_treeview(devices)
         except queue.Empty:
             pass
+        except Exception as e:
+            self.logger.error(f"Error processing scan queue: {e}")
+            self.update_feedback(f"Error processing scan queue: {e}")
         finally:
-            self.after(1000, self.process_queue)  # Check the queue every second
+            self.after(1000, self.process_scan_queue)  # Check the queue every second
 
     def update_treeview(self, devices: List[Dict[str, Any]]):
         """
-        Update the Treeview with new scan results.
+        Updates the Treeview with new scan results.
 
         Args:
             devices (List[Dict[str, Any]]): List of detected devices.
@@ -136,28 +126,46 @@ class LiveNetworkFrame(tk.Frame):
             ip = device.get("ip", "N/A")
             mac = device.get("mac", "N/A")
             hostname = device.get("hostname", "N/A")
-            vendor = device.get("vendor", "N/A")
-            # Assuming SSID and BSSID are part of the device info
             ssid = device.get("ssid", "N/A")
             bssid = device.get("bssid", "N/A")
             self.tree.insert("", "end", values=(ip, mac, hostname, ssid, bssid))
 
-    def start_dos_scan(self):
+    def initiate_dos_scan(self):
         """
-        Starts the DoS scan on the selected target in the Treeview.
+        Initiates a DoS scan on the selected target(s) in the Treeview.
         """
-        selected_item = self.tree.selection()
-        if not selected_item:
+        selected_items = self.tree.selection()
+        if not selected_items:
             self.update_feedback("No target selected for DoS scan.")
             return
 
-        target = self.tree.item(selected_item)['values']
-        if not target:
-            self.update_feedback("Invalid target selected.")
-            return
+        for item_id in selected_items:
+            target = self.tree.item(item_id)['values']
+            if not target:
+                self.update_feedback("Invalid target selected.")
+                continue
 
-        target_info = {
-            'bssid': target[4]  # Assuming BSSID is at index 4 in Treeview columns
-        }
-        self.update_feedback(f"Initiating DoS scan on target with BSSID: {target_info['bssid']}")
-        Thread(target=self.dos_scanner.scan, args=(target_info,), daemon=True).start()
+            # Assuming Treeview columns are ordered as: IP, MAC, Hostname, SSID, BSSID
+            bssid = target[4]  # BSSID is at index 4
+            target_info = {'bssid': bssid}
+
+            self.update_feedback(f"Initiating DoS scan on target with BSSID: {bssid}")
+
+            def dos_scan():
+                try:
+                    self.dos_scanner.scan(target_info)  # Implement the actual DoS scan method
+                    self.update_feedback(f"DoS scan on BSSID {bssid} completed.")
+                except Exception as e:
+                    self.logger.error(f"Error during DoS scan on BSSID {bssid}: {e}")
+                    self.update_feedback(f"Error during DoS scan on BSSID {bssid}: {e}")
+
+            threading.Thread(target=dos_scan, daemon=True).start()
+
+    def update_feedback(self, message: str):
+        """
+        Updates the feedback label with the provided message.
+
+        Args:
+            message (str): The message to display to the user.
+        """
+        self.feedback_label.config(text=message)

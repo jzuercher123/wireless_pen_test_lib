@@ -1,0 +1,10 @@
+{
+  "host_name": "host1",
+  "ssid": "TestNetwork",
+  "bssid": "AA:BB:CC:DD:EE:01",
+  "password": "Password123",
+  "encryption": "WPA2",
+  "mac_address": "AA:BB:CC:DD:EE:01",
+  "ipv4_address": "172.20.0.2",
+  "ipv6_address": "fd00:dead:beef::2"
+}
