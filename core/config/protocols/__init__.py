@@ -4,11 +4,11 @@ from core.config.protocols.wifi import WiFiProtocol
 from scanners.auth_bypass_scanner import AuthBypassScanner
 from scanners.encryption_scanner import EncryptionWeaknessScanner
 from scanners.dos_scanner import DosScanner
+from scanners.wep_scanner import WEPScanner
 from scanners.local_scanner import LocalScanner
 from exploits.session_hijacking import SessionHijacking
 from exploits.payload_delivery import PayloadDelivery
 from exploits.credential_extraction import CredentialExtraction
-
 # core/config/protocols/__init__.py
 
 # Optionally, register multiple scanners/exploits or keep it empty
@@ -21,7 +21,8 @@ def register_scanners():
         'auth_bypass': AuthBypassScanner,
         'encryption_weakness': EncryptionWeaknessScanner,
         'dos': DosScanner,
-        'local': LocalScanner
+        'local': LocalScanner,
+        'wep_scanner': WEPScanner,
     }
 def register_exploits():
     return {

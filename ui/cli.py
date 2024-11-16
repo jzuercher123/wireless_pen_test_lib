@@ -31,7 +31,8 @@ def initialize_coreframework():
         modules_path=protocols_path,  # Correct modules_path
         config_dir=os.path.join(project_root, 'core', 'config'), # Correct config_dir
         scanners=register_scanners(),
-        exploits=register_exploits()
+        exploits=register_exploits(),
+
     )
 
 @click.group()
@@ -267,57 +268,40 @@ def list(ctx):
     for ex in core.exploits.keys():
         click.echo(f"- {ex}")
 
+
+# Before
 @cli.command()
-@click.option('--action', type=click.Choice(['start', 'stop', 'status']), required=True, help="Action to perform on the test network.")
+@click.option('--action', type=click.Choice(['start', 'stop', 'status', 'help']), required=True, help="Action to perform on the test network.")
 @click.pass_context
 def test_network(ctx, action):
     """
     Manage the test network environment.
     """
     core = ctx.obj['core']
-    core.logger.info("Managing test network with action: %s", action)
-    manage_script = os.path.normpath(os.path.join(project_root, 'test_network', 'manage.py'))
-    manage_script = os.path.abspath(manage_script)
+    compose_file = os.path.join(project_root, 'test_network', 'docker-compose.yml')
+    manage_script = os.path.join(project_root, 'test_network', 'manage.py')
 
-    if not os.path.exists(manage_script):
-        click.echo(f"Manage script not found at {manage_script}")
+    if not os.path.exists(compose_file):
+        click.echo(f"Docker Compose file '{compose_file}' not found.")
         ctx.exit(1)
 
-    if action == 'start':
-        click.echo("Starting test network...")
-        try:
-            result = subprocess.run(['python', manage_script, 'start'], check=True, capture_output=True, text=True)
-            click.echo(result.stdout)
-            click.echo("Test network started successfully.")
-        except subprocess.CalledProcessError as e:
-            core.logger.exception("Error starting test network")
-            click.echo(f"Error starting test network: {e}")
-            click.echo(e.stderr)
-            ctx.exit(1)
-    elif action == 'stop':
-        click.echo("Stopping test network...")
-        try:
-            result = subprocess.run(['python', manage_script, 'stop'], check=True, capture_output=True, text=True)
-            click.echo(result.stdout)
-            click.echo("Test network stopped successfully.")
-        except subprocess.CalledProcessError as e:
-            core.logger.exception("Error stopping test network")
-            click.echo(f"Error stopping test network: {e}")
-            click.echo(e.stderr)
-            ctx.exit(1)
-    elif action == 'status':
-        click.echo("Checking test network status...")
-        try:
-            result = subprocess.run(['python', manage_script, 'status'], check=True, capture_output=True, text=True)
-            click.echo(result.stdout)
-        except subprocess.CalledProcessError as e:
-            core.logger.exception("Error checking test network status")
-            click.echo(f"Error checking test network status: {e}")
-            click.echo(e.stderr)
-            ctx.exit(1)
-    else:
-        click.echo("Invalid action.")
+    if action == 'help':
+        click.echo("Usage: test_network [OPTIONS] ACTION")
+        click.echo("Actions:")
+        click.echo("  start     Start the test network.")
+        click.echo("  stop      Stop the test network.")
+        click.echo("  status    Check the status of the test network.")
+        ctx.exit(0)
+
+    try:
+        subprocess.run([sys.executable, manage_script, action, '--compose-file', compose_file], check=True)
+    except subprocess.CalledProcessError as e:
+        core.logger.error(f"Error running manage.py script: {e}")
+        click.echo(f"Error running manage.py script: {e}")
         ctx.exit(1)
+
+    click.echo(f"Test network {action}ed successfully.")
+
 
 # local network scan
 @cli.command()
@@ -426,3 +410,11 @@ def finalize(ctx):
         core.logger.exception("Error during finalization")
         click.echo(f"Error during finalization: {e}")
         ctx.exit(1)
+
+
+# ui/cli.py
+
+...
+
+if __name__ == '__main__':
+    cli()

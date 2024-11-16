@@ -4,8 +4,7 @@
 
 import sys
 import logging
-from ui.cli import cli
-
+from ui.cli import cli  # Ensure the import path is correct
 
 def setup_logging():
     """
@@ -33,8 +32,8 @@ def main():
     setup_logging()
 
     try:
-        # Pass an empty dictionary since CoreFramework is handled inside the CLI
-        cli(obj={})
+        # Pass command-line arguments to Click's CLI
+        cli.main(args=sys.argv[1:], obj={})
     except Exception as e:
         logging.error(f"An error occurred while running the CLI: {e}")
         sys.exit(1)

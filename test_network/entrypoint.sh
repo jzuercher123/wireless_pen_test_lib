@@ -1,5 +1,3 @@
-# test_network/entrypoint.sh
-
 #!/bin/bash
 
 # Extract environment variables
@@ -10,12 +8,19 @@ PASSWORD=${PASSWORD:-password123}
 ENCRYPTION=${ENCRYPTION:-WPA2}
 MAC_ADDRESS=${MAC_ADDRESS:-AA:BB:CC:DD:EE:FF}
 
-# Set hostname
-hostnamectl set-hostname $HOST_NAME
+# Set hostname with alternative command to set-hostname
+echo $HOST_NAME > /etc/hostname
+hostname $HOST_NAME
+
+# Set MAC address
 
 # Configure network interfaces if needed
 # For simplicity, we'll skip actual wireless configurations
 # You can extend this script to simulate wireless behaviors
+# by using iwconfig, ifconfig, etc.
+
+# Set up the network
+echo "Setting up network with SSID: $SSID, BSSID: $BSSID, Password: $PASSWORD, Encryption: $ENCRYPTION, MAC Address: $MAC_ADDRESS"
 
 # Keep the container running
 tail -f /dev/null

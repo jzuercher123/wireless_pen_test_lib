@@ -6,11 +6,11 @@ import time
 import json
 import importlib.util
 from scapy.all import sendp
-
+from test_network.manage import start_network, stop_network, status_network
 from core.config_manager import ConfigManager
-from utils.network_interface_manager import NetworkInterfaceManager
-from utils.data_storage_manager import DataStorageManager
-from utils.authentication_tools import AuthenticationTools
+from project_specifc_utils.network_interface_manager import NetworkInterfaceManager
+from project_specifc_utils.data_storage_manager import DataStorageManager
+from project_specifc_utils.authentication_tools import AuthenticationTools
 
 # Initialize Logging for CoreFramework
 def setup_core_logging(project_root: str) -> logging.Logger:
@@ -43,13 +43,13 @@ class CoreFramework:
                  vulnerabilities_path: str = None,
                  sendp_func=sendp, sleep_func=time.sleep,
                  network_manager=None, data_storage_manager=None, auth_tools=None,
-                 scanners=None, exploits=None):
+                 scanners=None, exploits=None, test_network: bool=False):
         """
         Initialize the CoreFramework with necessary configurations.
         """
+        self.test_network = test_network
         self.modules_path = modules_path
         self.project_root = os.path.abspath(os.path.join(modules_path, os.pardir, os.pardir))
-
         self.logger = setup_core_logging(self.project_root)
         self.logger.info("Initializing CoreFramework...")
 
@@ -211,6 +211,17 @@ class CoreFramework:
         except Exception as e:
             self.logger.error(f"Error running exploit '{exploit_name}': {e}", exc_info=True)
             raise
+
+    def start_test_network(self, compose_file: str):
+        if self.test_network:
+            self.logger.info("Starting test network...")
+            start_network(compose_file)
+
+    def stop_test_network(self, compose_file: str):
+        if self.test_network is False:
+            self.logger.warning("Test network is not enabled. Skipping stop operation.")
+            return
+        stop_network(compose_file)
 
     def send_continuous_packets(self, packet, interval: float):
         self.logger.info(f"Starting to send packets every {interval} seconds.")

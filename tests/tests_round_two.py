@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 # Import your modules here
 from core.config_manager import ConfigManager, ConfigModel
-from utils.network_interface_manager import NetworkInterfaceManager
+from project_specifc_utils.network_interface_manager import NetworkInterfaceManager
 
 import os
 import json
@@ -17,9 +17,9 @@ import pytest
 import yaml
 from click.testing import CliRunner
 
-from utils.network_interface_manager import NetworkInterfaceManager
-from utils.data_storage_manager import DataStorageManager
-from utils.authentication_tools import AuthenticationTools
+from project_specifc_utils.network_interface_manager import NetworkInterfaceManager
+from project_specifc_utils.data_storage_manager import DataStorageManager
+from project_specifc_utils.authentication_tools import AuthenticationTools
 from core import CoreFramework
 from scanners.encryption_scanner import EncryptionWeaknessScanner
 from scanners.auth_bypass_scanner import AuthBypassScanner

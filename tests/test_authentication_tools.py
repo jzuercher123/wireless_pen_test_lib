@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from utils.authentication_tools import AuthenticationTools
+from project_specifc_utils.authentication_tools import AuthenticationTools
 import subprocess
 import os
 import logging
@@ -13,7 +13,7 @@ class TestAuthenticationTools(unittest.TestCase):
         self.logger.setLevel(logging.DEBUG)
         self.auth_tools = AuthenticationTools()
 
-    @patch('utils.authentication_tools.subprocess.run')
+    @patch('project_specifc_utils.authentication_tools.subprocess.run')
     def test_decrypt_handshake_success(self, mock_run):
         # Mock successful decryption with aircrack-ng
         mock_run.return_value = subprocess.CompletedProcess(
@@ -28,7 +28,7 @@ class TestAuthenticationTools(unittest.TestCase):
         mock_run.assert_called_once_with(['aircrack-ng', '-w', 'wordlist.txt', '-l', 'password.txt', 'handshake.cap'],
                                          check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    @patch('utils.authentication_tools.subprocess.run')
+    @patch('project_specifc_utils.authentication_tools.subprocess.run')
     def test_decrypt_handshake_failure_no_key(self, mock_run):
         # Mock decryption attempt with no key found
         mock_run.return_value = subprocess.CompletedProcess(
@@ -43,7 +43,7 @@ class TestAuthenticationTools(unittest.TestCase):
         mock_run.assert_called_once_with(['aircrack-ng', '-w', 'wordlist.txt', '-l', 'password.txt', 'handshake.cap'],
                                          check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    @patch('utils.authentication_tools.subprocess.run')
+    @patch('project_specifc_utils.authentication_tools.subprocess.run')
     def test_decrypt_handshake_command_error(self, mock_run):
         # Mock aircrack-ng command failure
         mock_run.side_effect = subprocess.CalledProcessError(

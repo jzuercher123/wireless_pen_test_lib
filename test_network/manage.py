@@ -24,24 +24,21 @@ def stop_network(compose_file):
 
 def status_network(compose_file):
     print("Checking test network status...")
-    try:
-        result = subprocess.run(['docker-compose', 'ps'], cwd=os.path.dirname(compose_file), check=True, stdout=subprocess.PIPE, text=True)
-        output = result.stdout.strip()
-        if "No containers" in output or "No services" in output:
-            print("Test network is not running.")
-        else:
-            print("Test network is running:")
-            print(output)
-    except subprocess.CalledProcessError as e:
-        print(f"Error checking test network status: {e}")
-        sys.exit(1)
+    run_command(['docker-compose', 'ps'], cwd=os.path.dirname(compose_file))
+    print("Test network status displayed above.")
 
 def main():
-    parser = argparse.ArgumentParser(description="Manage Test Network")
+    parser = argparse.ArgumentParser(description="Manage the test network environment.")
     parser.add_argument('action', choices=['start', 'stop', 'status'], help="Action to perform on the test network.")
+    parser.add_argument('--compose-file', default='docker-compose.yml', help="Path to the docker-compose file.")
+
     args = parser.parse_args()
 
-    compose_file = os.path.join(os.path.dirname(__file__), 'docker-compose.yml')
+    compose_file = args.compose_file
+
+    if not os.path.exists(compose_file):
+        print(f"Docker Compose file '{compose_file}' not found.")
+        sys.exit(1)
 
     if args.action == 'start':
         start_network(compose_file)
@@ -50,7 +47,8 @@ def main():
     elif args.action == 'status':
         status_network(compose_file)
     else:
-        parser.print_help()
+        print(f"Unknown action '{args.action}'.")
+        sys.exit(1)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 # ui/gui.py
-
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from tkinter import messagebox, filedialog
 import threading
@@ -9,40 +9,61 @@ import json
 from core.__init__ import CoreFramework
 import tkinter as tk
 from tkinter import ttk
-from live_network_frame import LiveNetworkFrame
+from ui.frames.live_network_frame import LiveNetworkFrame
+from ui.frames.live_packet_monitor import LivePacketMonitor
+from ui.frames.test_devices import FakeDeviceManager
+from ui.frames.rogue_access_point import FakeAccessPoint
 
 # Adjust the path to import core modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..'))
 sys.path.insert(0, project_root)
-
 # Import register_scanners and register_exploits
 from core.config.protocols import register_scanners, register_exploits
+
+
+def create_test_data():
+    return {
+        "wpa_networks": {
+            "00:11:22:33:44:55": {
+                "SSID": "TestNetwork",
+                "BSSID": "00:11:22:33:44:55",
+                "Security": "WPA2",
+                "WPS_Enabled": False
+            }
+        },
+        "wep_networks": {
+            "00:11:22:33:44:66": {
+                "SSID": "TestNetwork",
+                "BSSID": "00:11:22:33:44:66",
+                "Security": "WEP",
+                "Key_Strength": "Weak"
+            }
+        }
+    }
+
 
 class WirelessPenTestGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.wep_networks = None
+        self.wpa_networks = None
         self.title("WirelessPenTestLib GUI")
         self.geometry("800x600")
-
         # Initialize stop event
         self.stop_event = threading.Event()
-
         # Initialize Core Framework
         self.core = self.initialize_coreframework()
         if not self.core:
             messagebox.showerror("Initialization Error", "Failed to initialize CoreFramework. Exiting.")
             self.destroy()
             return
-
         # Create a Container Frame to hold Notebook and Stop Button
         container_frame = ttk.Frame(self)
         container_frame.pack(fill=tk.BOTH, expand=True)
-
         # Create a Notebook (tabbed interface) inside the Container Frame
         self.notebook = ttk.Notebook(container_frame)
         self.notebook.pack(fill=tk.BOTH, expand=True, side='top')
-
         # Add Live Network Details tab
         self.live_network_frame = LiveNetworkFrame(
             parent=self.notebook,
@@ -50,18 +71,19 @@ class WirelessPenTestGUI(tk.Tk):
             scan_interval=30  # Scan every 30 seconds
         )
         self.notebook.add(self.live_network_frame, text="Live Network Details")
-
         # Load vulnerability database
         self.vulnerability_db = self.core.vulnerability_db
-
         # Create additional tabs
         self.create_scan_tab(container_frame)
         self.create_exploit_tab(container_frame)
         self.create_report_tab(container_frame)
         self.create_settings_tab(container_frame)
-
         # Add Stop Button at the bottom of the Container Frame
         self.add_stop_button(container_frame)
+        self.create_live_packet_monitor_tab(container_frame)
+        self.create_fake_devices_tab(container_frame)
+        self.create_rogue_access_point_tab(container_frame)
+
 
     def initialize_coreframework(self):
         """
@@ -70,7 +92,6 @@ class WirelessPenTestGUI(tk.Tk):
         protocols_path = os.path.join(project_root, 'core', 'config', 'protocols')
         config_dir = os.path.join(project_root, 'core', 'config')
         vulnerabilities_path = os.path.join(project_root, 'vulnerabilities', 'vulnerabilities.json')
-
         # Initialize CoreFramework
         try:
             core = CoreFramework(
@@ -86,43 +107,45 @@ class WirelessPenTestGUI(tk.Tk):
             messagebox.showerror("Initialization Error", f"Failed to initialize CoreFramework: {e}")
             return None
 
+    def enter_fake_data(self):
+        test_data = create_test_data()
+        self.wpa_networks = test_data["wpa_networks"]
+        self.wep_networks = test_data["wep_networks"]
+        self.live_network_frame.update_gui(test_data)
+
+    def run_gui_as_test(self):
+        self.enter_fake_data()
+        self.mainloop()
+
     def create_scan_tab(self, parent):
         scan_frame = ttk.Frame(self.notebook)
         self.notebook.add(scan_frame, text='Scans')
-
         # Scanner Selection
         scanner_label = ttk.Label(scan_frame, text="Select Scanners:")
         scanner_label.pack(pady=5)
-
         self.scanner_vars = {}
         for sc in self.core.scanners.keys():
             var = tk.BooleanVar()
             chk = ttk.Checkbutton(scan_frame, text=sc, variable=var)
             chk.pack(anchor='w', padx=20)
             self.scanner_vars[sc] = var
-
         # Target Selection
         target_frame = ttk.LabelFrame(scan_frame, text="Target Network")
         target_frame.pack(padx=10, pady=10, fill='x')
-
         ssid_label = ttk.Label(target_frame, text="SSID:")
         ssid_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
         self.scan_ssid_entry = ttk.Entry(target_frame, width=50)
         self.scan_ssid_entry.grid(row=0, column=1, padx=5, pady=5)
-
         bssid_label = ttk.Label(target_frame, text="BSSID:")
         bssid_label.grid(row=1, column=0, padx=5, pady=5, sticky='e')
         self.scan_bssid_entry = ttk.Entry(target_frame, width=50)
         self.scan_bssid_entry.grid(row=1, column=1, padx=5, pady=5)
-
         # Scan Button
         scan_button = ttk.Button(scan_frame, text="Run Scans", command=self.run_scans)
         scan_button.pack(pady=10)
-
         finalize_button = ttk.Button(scan_frame, text="Finalize and Generate Reports",
                                      command=self.finalize_and_generate_reports)
         finalize_button.pack(pady=10)
-
         # Log Area
         self.scan_log = tk.Text(scan_frame, height=15, state='disabled')
         self.scan_log.pack(padx=10, pady=10, fill='both', expand=True)
@@ -154,20 +177,16 @@ class WirelessPenTestGUI(tk.Tk):
         selected_scanners = [sc for sc, var in self.scanner_vars.items() if var.get()]
         ssid = self.scan_ssid_entry.get()
         bssid = self.scan_bssid_entry.get()
-
         if not selected_scanners:
             messagebox.showwarning("No Scanners Selected", "Please select at least one scanner.")
             return
         if not ssid or not bssid:
             messagebox.showwarning("Incomplete Target Information", "Please provide both SSID and BSSID.")
             return
-
         target = {'ssid': ssid, 'bssid': bssid}
-
         # Reset stop_event before starting new scans
         if self.stop_event.is_set():
             self.stop_event.clear()
-
         # Start scanning in a separate thread
         threading.Thread(target=self.execute_scans, args=(selected_scanners, target), daemon=True).start()
 
@@ -211,57 +230,46 @@ class WirelessPenTestGUI(tk.Tk):
     def create_exploit_tab(self, parent):
         exploit_frame = ttk.Frame(self.notebook)
         self.notebook.add(exploit_frame, text='Exploits')
-
         # Exploit Selection
         exploit_label = ttk.Label(exploit_frame, text="Select Exploits:")
         exploit_label.pack(pady=5)
-
         self.exploit_vars = {}
         for ex in self.core.exploits.keys():
             var = tk.BooleanVar()
             chk = ttk.Checkbutton(exploit_frame, text=ex, variable=var)
             chk.pack(anchor='w', padx=20)
             self.exploit_vars[ex] = var
-
         # Target Selection
         target_frame = ttk.LabelFrame(exploit_frame, text="Target Network")
         target_frame.pack(padx=10, pady=10, fill='x')
-
         ssid_label = ttk.Label(target_frame, text="SSID:")
         ssid_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
         self.exploit_ssid_entry = ttk.Entry(target_frame, width=50)
         self.exploit_ssid_entry.grid(row=0, column=1, padx=5, pady=5)
-
         bssid_label = ttk.Label(target_frame, text="BSSID:")
         bssid_label.grid(row=1, column=0, padx=5, pady=5, sticky='e')
         self.exploit_bssid_entry = ttk.Entry(target_frame, width=50)
         self.exploit_bssid_entry.grid(row=1, column=1, padx=5, pady=5)
-
         # Exploit-specific Parameters
         params_frame = ttk.LabelFrame(exploit_frame, text="Exploit Parameters")
         params_frame.pack(padx=10, pady=10, fill='x')
-
         # Session Hijacking Parameters
         ip_label = ttk.Label(params_frame, text="Target IP (for Session Hijacking):")
         ip_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
         self.exploit_ip_entry = ttk.Entry(params_frame, width=50)
         self.exploit_ip_entry.grid(row=0, column=1, padx=5, pady=5)
-
         mac_label = ttk.Label(params_frame, text="Target MAC Address:")
         mac_label.grid(row=1, column=0, padx=5, pady=5, sticky='e')
         self.exploit_mac_entry = ttk.Entry(params_frame, width=50)
         self.exploit_mac_entry.grid(row=1, column=1, padx=5, pady=5)
-
         gateway_ip_label = ttk.Label(params_frame, text="Gateway IP:")
         gateway_ip_label.grid(row=2, column=0, padx=5, pady=5, sticky='e')
         self.exploit_gateway_ip_entry = ttk.Entry(params_frame, width=50)
         self.exploit_gateway_ip_entry.grid(row=2, column=1, padx=5, pady=5)
-
         gateway_mac_label = ttk.Label(params_frame, text="Gateway MAC Address:")
         gateway_mac_label.grid(row=3, column=0, padx=5, pady=5, sticky='e')
         self.exploit_gateway_mac_entry = ttk.Entry(params_frame, width=50)
         self.exploit_gateway_mac_entry.grid(row=3, column=1, padx=5, pady=5)
-
         # Payload Type (for Payload Delivery)
         payload_label = ttk.Label(params_frame, text="Payload Type (for Payload Delivery):")
         payload_label.grid(row=4, column=0, padx=5, pady=5, sticky='e')
@@ -270,11 +278,9 @@ class WirelessPenTestGUI(tk.Tk):
         self.payload_type_combo['values'] = ['reverse_shell', 'malicious_script']
         self.payload_type_combo.grid(row=4, column=1, padx=5, pady=5)
         self.payload_type_combo.current(0)
-
         # Exploit Button
         exploit_button = ttk.Button(exploit_frame, text="Run Exploits", command=self.run_exploits)
         exploit_button.pack(pady=10)
-
         # Log Area
         self.exploit_log = tk.Text(exploit_frame, height=15, state='disabled')
         self.exploit_log.pack(padx=10, pady=10, fill='both', expand=True)
@@ -283,14 +289,12 @@ class WirelessPenTestGUI(tk.Tk):
         selected_exploits = [ex for ex, var in self.exploit_vars.items() if var.get()]
         ssid = self.exploit_ssid_entry.get()
         bssid = self.exploit_bssid_entry.get()
-
         if not selected_exploits:
             messagebox.showwarning("No Exploits Selected", "Please select at least one exploit.")
             return
         if not ssid or not bssid:
             messagebox.showwarning("Incomplete Target Information", "Please provide both SSID and BSSID.")
             return
-
         # Gather exploit-specific parameters
         target_session = {
             'target_ip': self.exploit_ip_entry.get(),
@@ -300,17 +304,14 @@ class WirelessPenTestGUI(tk.Tk):
         }
         payload_type = self.payload_type_var.get()
         duration = 10  # Default duration, can be enhanced to allow user input
-
         # Define the target and vulnerability details
         target = {
             'ssid': ssid,
             'bssid': bssid
         }
-
         # Reset stop_event before starting new exploits
         if self.stop_event.is_set():
             self.stop_event.clear()
-
         # Start exploitation in a separate thread
         threading.Thread(target=self.execute_exploits,
                          args=(selected_exploits, target, target_session, payload_type, duration),
@@ -323,13 +324,11 @@ class WirelessPenTestGUI(tk.Tk):
                 break
             self.log_exploit(f"Running exploit: {ex}")
             vuln = self.vulnerability_db.get(ex, {})
-
             if ex == 'session_hijacking':
                 vuln['target_session'] = target_session
             elif ex == 'payload_delivery':
                 vuln['payload_type'] = payload_type
                 vuln['duration'] = duration
-
             try:
                 # Pass the stop_event to the exploit's scan method
                 self.core.run_exploit(ex, vuln, self.stop_event)
@@ -346,11 +345,9 @@ class WirelessPenTestGUI(tk.Tk):
     def create_report_tab(self, parent):
         report_frame = ttk.Frame(self.notebook)
         self.notebook.add(report_frame, text='Reports')
-
         # Report Display
         self.report_text = tk.Text(report_frame, height=25, state='disabled')
         self.report_text.pack(padx=10, pady=10, fill='both', expand=True)
-
         # Export Button
         export_button = ttk.Button(report_frame, text="Export Report", command=self.export_report)
         export_button.pack(pady=5)
@@ -360,7 +357,6 @@ class WirelessPenTestGUI(tk.Tk):
         export_format = tk.StringVar(value='txt')
         format_window = tk.Toplevel(self)
         format_window.title("Select Export Format")
-
         ttk.Label(format_window, text="Choose Report Format:").pack(padx=10, pady=10)
         format_combo = ttk.Combobox(format_window, textvariable=export_format, state='readonly')
         format_combo['values'] = ['txt', 'json']
@@ -386,21 +382,18 @@ class WirelessPenTestGUI(tk.Tk):
                         'scans': [],
                         'exploits': []
                     }
-
                     for sc_name, scanner in self.core.scanners.items():
                         if hasattr(scanner, 'detected_vulnerabilities') and scanner.detected_vulnerabilities:
                             report_data['scans'].append({
                                 'scanner': sc_name,
                                 'vulnerabilities': scanner.detected_vulnerabilities
                             })
-
                     for ex_name, exploit in self.core.exploits.items():
                         if hasattr(exploit, 'detected_vulnerabilities') and exploit.detected_vulnerabilities:
                             report_data['exploits'].append({
                                 'exploit': ex_name,
                                 'vulnerabilities': exploit.detected_vulnerabilities
                             })
-
                     try:
                         with open(file_path, 'w') as f:
                             json.dump(report_data, f, indent=4)
@@ -414,17 +407,13 @@ class WirelessPenTestGUI(tk.Tk):
     def create_settings_tab(self, parent):
         settings_frame = ttk.Frame(self.notebook)
         self.notebook.add(settings_frame, text='Settings')
-
         # Configuration Settings
         config_label = ttk.Label(settings_frame, text="Configuration Settings:")
         config_label.pack(pady=5)
-
         self.config_text = tk.Text(settings_frame, height=20, state='disabled')
         self.config_text.pack(padx=10, pady=10, fill='both', expand=True)
-
         # Load and Display Current Configuration
         self.load_configuration()
-
         # Refresh Button
         refresh_button = ttk.Button(settings_frame, text="Refresh Configuration", command=self.load_configuration)
         refresh_button.pack(pady=5)
@@ -451,6 +440,21 @@ class WirelessPenTestGUI(tk.Tk):
             self.config_text.delete(1.0, tk.END)
             self.config_text.insert(tk.END, "No configuration found.")
             self.config_text.config(state='disabled')
+
+    def create_live_packet_monitor_tab(self, parent):
+        live_packet_monitor = LivePacketMonitor(parent)
+        self.notebook.add(live_packet_monitor, text="Live Packet Monitor")
+
+    def create_fake_devices_tab(self, parent):
+        fake_devices_frame = FakeDeviceManager(parent)
+        self.notebook.add(fake_devices_frame, text="Fake Devices")
+
+    def create_rogue_access_point_tab(self, parent):
+        rogue_access_point_frame = FakeAccessPoint(parent)
+        self.notebook.add(rogue_access_point_frame, text="Rogue Access Point")
+
+
+
 
 if __name__ == '__main__':
     app = WirelessPenTestGUI()

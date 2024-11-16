@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open
-from utils.data_storage_manager import DataStorageManager
+from project_specifc_utils.data_storage_manager import DataStorageManager
 import os
 import shutil
 import json
