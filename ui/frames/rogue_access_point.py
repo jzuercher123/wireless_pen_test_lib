@@ -251,28 +251,31 @@ class FakeAccessPoint(BaseFrame):
         """
         Generates the hostapd configuration file.
         """
+        # Base configuration
         config = f"""
-interface={interface}
-driver=nl80211
-ssid={ssid}
-channel={channel}
-hw_mode=g
-ieee80211n=1
-wmm_enabled=1
+    interface={interface}
+    driver=nl80211
+    ssid={ssid}
+    channel={channel}
+    hw_mode=g
+    ieee80211n=1
+    wmm_enabled=1
         """
 
+        # Add security configuration
         if security == "WPA/WPA2":
             config += f"""
-wpa=2
-wpa_passphrase={password}
-wpa_key_mgmt=WPA-PSK
-rsn_pairwise=CCMP
+    wpa=2
+    wpa_passphrase={password}
+    wpa_key_mgmt=WPA-PSK
+    rsn_pairwise=CCMP
             """
         else:
             config += """
-auth_algs=1
-                """
+    auth_algs=1
+            """
 
+        # Write the configuration to the file
         with open(self.hostapd_conf_path, 'w') as f:
             f.write(config)
 
@@ -281,13 +284,13 @@ auth_algs=1
         Generates the dnsmasq configuration file for DHCP services.
         """
         config = f"""
-interface={interface}
-dhcp-range=192.168.10.10,192.168.10.50,12h
-dhcp-option=3,192.168.10.1
-dhcp-option=6,192.168.10.1
-server=8.8.8.8
-log-queries
-log-dhcp
+            interface={interface}
+            dhcp-range=192.168.10.10,192.168.10.50,12h
+            dhcp-option=3,192.168.10.1
+            dhcp-option=6,192.168.10.1
+            server=8.8.8.8
+            log-queries
+            log-dhcp
         """
 
         with open(self.dnsmasq_conf_path, 'w') as f:

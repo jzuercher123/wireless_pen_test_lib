@@ -132,3 +132,7 @@ class ConfigManager:
 
     def get_config(self):
         return self.config
+
+if __name__=="__main__":
+    configmgr = ConfigManager()
+    print(configmgr.project_root)

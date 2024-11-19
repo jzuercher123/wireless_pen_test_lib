@@ -1,5 +1,6 @@
 import time
 
+import scapy.packet
 from scapy.all import *
 import logging
 import threading

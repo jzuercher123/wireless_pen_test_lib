@@ -195,6 +195,18 @@ class LivePacketMonitor(BaseFrame):
             src = pkt[Ether].src
             dst = pkt[Ether].dst
 
+        # Attempt to extract and decode payload
+        payload = b""
+        decoded_payload = "No Decodable Payload"
+
+        # Check for Raw layer which contains the payload
+        if pkt.haslayer("Raw"):
+            payload = pkt.getlayer("Raw").load
+            try:
+                decoded_payload = payload.decode('utf-8', errors='replace')
+            except Exception as e:
+                decoded_payload = "Payload could not be decoded."
+
         # You can extend this to extract more details as needed
 
         packet_info = {
@@ -202,7 +214,9 @@ class LivePacketMonitor(BaseFrame):
             'source': src,
             'destination': dst,
             'protocol': protocol,
-            'packet': pkt  # Store the entire packet for detailed view
+            'packet': pkt,  # Store the entire packet for detailed view
+            'payload': payload,  # Raw payload
+            'decoded_payload': decoded_payload  # Decoded payload
         }
 
         # Put the packet_info into the queue
@@ -265,12 +279,25 @@ class LivePacketMonitor(BaseFrame):
                         src = pkt[Ether].src
                         dst = pkt[Ether].dst
 
+                    # Attempt to extract and decode payload
+                    payload = b""
+                    decoded_payload = "No Decodable Payload"
+
+                    if pkt.haslayer("Raw"):
+                        payload = pkt.getlayer("Raw").load
+                        try:
+                            decoded_payload = payload.decode('utf-8', errors='replace')
+                        except Exception as e:
+                            decoded_payload = "Payload could not be decoded."
+
                     packet_info = {
                         'time': pkt_time,
                         'source': src,
                         'destination': dst,
                         'protocol': protocol,
-                        'packet': pkt
+                        'packet': pkt,
+                        'payload': payload,
+                        'decoded_payload': decoded_payload
                     }
 
                     self.update_gui(packet_info)
@@ -335,29 +362,61 @@ class LivePacketMonitor(BaseFrame):
             messagebox.showerror("Error", "Invalid packet selection.")
             return
 
-        pkt = self.packet_list[index]['packet']
+        pkt_info = self.packet_list[index]
+        pkt = pkt_info['packet']
 
         # Create a new window to display packet details
         detail_window = tk.Toplevel(self)
         detail_window.title(f"Packet #{index + 1} Details")
-        detail_window.geometry("800x600")
+        detail_window.geometry("800x700")  # Increased height for payload
 
-        # Text widget with scrollbar
-        text_area = Text(detail_window, wrap=tk.NONE)
-        text_area.pack(fill=tk.BOTH, expand=True, side=tk.LEFT)
+        # Create Notebook for organized tabs
+        notebook = ttk.Notebook(detail_window)
+        notebook.pack(fill=tk.BOTH, expand=True)
 
-        text_vsb = Scrollbar(detail_window, orient=VERTICAL, command=text_area.yview)
-        text_vsb.pack(side=tk.RIGHT, fill=tk.Y)
-        text_area.configure(yscrollcommand=text_vsb.set)
+        # Frame for Packet Summary
+        summary_frame = ttk.Frame(notebook)
+        notebook.add(summary_frame, text="Summary")
 
-        text_hsb = Scrollbar(detail_window, orient=HORIZONTAL, command=text_area.xview)
-        text_hsb.pack(side=tk.BOTTOM, fill=tk.X)
-        text_area.configure(xscrollcommand=text_hsb.set)
+        # Text widget for Packet Summary
+        summary_text = Text(summary_frame, height=15, wrap=tk.NONE)
+        summary_text.pack(fill=tk.BOTH, expand=True, side=tk.LEFT)
 
-        # Insert packet details
-        packet_details = pkt.show(dump=True)
-        text_area.insert(END, packet_details)
-        text_area.config(state=tk.DISABLED)
+        # Scrollbars for summary_text
+        summary_vsb = Scrollbar(summary_frame, orient=VERTICAL, command=summary_text.yview)
+        summary_vsb.pack(side=tk.RIGHT, fill=tk.Y)
+        summary_text.configure(yscrollcommand=summary_vsb.set)
+
+        summary_hsb = Scrollbar(summary_frame, orient=HORIZONTAL, command=summary_text.xview)
+        summary_hsb.pack(side=tk.BOTTOM, fill=tk.X)
+        summary_text.configure(xscrollcommand=summary_hsb.set)
+
+        # Insert packet summary
+        packet_summary = pkt.show(dump=True)
+        summary_text.insert(END, packet_summary)
+        summary_text.config(state=tk.DISABLED)
+
+        # Frame for Decoded Payload
+        payload_frame = ttk.Frame(notebook)
+        notebook.add(payload_frame, text="Decoded Payload")
+
+        # Text widget for Decoded Payload
+        payload_text = Text(payload_frame, height=15, wrap=tk.NONE)
+        payload_text.pack(fill=tk.BOTH, expand=True, side=tk.LEFT)
+
+        # Scrollbars for payload_text
+        payload_vsb = Scrollbar(payload_frame, orient=VERTICAL, command=payload_text.yview)
+        payload_vsb.pack(side=tk.RIGHT, fill=tk.Y)
+        payload_text.configure(yscrollcommand=payload_vsb.set)
+
+        payload_hsb = Scrollbar(payload_frame, orient=HORIZONTAL, command=payload_text.xview)
+        payload_hsb.pack(side=tk.BOTTOM, fill=tk.X)
+        payload_text.configure(xscrollcommand=payload_hsb.set)
+
+        # Insert decoded payload
+        decoded_payload = pkt_info.get('decoded_payload', "No Decodable Payload")
+        payload_text.insert(END, decoded_payload)
+        payload_text.config(state=tk.DISABLED)
 
     def export_packet(self):
         """
@@ -400,6 +459,7 @@ class LivePacketMonitor(BaseFrame):
         if file_path:
             try:
                 imported_packets = rdpcap(file_path)
+                self.clear_packets()
                 for pkt in imported_packets:
                     pkt_time = time.strftime("%H:%M:%S", time.localtime(pkt.time))
                     src = "N/A"
@@ -410,18 +470,31 @@ class LivePacketMonitor(BaseFrame):
                         src = pkt[Ether].src
                         dst = pkt[Ether].dst
 
+                    # Attempt to extract and decode payload
+                    payload = b""
+                    decoded_payload = "No Decodable Payload"
+
+                    if pkt.haslayer("Raw"):
+                        payload = pkt.getlayer("Raw").load
+                        try:
+                            decoded_payload = payload.decode('utf-8', errors='replace')
+                        except Exception as e:
+                            decoded_payload = "Payload could not be decoded."
+
                     packet_info = {
                         'time': pkt_time,
                         'source': src,
                         'destination': dst,
                         'protocol': protocol,
-                        'packet': pkt
+                        'packet': pkt,
+                        'payload': payload,
+                        'decoded_payload': decoded_payload
                     }
 
                     self.update_gui(packet_info)
                 messagebox.showinfo("Success", f"Imported {len(imported_packets)} packets from {file_path}")
             except Exception as e:
-                messagebox.showerror("Error", f"Failed to import packets:\n{e}")
+                messagebox.showerror("Error", f"Failed to load packets:\n{e}")
 
 
 # Example usage within a Tkinter application
@@ -437,3 +510,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+S

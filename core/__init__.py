@@ -12,8 +12,16 @@ from project_specifc_utils.network_interface_manager import NetworkInterfaceMana
 from project_specifc_utils.data_storage_manager import DataStorageManager
 from project_specifc_utils.authentication_tools import AuthenticationTools
 
-# Initialize Logging for CoreFramework
 def setup_core_logging(project_root: str) -> logging.Logger:
+    """
+    Set up logging for the CoreFramework.
+
+    Args:
+        project_root (str): The root directory of the project.
+
+    Returns:
+        logging.Logger: Configured logger for the CoreFramework.
+    """
     logs_dir = os.path.join(project_root, 'logs')
     os.makedirs(logs_dir, exist_ok=True)
 
@@ -39,13 +47,32 @@ def setup_core_logging(project_root: str) -> logging.Logger:
     return logger
 
 class CoreFramework:
-    def __init__(self, modules_path: str, config_dir: str = "config",
+    def __init__(self, modules_path: str,
+                 config_dir: str = "config",
                  vulnerabilities_path: str = None,
-                 sendp_func=sendp, sleep_func=time.sleep,
-                 network_manager=None, data_storage_manager=None, auth_tools=None,
-                 scanners=None, exploits=None, test_network: bool=False):
+                 sendp_func=sendp,
+                 sleep_func=time.sleep,
+                 network_manager=None,
+                 data_storage_manager=None,
+                 auth_tools=None,
+                 scanners=None,
+                 exploits=None,
+                 test_network: bool=False):
         """
         Initialize the CoreFramework with necessary configurations.
+
+        Args:
+            modules_path (str): Path to the protocol modules.
+            config_dir (str): Directory for configuration files.
+            vulnerabilities_path (str): Path to the vulnerabilities file.
+            sendp_func (function): Function to send packets.
+            sleep_func (function): Function to sleep.
+            network_manager (NetworkInterfaceManager): Network manager instance.
+            data_storage_manager (DataStorageManager): Data storage manager instance.
+            auth_tools (AuthenticationTools): Authentication tools instance.
+            scanners (dict): Dictionary of scanners.
+            exploits (dict): Dictionary of exploits.
+            test_network (bool): Flag to enable test network.
         """
         self.test_network = test_network
         self.modules_path = modules_path
@@ -125,6 +152,12 @@ class CoreFramework:
         self.logger.info("CoreFramework initialized successfully.")
 
     def run_local_scan(self, interface: str):
+        """
+        Run a local scan on the specified interface.
+
+        Args:
+            interface (str): Network interface to scan.
+        """
         self.logger.info(f"Running local scan on interface: {interface}")
         try:
             self.network_manager.set_monitor_mode()
@@ -138,6 +171,9 @@ class CoreFramework:
             raise
 
     def load_protocol_modules(self):
+        """
+        Load protocol modules from the specified directory.
+        """
         protocols_dir = self.modules_path
         self.logger.info(f"Loading protocol modules from {protocols_dir}...")
 
@@ -177,6 +213,13 @@ class CoreFramework:
         self.logger.info("Protocol modules loaded successfully.")
 
     def run_scanner(self, scanner_name: str, target_info: dict):
+        """
+        Run the specified scanner on the target information.
+
+        Args:
+            scanner_name (str): Name of the scanner to run.
+            target_info (dict): Information about the target to scan.
+        """
         scanner = self.scanners.get(scanner_name)
         if not scanner:
             self.logger.error(f"Scanner '{scanner_name}' not found.")
@@ -195,6 +238,13 @@ class CoreFramework:
             raise
 
     def run_exploit(self, exploit_name: str, vuln_info: dict):
+        """
+        Run the specified exploit on the vulnerability information.
+
+        Args:
+            exploit_name (str): Name of the exploit to run.
+            vuln_info (dict): Information about the vulnerability to exploit.
+        """
         exploit = self.exploits.get(exploit_name)
         if not exploit:
             self.logger.error(f"Exploit '{exploit_name}' not found.")
@@ -213,17 +263,36 @@ class CoreFramework:
             raise
 
     def start_test_network(self, compose_file: str):
+        """
+        Start the test network using the specified compose file.
+
+        Args:
+            compose_file (str): Path to the Docker Compose file.
+        """
         if self.test_network:
             self.logger.info("Starting test network...")
             start_network(compose_file)
 
     def stop_test_network(self, compose_file: str):
+        """
+        Stop the test network using the specified compose file.
+
+        Args:
+            compose_file (str): Path to the Docker Compose file.
+        """
         if self.test_network is False:
             self.logger.warning("Test network is not enabled. Skipping stop operation.")
             return
         stop_network(compose_file)
 
     def send_continuous_packets(self, packet, interval: float):
+        """
+        Send packets continuously at the specified interval.
+
+        Args:
+            packet: The packet to send.
+            interval (float): Interval between packet sends in seconds.
+        """
         self.logger.info(f"Starting to send packets every {interval} seconds.")
         self.continuous_sending = True
         while self.continuous_sending:
@@ -235,10 +304,16 @@ class CoreFramework:
                 self.continuous_sending = False
 
     def stop_continuous_packets(self):
+        """
+        Stop sending packets continuously.
+        """
         self.logger.info("Stopping continuous packet sending.")
         self.continuous_sending = False
 
     def finalize(self):
+        """
+        Finalize testing activities and generate a report.
+        """
         self.logger.info("Finalizing testing activities...")
         try:
             self.data_storage_manager.generate_report(self.vulnerability_db)
