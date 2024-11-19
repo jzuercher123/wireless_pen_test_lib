@@ -16,7 +16,7 @@ class HiddenSSIDRevealer:
     def start_capture(self):
         sniff(iface=self.interface, prn=self.process_packet, stop_filter=self.should_stop)
 
-    def should_stop(self, packet) -> bool:
+    def should_stop(self) -> bool:
         return self.stop_event.is_set()
 
     def process_packet(self, packet):

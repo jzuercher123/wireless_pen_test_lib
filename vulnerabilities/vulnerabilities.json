@@ -1,1 +1,3878 @@
-{}
+{
+    "vulnerabilities": [
+        {
+            "id": "",
+            "name": "ActiveMQ < 5.14.0 - Web Shell Upload (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42283"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache (Windows x86) - Chunked Encoding (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows_x86"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/16782"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache + PHP < 5.3.12 / < 5.4.2 - cgi-bin Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/29290"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache + PHP < 5.3.12 / < 5.4.2 - Remote Code Execution + Scanner",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/29316"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache - Arbitrary Long HTTP Headers (Denial of Service)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/360"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache - Arbitrary Long HTTP Headers Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/371"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18221"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache - httpOnly Cookie Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18442"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache - Remote Memory Exhaustion (Denial of Service)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/17696"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 0.8.x/1.0.x / NCSA HTTPd 1.x - 'test-cgi' Directory Listing",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "cgi"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20435"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.0/1.2/1.3 - Server Address Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21067"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.1 / NCSA HTTPd 1.5.2 / Netscape Server 1.12/1.1/2.0 - a nph-test-cgi",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/19536"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.2 - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20558"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.2.5/1.3.1 / UnityMail 2.0 - MIME Header Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20272"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3 + PHP 3 - File Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20466"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3 - Artificially Long Slash Path Directory Listing (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20692"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3 - Artificially Long Slash Path Directory Listing (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20693"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3 - Artificially Long Slash Path Directory Listing (3)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20694"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3 - Artificially Long Slash Path Directory Listing (4)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20695"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3 - Directory Index Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21002"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.12 - WebDAV Directory Listings",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20210"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.14 - Mac File Protection Bypass",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "osx"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20911"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.20 (Win32) - 'PHP.exe' Remote File Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21204"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.31 mod_include - Local Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/587"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.34/1.3.33 (Ubuntu / Debian) - CGI TTY Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/3384"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.35/2.0.58/2.2.2 - Arbitrary HTTP Request Headers Security",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/28424"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.6/1.3.9/1.3.11/1.3.12/1.3.20 - Root Directory Access",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/19975"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.x + Tomcat 4.0.x/4.1.x mod_jk - Chunked Encoding Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/22068"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.x - HTDigest Realm Command Line Argument Buffer Overflow (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/25624"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.x - HTDigest Realm Command Line Argument Buffer Overflow (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/25625"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.x < 2.0.48 mod_userdir - Remote Users Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/132"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.x mod_include - Local Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/24694"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3.x mod_mylo - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/67"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.3/2.0.x - Server Side Include Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21885"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.4/2.2.x - APR 'apr_fnmatch()' Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/35738"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.x/2.0.x - Chunked-Encoding Memory Corruption (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21559"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 1.x/2.0.x - Chunked-Encoding Memory Corruption (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21560"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0 - Encoded Backslash Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21697"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0 - Full Path Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21719"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0 mod_jk2 2.0.2 (Windows x86) - Remote Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows_x86"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/5330"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.39/40 - Oversized STDERR Buffer Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21854"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.44 (Linux) - Remote Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/11"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.45 - 'APR' Crash",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.49 - Arbitrary Long HTTP Headers Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/1056"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.4x mod_perl - File Descriptor Leakage (3)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23581"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.4x mod_php - File Descriptor Leakage (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23481"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.4x mod_php - File Descriptor Leakage (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23482"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.52 - GET Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/855"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.0.58 mod_rewrite (Windows 2003) - Remote Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/3996"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2 (Windows) - Local Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/15319"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2 - Scoreboard Invalid Free On Shutdown",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/41768"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2.14 mod_isapi - Dangling Pointer Remote SYSTEM",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/11650"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2.15 mod_proxy - Reverse Proxy Security Bypass",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36663"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2.2 - CGI Script Source Code Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/28365"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2.4 - 413 Error HTTP Request Method Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30835"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2.6 (Windows) - Share PHP File Extension Mapping Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30901"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.2.6 mod_negotiation - HTML Injection / HTTP Response Splitting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/31052"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.4.17 - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39037"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.4.17 < 2.4.38 - 'apache2ctl graceful' 'logrotate' Local Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46676"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.4.23 mod_http2 - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40909"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.4.7 + PHP 7.0.2 - 'openssl_seal()' Uninitialized Memory Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40142"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.4.7 mod_status - Scoreboard Handling Race Condition",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/34133"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.4.x - Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/51193"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 2.x - Memory Leak",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/9"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache 7.0.x mod_proxy - Reverse Proxy Security Bypass",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36352"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache < 1.3.37/2.0.59/2.2.3 mod_rewrite - Remote Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/2237"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache < 2.0.64 / < 2.2.21 mod_setenvif - Integer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/41769"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache < 2.2.34 / < 2.4.27 - OPTIONS Memory Leak",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42745"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache ActiveMQ 5.11.1/5.13.2 - Directory Traversal / Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40857"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache ActiveMQ 5.2/5.3 - Source Code Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/33868"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache ActiveMQ 5.3 - 'admin/queueBrowse' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/33905"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache ActiveMQ 5.x-5.11.1 - Directory Traversal Shell Upload (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48181"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Airflow 1.10.10 - 'Example Dag' Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/49927"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache APISIX 2.12.1 - Remote Code Execution (RCE)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50829"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache APR - Hash Collision Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36669"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Archiva 1.0 < 1.3.1 - Cross-Site Request Forgery",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/15710"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Archiva 1.3.9 - Multiple Cross-Site Request Forgery Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "xml"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40109"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache AXIS 1.0 - Non-Existent WSDL Path Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/29930"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Axis 1.4 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46682"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Axis2 1.4.1 - Local File Inclusion",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/12721"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Axis2 1.x - '/axis2/axis2-admin' Session Fixation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/34186"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Axis2 Administration Console - (Authenticated) Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/12689"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache cocoon 2.14/2.2 - Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23282"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Commons FileUpload and Apache Tomcat - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/31615"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Continuum - Arbitrary Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39945"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Continuum 1.4.2 - Multiple Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39886"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB - Arbitrary Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45019"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB - Arbitrary Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45019"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 1.5.0 - 'uuids' Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32519"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 1.7.0 / 2.x < 2.1.1 - Remote Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44498"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 2.0.0 - Local Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40865"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 2.3.0 - Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46406"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 2.3.1 - Cross-Site Request Forgery / Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46595"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 2.3.1 - Cross-Site Request Forgery / Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46595"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB 3.2.1 - Remote Code Execution (RCE)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50914"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CouchDB < 2.1.0 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44913"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache CXF < 2.5.10/2.6.7/2.7.4 - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/26710"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Cygwin 1.3.x/2.0.x - Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23751"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Flink 1.11.0 - Unauthenticated Arbitrary File Read (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/49398"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Flink 1.9.x - File Upload RCE (Unauthenticated)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48978"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Geronimo 1.0 - Error Page Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/27096"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Geronimo 2.1.3 - Multiple Directory Traversal Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/8458"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Geronimo 2.1.x - '/console/portal/' URI Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32921"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Geronimo 2.1.x - '/console/portal/Server/Monitoring' Multiple Cross-Site Scripting Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32920"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Geronimo 2.1.x - Cross-Site Request Forgery (Multiple Admin Function)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32922"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache HTTP Server 2.4.49 - Path Traversal & Remote Code Execution (RCE)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50383"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache HTTP Server 2.4.50 - Path Traversal & Remote Code Execution (RCE)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50406"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache HTTP Server 2.4.50 - Remote Code Execution (RCE) (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50446"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache HTTP Server 2.4.50 - Remote Code Execution (RCE) (3)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50512"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Httpd mod_proxy - Error Page Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47688"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Httpd mod_rewrite - Open Redirects",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47689"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache JackRabbit - WebDAV XML External Entity",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/37110"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache JackRabbit 1.4/1.5 Content Repository (JCR) - 'search.jsp?q' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32741"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache JackRabbit 1.4/1.5 Content Repository (JCR) - 'swr.jsp?q' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32742"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache JackRabbit 2.0.0 - webapp XPath Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/14617"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache James Server 2.2 - SMTP Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/27915"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache James Server 2.3.2 - Insecure User Creation Arbitrary File Write (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48130"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache James Server 2.3.2 - Remote Command Execution (RCE) (Authenticated) (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50347"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache James Server 2.3.2 - Remote Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/35513"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Jetspeed - Arbitrary File Upload (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39643"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Libcloud Digital Ocean API - Local Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38937"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Log4j 2 - Remote Code Execution (RCE)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50592"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Log4j2 2.14.1 - Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50590"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Mina 2.0.13 - Remote Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40382"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Mod_Access_Referer 1.0.2 - Null Pointer Dereference Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/22505"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Mod_Auth_OpenID - Session Stealing",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18917"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_cgi - 'Shellshock' Remote Command Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/34900"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_dav / svn - Remote Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/8842"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_gzip (with debug_mode) 1.2.26.1a - Remote Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/126"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_jk 1.2.19 (Windows x86) - Remote Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows_x86"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/6100"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_jk 1.2.19/1.2.20 - Remote Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/4093"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_perl - 'Apache::Status' / 'Apache2::Status' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/9993"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_proxy - Reverse Proxy Exposure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/17969"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_proxy_cluster - Stored XSS",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/52010"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_rewrite (Windows x86) - Off-by-One Remote Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows_x86"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/3680"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_rewrite - LDAP protocol Buffer Overflow (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/16752"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_session_crypto - Padding Oracle",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40961"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_ssl 2.0.x - Remote Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/24590"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_ssl 2.8.x - Off-by-One HTAccess Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21575"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_ssl < 2.8.7 OpenSSL - 'OpenFuck.c' Remote Buffer Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21671"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_ssl < 2.8.7 OpenSSL - 'OpenFuckV2.c' Remote Buffer Overflow (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/764"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_ssl < 2.8.7 OpenSSL - 'OpenFuckV2.c' Remote Buffer Overflow (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47080"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_ssl OpenSSL < 0.9.6d / < 0.9.7-beta2 - 'openssl-too-open.c' SSL2 KEY_ARG Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40347"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache mod_wsgi - Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39196"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache MyFaces - 'ln' Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36681"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache MyFaces Tomahawk JSF Framework 1.1.5 - 'Autoscroll' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30191"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz - Admin Creator",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/12264"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz - Multiple Cross-Site Scripting Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/12330"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz - Remote Execution (via SQL Execution)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/12263"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz 10.4.x - Multiple Cross-Site Scripting Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38230"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz 16.11.04 - XML External Entity Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45673"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz 16.11.05 - Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45975"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz 17.12.03 - Cross-Site Request Forgery (Account Takeover)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48408"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OFBiz 18.12.12 - Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/52020"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Olingo OData 4.0 - XML External Entity Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47770"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OpenMeetings 1.9.x < 3.1.0 - '.ZIP' File Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39642"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache OpenMeetings 5.0.0 - 'hostname' Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/49094"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Pluto 3.0.0 / 3.0.1 - Persistent Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46759"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Portals Pluto 3.0.0 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45396"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Rave 0.11 < 0.20 - User Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/24744"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Roller - OGNL Injection (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/29859"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Roller 5.0.3 - XML External Entity Injection (File Disclosure)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45341"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Shindig - XML External Entity Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38813"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Shiro - Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/34952"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Shiro 1.2.4 - Cookie RememberME Deserial RCE (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48410"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Sling - Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/37487"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Sling Framework (Adobe AEM) 2.3.6 - Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39435"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Solr - Remote Code Execution via Velocity Template (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48338"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Solr 7.0.1 - XML External Entity Expansion / Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "xml"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/43009"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Solr 8.2.0 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47572"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache SpamAssassin Milter Plugin 0.3.1 - Remote Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/11662"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Spark - (Unauthenticated) Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45925"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Spark - (Unauthenticated) Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45925"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Spark Cluster 1.3.x - Arbitrary Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36562"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - 'ParametersInterceptor' Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/24874"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - ClassLoader Manipulation Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/33142"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - Developer Mode OGNL Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/31434"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - Dynamic Method Invocation Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39756"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - includeParams Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/25980"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - Multiple Persistent Cross-Site Scripting Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18452"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - OGNL Expression Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38549"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - REST Plugin With Dynamic Method Invocation Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39919"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts - REST Plugin With Dynamic Method Invocation Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/43382"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 1.2.7 - Error Response Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/26542"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - DefaultActionMapper Prefixes OGNL Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/27135"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - DefaultActionMapper Prefixes OGNL Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48917"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - Namespace Redirect OGNL Injection (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45367"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - Namespace Redirect OGNL Injection (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45367"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - Skill Name Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/37647"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - Struts 1 Plugin Showcase OGNL Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44643"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 - Struts 1 Plugin Showcase OGNL Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44643"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2 < 2.3.1 - Multiple Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18329"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.0 - 'XSLTResult.java' Arbitrary File Upload",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/37009"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.0.0 < 2.2.1.1 - XWork 's:submit' HTML Tag Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/35735"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.0.1 < 2.3.33 / 2.5 < 2.5.10 - Arbitrary Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44556"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.0.9/2.1.8 - Session Tampering Security Bypass",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36426"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.2.1.1 - Remote Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18984"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.2.3 - Multiple Open Redirections",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38666"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.3 < 2.3.34 / 2.5 < 2.5.16 - Remote Code Execution (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45260"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.3 < 2.3.34 / 2.5 < 2.5.16 - Remote Code Execution (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45262"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.3.5 < 2.3.31 / 2.5 < 2.5.10 - 'Jakarta' Multipart Parser OGNL Injection (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/41614"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.3.5 < 2.3.31 / 2.5 < 2.5.10 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/41570"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.3.x Showcase - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42324"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.5 < 2.5.12 - REST Plugin XStream Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42627"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts 2.5.20 - Double OGNL evaluation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/49068"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts < 1.3.10 / < 2.3.16.2 - ClassLoader Manipulation Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/41690"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts < 2.2.0 - Remote Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/17691"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Struts2 2.0.0 < 2.3.15 - Prefixed Parameters OGNL Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44583"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Subversion - Remote Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38422"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Subversion 1.6.x - 'mod_dav_svn/lock.c' Remote Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/38421"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache suEXEC - Information Disclosure / Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/27397"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Superset 1.1.0 - Time-Based Account Enumeration",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50072"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Superset 2.0.0 - Authentication Bypass",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/51447"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Superset < 0.23 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45933"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Syncope 2.0.7 - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/45400"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tika 1.15 - 1.17 - Header Command Injection (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47208"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tika-server < 1.18 - Command Injection",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46540"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat (Windows) - 'runtime.getRuntime().exec()' Local Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/7264"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - 'WebDAV' Remote File Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/4530"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - Account Scanner / 'PUT' Request Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18619"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - AJP 'Ghostcat File Read/Inclusion",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/48143"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - AJP 'Ghostcat' File Read/Inclusion (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/49039"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - CGIServlet enableCmdLineArguments Remote Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/47073"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - Cookie Quote Handling Remote Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/9994"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - Form Authentication 'Username' Enumeration",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/9995"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat - WebDAV SSL Remote File Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/4552"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat / Geronimo 1.0 - 'Sample Script cal2.jsp?time' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/27095"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 10.1 - Denial Of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/51262"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.0 - Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20716"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.1 - Path Revealing",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20131"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.2 - 404 Error Page Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/33379"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.2 - Directory Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21882"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.2.1 - 404 Error Page Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/10292"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.2.3/3.2.4 - 'RealPath.jsp' Information Disclosuree",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21492"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.2.3/3.2.4 - 'Source.jsp' Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21490"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.2.3/3.2.4 - Example Files Web Root Full Path Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21491"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3.x - Null Byte Directory / File Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/22205"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3/4 - 'DefaultServlet' File Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21853"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 3/4 - JSP Engine Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21534"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 4.0.3 - Denial of Service 'Device Name' / Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21605"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 4.0.3 - Requests Containing MS-DOS Device Names Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/31551"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 4.0.3 - Servlet Mapping Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21604"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 4.0.x - Non-HTTP Request Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23245"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 4.0/4.1 - Servlet Full Path Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21412"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 4.1 - JSP Request Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21734"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 5 - Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/28254"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 5.5.0 < 5.5.29 / 6.0.0 < 6.0.26 - Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/12343"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 5.5.15 - cal2.jsp Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30563"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 5.5.25 - Cross-Site Request Forgery",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/29435"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 5.x/6.0.x - Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/29739"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.10 - Documentation Sample Application Multiple Cross-Site Scripting Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30052"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.13 - Host Manager Servlet Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30495"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.13 - Insecure Cookie Handling Quote Delimiter Session ID Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30496"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.13 - JSP Example Web Applications Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/30189"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.15 - Cookie Quote Handling Remote Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/31130"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.16 - 'HttpServletResponse.sendError()' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32138"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.16 - 'RequestDispatcher' Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/32137"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6.0.18 - Form Authentication Existing/Non-Existing 'Username' Enumeration",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/33023"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 6/7/8/9 - Information Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/41783"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 7.0.4 - 'sort' / 'orderBy' Cross-Site Scripting",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/35011"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 8/7/6 (Debian-Based Distros) - Local Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40450"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 8/7/6 (RedHat Based Distros) - Local Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/40488"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 9.0.0.M1 - Cross-Site Scripting (XSS)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50119"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat 9.0.0.M1 - Open Redirect",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50118"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat < 5.5.17 - Remote Directory Listing",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/2061"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat < 6.0.18 - 'utf8' Directory Traversal (PoC)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/6229"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat < 6.0.18 - 'utf8' Directory Traversal",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/14489"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat < 9.0.1 (Beta) / < 8.5.23 / < 8.0.47 / < 7.0.8 - JSP Upload Bypass / Remote Code Execution (1)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42953"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat < 9.0.1 (Beta) / < 8.5.23 / < 8.0.47 / < 7.0.8 - JSP Upload Bypass / Remote Code Execution (2)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "jsp"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42966"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat Connector jk2-2.0.2 mod_jk2 - Remote Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/5386"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat Connector mod_jk - 'exec-shield' Remote Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/4162"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat Manager - Application Deployer (Authenticated) Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/16317"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat Manager - Application Upload (Authenticated) Code Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/31433"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat mod_jk 1.2.20 - Remote Buffer Overflow (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/16798"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Tomcat/JBoss EJBInvokerServlet / JMXInvokerServlet (RMI over HTTP) Marshalled Object - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/28713"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache UNO / LibreOffice Version: 6.1.2 / OpenOffice 4.1.6 API - Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/46544"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Web Server 2.0.x - MS-DOS Device Name Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/22191"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Win32 1.3.x/2.0.x - Batch File Remote Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21350"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache Xerces-C XML Parser < 3.1.2 - Denial of Service (PoC)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/36906"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache2Triad 1.5.4 - Multiple Vulnerabilities",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/42520"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Apache::Gallery 0.4/0.5/0.6 - Insecure File Storage Privilege Escalation",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23119"
+            ]
+        },
+        {
+            "id": "",
+            "name": "ApacheOfBiz 17.12.01 - Remote Command Execution (RCE)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/50178"
+            ]
+        },
+        {
+            "id": "",
+            "name": "AWStats 6.x - Apache Tomcat Configuration File Arbitrary Command Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "cgi"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/35035"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Azure Apache Ambari 2302250400 - Spoofing",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/51546"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Bea Weblogic Apache Connector - Code Execution / Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/6089"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Cobalt RaQ 2.0/3.0 - Apache .htaccess Disclosure",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/19828"
+            ]
+        },
+        {
+            "id": "",
+            "name": "htpasswd Apache 1.3.31 - Local Overflow",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/466"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Joomla! Component com_intuit - Apache Directory listing Download",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/10811"
+            ]
+        },
+        {
+            "id": "",
+            "name": "NCSA 1.3/1.4.x/1.5 / Apache HTTPd 0.8.11/0.8.14 - ScriptAlias Source Retrieval",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "multiple"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/20595"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Oracle Java JDK/JRE < 1.8.0.131 / Apache Xerces 2.11.0 - 'PDF/Docx' Server Side Denial of Service",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "php"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/44057"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Oracle Weblogic Apache Connector - POST Buffer Overflow (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/18897"
+            ]
+        },
+        {
+            "id": "",
+            "name": "PHP 5.4.3 - apache_request_headers Function Buffer Overflow (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "windows"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/19231"
+            ]
+        },
+        {
+            "id": "",
+            "name": "RedHat Apache 2.0.40 - Directory Index Default Configuration Error",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/23296"
+            ]
+        },
+        {
+            "id": "",
+            "name": "RedHat Linux 7.0 Apache - Remote Username Enumeration",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/21112"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Solr 3.5.0 - Arbitrary Data Deletion",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "java"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/39418"
+            ]
+        },
+        {
+            "id": "",
+            "name": "SpamAssassin spamd - Remote Command Execution (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/16920"
+            ]
+        },
+        {
+            "id": "",
+            "name": "SpamAssassin spamd 3.1.3 - Command Injection (Metasploit)",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "unix"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/9914"
+            ]
+        },
+        {
+            "id": "",
+            "name": "Webfroot Shoutbox < 2.32 (Apache) - Local File Inclusion / Remote Code Execution",
+            "description": "No description available.",
+            "severity": "unknown",
+            "recommendation": "Refer to ExploitDB and apply appropriate patches.",
+            "affected_protocols": [
+                "linux"
+            ],
+            "references": [
+                "https://www.exploit-db.com/exploits/34"
+            ]
+        }
+    ]
+}

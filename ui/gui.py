@@ -47,6 +47,9 @@ from ui.frames.test_devices import FakeDeviceManager
 from ui.frames.rogue_access_point import FakeAccessPoint
 from ui.frames.network_graph_visualization import NetworkGraphVisualizationFrame
 from ui.frames.report_generation_frame import ReportGenerationFrame
+from ui.frames.beacon_analysis_frame import BeaconAnalysisFrame
+from ui.frames.deauth_attack_frame import DeauthAttackFrame
+from ui.frames.hidden_ssid_frame import HiddenSSIDFrame
 
 
 def create_test_data() -> Dict[str, Any]:
@@ -160,7 +163,9 @@ class WirelessPenTestGUI(tk.Tk):
         self.create_hidden_ssid_tab()
         self.create_signal_heatmap_tab()
         self.create_anomaly_detection_tab()
-
+        self.create_wireless_network_enumeration_tab()
+        self.create_deauth_attack_tab()
+        self.add_hidden_ssid_attack_frame_tab()
 
         # Add a Stop button at the bottom of the container frame to halt ongoing operations
         self.add_stop_button(container_frame)
@@ -234,6 +239,10 @@ class WirelessPenTestGUI(tk.Tk):
         self.report_generation_frame = ReportGenerationFrame(self.notebook, self.core)
         self.notebook.add(self.report_generation_frame, text='Report Generation')
 
+    def create_deauth_attack_tab(self):
+        self.deauth_attack_frame = DeauthAttackFrame(self.notebook, self.core)
+        self.notebook.add(self.deauth_attack_frame, text='Deauth Attack')
+
     def add_stop_button(self, parent: ttk.Frame) -> None:
         """
         Adds a Stop button at the bottom of the GUI to halt ongoing operations.
@@ -243,6 +252,18 @@ class WirelessPenTestGUI(tk.Tk):
         """
         stop_button = ttk.Button(parent, text="Stop", command=self.stop_operations)
         stop_button.pack(pady=10, side='bottom')
+
+    def create_wireless_network_enumeration_tab(self):
+        self.beacon_analysis_frame = BeaconAnalysisFrame(self.notebook, self.core)
+        self.notebook.add(self.beacon_analysis_frame, text='Beacon Analysis')
+
+    def add_hidden_ssid_attack_frame_tab(self):
+        """
+
+        :return:
+        """
+        self.hidden_ssid_frame = HiddenSSIDFrame(self.notebook, self.core)
+        self.notebook.add(self.hidden_ssid_frame, text='Hidden SSID')
 
     def stop_operations(self) -> None:
         """

@@ -17,6 +17,8 @@ from project_specifc_utils.data_storage_manager import DataStorageManager
 from project_specifc_utils.authentication_tools import AuthenticationTools
 from modules.machine_learning.anomaly_detection import AnomalyDetector
 from modules.data_analytics.report_generator import ReportGenerator
+from modules.network_enumeration.beacon_analyzer import BeaconAnalyzer
+from modules.attack_modules.deauth_attack import DeauthAttack
 from typing import List, Dict, Any
 import pandas as pd
 
@@ -83,14 +85,16 @@ class CoreFramework:
             test_network (bool): Flag to enable test network.
         """
         self.stop_event = threading.Event()
-        self.test_network = test_network
         self.modules_path = modules_path
+        self.compose_file_path = os.path.join(modules_path, 'test_network', 'docker-compose.yml')
         self.project_root = os.path.abspath(os.path.join(modules_path, os.pardir, os.pardir))
         self.logger = setup_core_logging(self.project_root)
         self.logger.info("Initializing CoreFramework...")
         self.hidden_ssid_revealer = HiddenSSIDRevealer(interface='wlan0', stop_event=self.stop_event)
         self.signal_heatmap = SignalHeatmap(interface='wlan0', stop_event=self.stop_event)
+        self.beacon_analyzer = BeaconAnalyzer(interface='wlan0', stop_event=self.stop_event)
 
+        self.deauth_attacks: List[DeauthAttack] = []
 
 
         # Initialize ConfigManager
@@ -145,6 +149,14 @@ class CoreFramework:
             self.logger.info("Network and Data Storage Managers initialized successfully.")
         except Exception as e:
             self.logger.error(f"Error initializing components: {e}", exc_info=True)
+            raise
+
+        try:
+            self.test_network = test_network
+            if self.test_network:
+                self.start_test_network(self.config.test_network.compose_file)
+        except Exception as e:
+            self.logger.error(f"Error starting test network: {e}", exc_info=True)
             raise
 
         # Initialize Scanners and Exploits
@@ -241,6 +253,28 @@ class CoreFramework:
 
         self.logger.info("Protocol modules loaded successfully.")
 
+    def execute_deauth_attack(self, interface: str, target_bssid: str, target_client: str = None):
+        """
+        Executes a deauthentication attack.
+
+        Args:
+            interface (str): Network interface.
+            target_bssid (str): Target access point BSSID.
+            target_client (str, optional): Target client MAC address.
+        """
+        stop_event = threading.Event()
+        attack = DeauthAttack(interface, target_bssid, target_client, stop_event)
+        attack.start_attack()
+        self.deauth_attacks.append(attack)
+
+    def stop_all_deauth_attacks(self):
+        """
+        Stops all ongoing deauthentication attacks.
+        """
+        for attack in self.deauth_attacks:
+            attack.stop_attack()
+        self.deauth_attacks = []
+
     def run_scanner(self, scanner_name: str, target_info: dict):
         """
         Run the specified scanner on the target information.
@@ -265,6 +299,18 @@ class CoreFramework:
         except Exception as e:
             self.logger.error(f"Error running scanner '{scanner_name}': {e}", exc_info=True)
             raise
+
+    def start_beacon_analysis(self):
+        """
+        Starts the beacon frame analysis.
+        """
+        self.beacon_analyzer.run()
+
+    def get_access_points(self):
+        """
+        Retrieves detected access points.
+        """
+        return self.beacon_analyzer.get_access_points()
 
     def start_hidden_ssid_reveal(self):
         self.hidden_ssid_revealer.run()
@@ -297,13 +343,18 @@ class CoreFramework:
             self.logger.error(f"Error running exploit '{exploit_name}': {e}", exc_info=True)
             raise
 
-    def start_test_network(self, compose_file: str):
+    def start_test_network(self, compose_file: str = None):
         """
         Start the test network using the specified compose file.
 
         Args:
             compose_file (str): Path to the Docker Compose file.
         """
+        if not compose_file:
+            self.logger.info("Starting test network...")
+            start_network(self.compose_file_path)
+
+        # optional compose file path override
         if self.test_network:
             self.logger.info("Starting test network...")
             start_network(compose_file)
