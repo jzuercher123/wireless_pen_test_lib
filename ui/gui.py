@@ -30,6 +30,10 @@ import queue
 import re
 from typing import Optional, Dict, Any, List
 
+from ui.frames.anomaly_detector_frame import AnomalyDetectionFrame
+from ui.frames.hidden_ssid_frame import HiddenSSIDFrame
+from ui.frames.signal_heatmap_frame import SignalHeatmapFrame
+
 # Add the parent directory to the system path to import core modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -42,6 +46,7 @@ from ui.frames.live_packet_monitor import LivePacketMonitor
 from ui.frames.test_devices import FakeDeviceManager
 from ui.frames.rogue_access_point import FakeAccessPoint
 from ui.frames.network_graph_visualization import NetworkGraphVisualizationFrame
+from ui.frames.report_generation_frame import ReportGenerationFrame
 
 
 def create_test_data() -> Dict[str, Any]:
@@ -151,6 +156,11 @@ class WirelessPenTestGUI(tk.Tk):
         self.create_fake_devices_tab()
         self.create_rogue_access_point_tab()
         self.create_network_visualization_tab()
+        self.create_report_generation_tab()
+        self.create_hidden_ssid_tab()
+        self.create_signal_heatmap_tab()
+        self.create_anomaly_detection_tab()
+
 
         # Add a Stop button at the bottom of the container frame to halt ongoing operations
         self.add_stop_button(container_frame)
@@ -191,6 +201,10 @@ class WirelessPenTestGUI(tk.Tk):
             messagebox.showerror("Initialization Error", f"An unexpected error occurred: {e}")
         return None
 
+    def create_hidden_ssid_tab(self):
+        self.hidden_ssid_frame = HiddenSSIDFrame(self.notebook, self.core)
+        self.notebook.add(self.hidden_ssid_frame, text='Hidden SSID Reveal')
+
     def enter_fake_data(self):
         """
         Inserts fake test data into the LiveNetworkFrame for testing purposes.
@@ -215,6 +229,10 @@ class WirelessPenTestGUI(tk.Tk):
         """
         self.scans_tab = ScansTab(self.notebook, self.core, self.stop_event, self.scan_log_queue)
         self.notebook.add(self.scans_tab, text='Scans')
+
+    def create_report_generation_tab(self):
+        self.report_generation_frame = ReportGenerationFrame(self.notebook, self.core)
+        self.notebook.add(self.report_generation_frame, text='Report Generation')
 
     def add_stop_button(self, parent: ttk.Frame) -> None:
         """
@@ -274,6 +292,10 @@ class WirelessPenTestGUI(tk.Tk):
         self.exploits_tab = ExploitsTab(self.notebook, self.core, self.stop_event, self.exploit_log_queue)
         self.notebook.add(self.exploits_tab, text='Exploits')
 
+    def create_signal_heatmap_tab(self):
+        self.signal_heatmap_frame = SignalHeatmapFrame(self.notebook, self.core)
+        self.notebook.add(self.signal_heatmap_frame, text='Signal Heatmap')
+
     def create_report_tab(self) -> None:
         """
         Creates the 'Reports' tab in the Notebook.
@@ -315,6 +337,25 @@ class WirelessPenTestGUI(tk.Tk):
         """
         network_graph_frame = NetworkGraphVisualizationFrame(self.notebook)
         self.notebook.add(network_graph_frame, text="Network Visualization")
+
+    def create_anomaly_detection_tab(self) -> None:
+        """
+        Creates the 'Anomaly Detection' tab in the Notebook.
+        """
+        anomaly_detection_frame = AnomalyDetectionFrame(self.notebook, self.core)
+        self.notebook.add(anomaly_detection_frame, text="Anomaly Detection")
+
+    def stop_operations(self) -> None:
+        """
+        Handles the Stop button click event.
+
+        Signals all running operations to terminate gracefully.
+        """
+        if not self.core.stop_event.is_set():
+            self.core.stop_all_operations()
+            messagebox.showinfo("Operations Stopped", "All ongoing operations have been stopped.")
+        else:
+            messagebox.showinfo("No Ongoing Operations", "There are no ongoing operations to stop.")
 
     def on_closing(self) -> None:
         """

@@ -1530,3 +1530,47 @@ OSError: [Errno 19] No such device
 [2024-11-18 21:46:01,942] DEBUG - CoreFramework - Loading module 'wifi' from '/mnt/c/Users/13096/wireless_pen_test_lib/core/config/protocols/wifi.py'.
 [2024-11-18 21:46:01,999] INFO - CoreFramework - Protocol modules loaded successfully.
 [2024-11-18 21:46:02,009] INFO - CoreFramework - CLI initialized successfully with project root: /mnt/c/Users/13096/wireless_pen_test_lib and protocols path: /mnt/c/Users/13096/wireless_pen_test_lib/core/config/protocols
+[2024-11-19 01:01:09,937] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:01:46,644] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:05:32,256] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:08:57,055] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:09:39,680] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:11:51,039] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:11:51,049] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-19 01:11:51,053] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-19 01:11:51,054] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-19 01:11:51,054] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\core\config\protocols...
+[2024-11-19 01:11:51,055] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-19 01:11:51,056] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-19 01:11:51,058] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-19 01:11:51,060] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-19 01:11:51,060] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-19 01:11:51,061] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-19 01:11:53,879] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-19 01:11:53,880] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-19 01:15:32,149] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:15:32,167] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-19 01:15:32,169] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-19 01:15:32,169] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-19 01:15:32,182] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\core\config\protocols...
+[2024-11-19 01:15:32,183] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-19 01:15:32,184] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-19 01:15:32,189] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-19 01:15:32,193] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-19 01:15:32,193] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-19 01:15:32,193] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-19 01:15:33,956] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-19 01:15:33,956] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-19 01:16:33,713] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-19 01:16:33,724] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-19 01:16:33,727] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-19 01:16:33,727] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-19 01:16:33,727] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\core\config\protocols...
+[2024-11-19 01:16:33,728] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-19 01:16:33,729] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-19 01:16:33,731] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-19 01:16:33,733] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-19 01:16:33,733] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-19 01:16:33,733] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-19 01:16:35,474] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-19 01:16:35,474] INFO - CoreFramework.DosScanner - DosScanner initialized.

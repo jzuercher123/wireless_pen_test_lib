@@ -2,15 +2,23 @@
 
 import os
 import logging
+import threading
 import time
 import json
 import importlib.util
 from scapy.all import sendp
+
+from modules.network_enumeration.hidden_ssid_reveal import HiddenSSIDRevealer
+from modules.network_enumeration.signal_heatmap import SignalHeatmap
 from test_network.manage import start_network, stop_network, status_network
 from core.config_manager import ConfigManager
 from project_specifc_utils.network_interface_manager import NetworkInterfaceManager
 from project_specifc_utils.data_storage_manager import DataStorageManager
 from project_specifc_utils.authentication_tools import AuthenticationTools
+from modules.machine_learning.anomaly_detection import AnomalyDetector
+from modules.data_analytics.report_generator import ReportGenerator
+from typing import List, Dict, Any
+import pandas as pd
 
 def setup_core_logging(project_root: str) -> logging.Logger:
     """
@@ -74,11 +82,16 @@ class CoreFramework:
             exploits (dict): Dictionary of exploits.
             test_network (bool): Flag to enable test network.
         """
+        self.stop_event = threading.Event()
         self.test_network = test_network
         self.modules_path = modules_path
         self.project_root = os.path.abspath(os.path.join(modules_path, os.pardir, os.pardir))
         self.logger = setup_core_logging(self.project_root)
         self.logger.info("Initializing CoreFramework...")
+        self.hidden_ssid_revealer = HiddenSSIDRevealer(interface='wlan0', stop_event=self.stop_event)
+        self.signal_heatmap = SignalHeatmap(interface='wlan0', stop_event=self.stop_event)
+
+
 
         # Initialize ConfigManager
         try:
@@ -170,6 +183,22 @@ class CoreFramework:
             self.logger.error(f"Error running local scan: {e}", exc_info=True)
             raise
 
+    def stop_all_operations(self):
+        """
+        Stop all ongoing operations.
+        """
+        self.logger.info("Stopping all operations...")
+        self.stop_event.set()
+        self.stop_test_network()
+        self.stop_continuous_packets()
+        self.logger.info("All operations stopped successfully.")
+
+    def start_signal_heatmap(self):
+        self.signal_heatmap.run()
+
+    def generate_heatmap(self):
+        self.signal_heatmap.generate_heatmap()
+
     def load_protocol_modules(self):
         """
         Load protocol modules from the specified directory.
@@ -236,6 +265,12 @@ class CoreFramework:
         except Exception as e:
             self.logger.error(f"Error running scanner '{scanner_name}': {e}", exc_info=True)
             raise
+
+    def start_hidden_ssid_reveal(self):
+        self.hidden_ssid_revealer.run()
+
+    def get_hidden_ssids(self):
+        return self.hidden_ssid_revealer.get_hidden_ssids()
 
     def run_exploit(self, exploit_name: str, vuln_info: dict):
         """
@@ -309,6 +344,69 @@ class CoreFramework:
         """
         self.logger.info("Stopping continuous packet sending.")
         self.continuous_sending = False
+
+    def perform_anomaly_detection(self, traffic_data: List[Dict[str, Any]]) -> pd.DataFrame:
+        """
+        Performs anomaly detection on the provided traffic data.
+
+        Args:
+            traffic_data (List[Dict[str, Any]]): List of traffic data points.
+
+        Returns:
+            pd.DataFrame: Data containing detected anomalies.
+        """
+        df = pd.DataFrame(traffic_data)
+        detector = AnomalyDetector(df)
+        detector.train_model()
+        anomalies = detector.detect_anomalies()
+        return anomalies
+
+    def get_scan_results(self):
+        """
+        Get the results of the network scan.
+
+        Returns:
+            dict: Dictionary containing the scan results.
+        """
+        pass
+
+    def get_exploit_results(self):
+        """
+        Get the results of the exploit execution.
+
+        Returns:
+            dict: Dictionary containing the exploit results.
+        """
+        pass
+
+    def get_additional_report_data(self):
+        """
+        Get additional data to include in the report.
+
+        Returns:
+            dict: Dictionary containing additional data.
+        """
+        pass
+
+    def generate_detailed_report(self, scan_results: Dict[str, Any], exploit_results: Dict[str, Any],
+                                 report_data: Dict[str, Any], export_format: str, file_path: str):
+        """
+        Generates and exports a detailed report.
+
+        Args:
+            scan_results (Dict[str, Any]): Scan results.
+            exploit_results (Dict[str, Any]): Exploit results.
+            report_data (Dict[str, Any]): Additional data.
+            export_format (str): 'pdf', 'json', or 'csv'.
+            file_path (str): Destination file path.
+        """
+        reporter = ReportGenerator(scan_results, exploit_results, report_data)
+        if export_format == 'pdf':
+            reporter.generate_pdf_report(file_path)
+        elif export_format == 'json':
+            reporter.export_json(file_path)
+        elif export_format == 'csv':
+            reporter.export_csv(file_path)
 
     def finalize(self):
         """
