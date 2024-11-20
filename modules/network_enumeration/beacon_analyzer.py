@@ -8,6 +8,9 @@ from scapy.layers.dot11 import Dot11Beacon, Dot11Elt, Dot11
 
 
 class BeaconAnalyzer:
+    """
+    Analyzes beacon frames to detect nearby access points
+    """
     def __init__(self, interface: str, stop_event: threading.Event):
         """
         Initializes the BeaconAnalyzer.

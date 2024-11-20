@@ -25,6 +25,11 @@ def searchsploit_to_json(query: str) -> list:
 
 
 def convert_to_vulnerabilities_format(exploit_list: list) -> list:
+    """
+    Convert Searchsploit JSON output to vulnerabilities.json format.
+    :param exploit_list:
+    :return List of vulnerabilities in the desired format:
+    """
     vulnerabilities = []
 
     for exploit in exploit_list:
