@@ -6,6 +6,9 @@ import logging
 from threading import Thread
 
 class AuthBypassScanner(BaseScanner):
+    """
+    A scanner to detect authentication bypass vulnerabilities in wireless networks.
+    """
     def __init__(self, core_framework, scan_duration: int = 10):
         """
         Initialize the AuthBypassScanner with core framework and scan duration.

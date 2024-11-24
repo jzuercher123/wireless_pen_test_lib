@@ -7,6 +7,9 @@ from core.config_manager import ConfigManager
 
 
 class ReportGenerator:
+    """
+    A class to generate reports based on the results from scanners and exploits
+    """
     def __init__(self, config, scanners, exploits):
         self.config = config
         self.scanners = scanners

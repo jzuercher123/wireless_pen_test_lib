@@ -6,6 +6,9 @@ import logging
 
 
 class EncryptionWeaknessScanner(BaseScanner):
+    """
+    A scanner to detect encryption weaknesses in wireless networks.
+    """
     def __init__(self, scan_duration: int = 15):
         """
         Initialize the EncryptionWeaknessScanner with a scan duration.

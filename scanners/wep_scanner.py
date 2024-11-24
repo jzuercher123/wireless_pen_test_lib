@@ -10,6 +10,9 @@ from .base_scanner import BaseScanner
 
 
 class WEPScanner(BaseScanner):
+    """
+    A scanner to detect WEP networks and assess key strength.
+    """
     def __init__(self, core_framework, scan_duration: int = 10):
         super().__init__(core_framework, scan_duration)
         self.logger = core_framework.logger.getChild(self.__class__.__name__)

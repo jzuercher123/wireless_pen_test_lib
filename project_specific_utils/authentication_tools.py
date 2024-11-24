@@ -1,8 +1,11 @@
-# wireless_pen_test_lib/project_specifc_utils/authentication_tools.py
+# wireless_pen_test_lib/project_specific_utils/authentication_tools.py
 
 import logging
 
 class AuthenticationTools:
+    """
+    A class to provide authentication-related tools.
+    """
     def __init__(self):
         """
         Initialize the AuthenticationTools.

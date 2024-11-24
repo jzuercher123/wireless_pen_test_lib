@@ -1,11 +1,15 @@
-# wireless_pen_test_lib/project_specifc_utils/data_storage_manager.py
+# wireless_pen_test_lib/project_specific_utils/data_storage_manager.py
 
 import os
 import json
 import logging
 
+
 class DataStorageManager:
-    def __init__(self, report_directory: str = "reports"):
+    """
+    A class to manage data storage and report generation.
+    """
+    def __init__(self, report_directory: str = "reports", filename="report.txt"):
         """
         Initialize the DataStorageManager with the specified report directory.
 
@@ -16,6 +20,7 @@ class DataStorageManager:
         os.makedirs(self.report_directory, exist_ok=True)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info(f"DataStorageManager initialized for report directory: {self.report_directory}")
+        self.filename = filename
 
     def generate_report(self, vulnerability_db: dict):
         """
@@ -54,3 +59,29 @@ class DataStorageManager:
                     f.write(f"    Description: {vuln.get('description', 'N/A')}\n")
                     f.write(f"    Action: {vuln.get('action', 'N/A')}\n")
         self.logger.info(f"TXT report generated at {txt_report_path}")
+
+
+if __name__=="__main__":
+    dsm = DataStorageManager()
+    dsm.generate_report({
+        'scans': {
+            'WEPScanner': [
+                {
+                    'ssid': 'TestNet',
+                    'bssid': '00:11:22:33:44:55',
+                    'protocol': 'WEP',
+                    'description': 'Weak WEP key detected.'
+                }
+            ]
+        },
+        'exploits': {
+            'DeauthExploit': [
+                {
+                    'bssid': '00:11:22:33:44:55',
+                    'description': 'Deauth attack successful.',
+                    'action': 'Disconnect the client.'
+                }
+            ]
+        }
+    })
+    print("Report generation completed.")

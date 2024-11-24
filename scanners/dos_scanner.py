@@ -1,16 +1,22 @@
 # scanners/dos_scanner.py
 
 import time
+from asyncio import timeout
+from ipaddress import ip_address
 from random import random
 from threading import Thread, Event
 from typing import Dict, Any, Optional
-
 from scapy.layers.dot11 import RadioTap, Dot11, Dot11Deauth
-
+from scapy.all import srp
+from scapy.layers.l2 import ARP
+from scapy.layers.l2 import Ether
 from scanners.base_scanner import BaseScanner
 
 
 class DosScanner(BaseScanner):
+    """
+    A scanner to detect Denial-of-Service (DoS) vulnerabilities in wireless networks.
+    """
     def __init__(
         self,
         core_framework,
@@ -31,6 +37,7 @@ class DosScanner(BaseScanner):
         self.stop_monitoring_event = Event()
         self.logger = self.core_framework.logger.getChild(self.__class__.__name__)
         self.logger.info("DosScanner initialized.")
+
 
     def scan(self, target: Dict[str, Any]):
         """
@@ -129,9 +136,28 @@ class DosScanner(BaseScanner):
         Returns:
             bool: True if reachable, False otherwise.
         """
-        # Replace with actual connectivity check logic
-        # For demonstration, we'll simulate random connectivity status
-        return random() > 0.5
+
+        # define target
+        target = {
+            'ssid': '',
+            'bssid': bssid,
+            'ip_address': None,
+            'ports': [],
+            'mac_address': None
+        }
+
+        # Construct packet
+        self.logger.info(f"Constructing packet for target {str(target.ssid)}")
+        arp_frame = ARP(dst=target['ip_address'])
+        eth_frame = Ether(dst=target['mac_address'])
+        packet = eth_frame / arp_frame
+        self.logger.info(f"{str(packet)} Created")
+
+        # send packet
+        response = srp(packet, timeout=2, verbose=True)
+        if response:
+            return False
+
 
     def update_feedback(self, message: str):
         """

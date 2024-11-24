@@ -6,6 +6,9 @@ import logging
 import threading
 
 class PacketInjector:
+    """
+    A class to handle packet injection using Scapy.
+    """
     def __init__(self, interface='wlan0mon'):
         self.interface = interface
         self.logger = logging.getLogger(self.__class__.__name__)

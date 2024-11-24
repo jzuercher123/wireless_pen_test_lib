@@ -54,6 +54,9 @@ class ConfigModel(BaseModel):
     ui: UIConfig = Field(default_factory=UIConfig)
 
 class ConfigManager:
+    """
+    A class to manage application configuration.
+    """
     def __init__(self, config_dir: str = None):
         self.project_root = os.path.abspath(os.path.dirname(__file__))
         self.config_dir = config_dir or os.path.join(self.project_root, 'config')

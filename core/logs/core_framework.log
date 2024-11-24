@@ -1574,3 +1574,59 @@ OSError: [Errno 19] No such device
 [2024-11-19 01:16:33,733] INFO - CoreFramework - CoreFramework initialized successfully.
 [2024-11-19 01:16:35,474] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
 [2024-11-19 01:16:35,474] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-23 20:16:11,186] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-23 20:16:11,201] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-23 20:16:11,206] INFO - CoreFramework - Loaded vulnerability database from ../core/vulnerabilities/vulnerabilities.json.
+[2024-11-23 20:16:11,206] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-23 20:16:11,207] INFO - CoreFramework - Loading protocol modules from ../core/config/protocols...
+[2024-11-23 20:16:11,207] DEBUG - CoreFramework - Loading module 'base_protocol' from '../core/config/protocols\base_protocol.py'.
+[2024-11-23 20:16:11,236] DEBUG - CoreFramework - Loading module 'bluetooth' from '../core/config/protocols\bluetooth.py'.
+[2024-11-23 20:16:11,826] ERROR - CoreFramework - Failed to load module 'bluetooth': No module named 'base_exploit'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 188, in load_protocol_modules
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:\Users\13096\wireless_pen_test_lib\ui\../core/config/protocols\bluetooth.py", line 5, in <module>
+    from core.config.protocols.base_protocol import BaseProtocol
+  File "C:\Users\13096\wireless_pen_test_lib\core\config\protocols\__init__.py", line 9, in <module>
+    from exploits.session_hijacking import SessionHijacking
+  File "C:\Users\13096\wireless_pen_test_lib\exploits\session_hijacking.py", line 17, in <module>
+    from base_exploit import BaseExploit  # Ensure this is an absolute import
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'base_exploit'
+[2024-11-23 20:16:11,838] DEBUG - CoreFramework - Loading module 'wifi' from '../core/config/protocols\wifi.py'.
+[2024-11-23 20:16:11,840] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-23 20:16:11,840] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-23 20:16:29,812] INFO - CoreFramework - Running local scan on interface: lo
+[2024-11-23 20:16:29,826] ERROR - CoreFramework - Error running local scan: [WinError 2] The system cannot find the file specified
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 146, in run_local_scan
+    self.network_manager.set_monitor_mode()
+  File "C:\Users\13096\wireless_pen_test_lib\project_specific_utils\network_interface_manager.py", line 52, in set_monitor_mode
+    subprocess.run(["sudo", "ifconfig", self.interface, "down"], check=True)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2032.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2032.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2032.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+[2024-11-23 20:16:34,259] INFO - CoreFramework - Running local scan on interface: eth0
+[2024-11-23 20:16:34,276] ERROR - CoreFramework - Error running local scan: [WinError 2] The system cannot find the file specified
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 146, in run_local_scan
+    self.network_manager.set_monitor_mode()
+  File "C:\Users\13096\wireless_pen_test_lib\project_specific_utils\network_interface_manager.py", line 52, in set_monitor_mode
+    subprocess.run(["sudo", "ifconfig", self.interface, "down"], check=True)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2032.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2032.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2032.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] The system cannot find the file specified

@@ -3,6 +3,9 @@ import logging
 import threading
 
 class PacketSniffer:
+    """
+    A class to handle packet sniffing using Scapy.
+    """
     def __init__(self, interface='wlan0mon', filter=None, prn=None):
         """
         Initializes the PacketSniffer.

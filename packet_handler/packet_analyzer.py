@@ -10,6 +10,9 @@ from scapy.layers.inet import IP
 
 
 class Dot11BeaconHandler(PacketHandler):
+    """
+    A handler to process Dot11 Beacon frames.
+    """
     def handle(self, packet):
         if packet.haslayer(Dot11Beacon):
             dot11 = packet.getlayer(Dot11)
@@ -21,6 +24,9 @@ class Dot11BeaconHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class Dot11DeauthHandler(PacketHandler):
+    """
+    A handler to process Dot11 Deauth frames.
+    """
     def handle(self, packet):
         if packet.haslayer(Dot11Deauth):
             dot11 = packet.getlayer(Dot11)
@@ -34,6 +40,9 @@ class Dot11DeauthHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class Dot11ProbeRequestHandler(PacketHandler):
+    """
+    A handler to process Dot11 Probe Request frames.
+    """
     def handle(self, packet):
         if packet.haslayer(Dot11) and packet.type == 0 and packet.subtype == 4:
             dot11 = packet.getlayer(Dot11)
@@ -45,6 +54,9 @@ class Dot11ProbeRequestHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class EtherHandler(PacketHandler):
+    """
+    A handler to process Ethernet frames.
+    """
     def handle(self, packet):
         if packet.haslayer(Ether):
             eth_layer = packet.getlayer(Ether)
@@ -54,6 +66,9 @@ class EtherHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class IPHandler(PacketHandler):
+    """
+    A handler to process IP packets.
+    """
     def handle(self, packet):
         if packet.haslayer(IP):
             ip_layer = packet.getlayer(IP)
@@ -63,6 +78,9 @@ class IPHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class TCPHandler(PacketHandler):
+    """
+    A handler to process TCP segments.
+    """
     def handle(self, packet):
         if packet.haslayer(TCP):
             tcp_layer = packet.getlayer(TCP)
@@ -72,6 +90,9 @@ class TCPHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class UDPHandler(PacketHandler):
+    """
+    A handler to process UDP datagrams.
+    """
     def handle(self, packet):
         if packet.haslayer(UDP):
             udp_layer = packet.getlayer(UDP)
@@ -81,6 +102,9 @@ class UDPHandler(PacketHandler):
             self.next_handler.handle(packet)
 
 class RawDataHandler(PacketHandler):
+    """
+    A handler to process raw data in packets.
+    """
     def handle(self, packet):
         if packet.haslayer(Raw):
             raw_data = packet.getlayer(Raw).load
@@ -91,6 +115,9 @@ class RawDataHandler(PacketHandler):
 
 # PacketAnalyzer Using Chain of Responsibility
 class PacketAnalyzer:
+    """
+    A packet analyzer that uses the Chain of Responsibility pattern to process packets.
+    """
     def __init__(self, event_dispatcher):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.event_dispatcher = event_dispatcher

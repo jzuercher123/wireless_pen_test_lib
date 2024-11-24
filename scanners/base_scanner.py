@@ -3,6 +3,9 @@
 import logging
 
 class BaseScanner:
+    """
+    A base class for scanners.
+    """
     def __init__(self, core_framework, scan_duration: int = 10):
         """
         Initialize the BaseScanner with core framework and scan duration.

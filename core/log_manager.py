@@ -5,6 +5,9 @@ from core.config_manager import ConfigManager
 
 
 class LogManager:
+    """
+    A class to configure logging for the application.
+    """
     def __init__(self, config: ConfigManager):
         self.config = config.get_config()
         self.logger = logging.getLogger()

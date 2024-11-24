@@ -26,10 +26,8 @@ if project_root not in sys.path:
 
 def initialize_coreframework():
     from core import CoreFramework  # Import inside the function to avoid circular imports
-    protocols_path = os.path.join(project_root, 'core', 'config', 'protocols')  # Correct path to protocols
     return CoreFramework(
-        modules_path=protocols_path,  # Correct modules_path
-        config_dir=os.path.join(project_root, 'core', 'config'), # Correct config_dir
+        config_dir=os.path.join('config'), # Correct config_dir
         scanners=register_scanners(),
         exploits=register_exploits(),
 

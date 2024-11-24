@@ -1,9 +1,12 @@
-# wireless_pen_test_lib/project_specifc_utils/network_interface_manager.py
+# wireless_pen_test_lib/project_specific_utils/network_interface_manager.py
 
 import subprocess
 import logging
 
 class NetworkInterfaceManager:
+    """
+    A class to manage network interfaces.
+    """
     def __init__(self, interface: str = "wlan0mon"):
         """
         Initialize the NetworkInterfaceManager with the specified interface.

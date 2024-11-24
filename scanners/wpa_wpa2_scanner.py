@@ -9,6 +9,9 @@ from .base_scanner import BaseScanner
 
 
 class WPAWPA2Scanner(BaseScanner):
+    """
+    A scanner to detect WPA/WPA2 networks and check for weak PSKs and WPS status.
+    """
     def scan(self, core_framework, target_info=None, scan_duration=10, gui_update_callback=None, stop_event=None):
         """
         Scan for WPA/WPA2 networks, check for weak PSKs, and detect WPS status.

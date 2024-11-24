@@ -1,0 +1,9 @@
+Scanner: WEPScanner
+  - SSID: TestNet
+    BSSID: 00:11:22:33:44:55
+    Protocol: WEP
+    Description: Weak WEP key detected.
+Exploit: DeauthExploit
+  - BSSID: 00:11:22:33:44:55
+    Description: Deauth attack successful.
+    Action: Disconnect the client.

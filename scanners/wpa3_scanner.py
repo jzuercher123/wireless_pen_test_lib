@@ -8,6 +8,9 @@ from .base_scanner import BaseScanner
 
 
 class WPA3Scanner(BaseScanner):
+    """
+    A scanner to detect WPA3 networks and assess downgrade attack possibilities
+    """
     def scan(self, core_framework, target_info=None, scan_duration=10, gui_update_callback=None, stop_event=None):
         """
         Scan for WPA3 networks and assess downgrade attack possibilities.

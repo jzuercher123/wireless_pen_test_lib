@@ -2,6 +2,9 @@ import threading
 import logging
 
 class TaskScheduler:
+    """
+    A simple task scheduler that can run tasks sequentially or concurrently.
+    """
     def __init__(self):
         self.tasks = []
         self.logger = logging.getLogger(self.__class__.__name__)

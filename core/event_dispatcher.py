@@ -2,6 +2,9 @@ import logging
 from collections import defaultdict
 
 class EventDispatcher:
+    """
+    A simple event dispatcher that allows subscribing to and dispatching events.
+    """
     def __init__(self):
         self.listeners = defaultdict(list)
         self.logger = logging.getLogger(self.__class__.__name__)

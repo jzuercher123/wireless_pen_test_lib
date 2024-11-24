@@ -1,0 +1,21 @@
+{
+    "scans": {
+        "WEPScanner": [
+            {
+                "ssid": "TestNet",
+                "bssid": "00:11:22:33:44:55",
+                "protocol": "WEP",
+                "description": "Weak WEP key detected."
+            }
+        ]
+    },
+    "exploits": {
+        "DeauthExploit": [
+            {
+                "bssid": "00:11:22:33:44:55",
+                "description": "Deauth attack successful.",
+                "action": "Disconnect the client."
+            }
+        ]
+    }
+}

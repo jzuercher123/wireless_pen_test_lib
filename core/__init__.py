@@ -1,5 +1,3 @@
-# core/__init__.py
-
 import os
 import logging
 import threading
@@ -12,9 +10,9 @@ from modules.network_enumeration.hidden_ssid_reveal import HiddenSSIDRevealer
 from modules.network_enumeration.signal_heatmap import SignalHeatmap
 from test_network.manage import start_network, stop_network, status_network
 from core.config_manager import ConfigManager
-from project_specifc_utils.network_interface_manager import NetworkInterfaceManager
-from project_specifc_utils.data_storage_manager import DataStorageManager
-from project_specifc_utils.authentication_tools import AuthenticationTools
+from project_specific_utils.network_interface_manager import NetworkInterfaceManager
+from project_specific_utils.data_storage_manager import DataStorageManager
+from project_specific_utils.authentication_tools import AuthenticationTools
 from modules.machine_learning.anomaly_detection import AnomalyDetector
 from modules.data_analytics.report_generator import ReportGenerator
 from modules.network_enumeration.beacon_analyzer import BeaconAnalyzer
@@ -23,15 +21,6 @@ from typing import List, Dict, Any
 import pandas as pd
 
 def setup_core_logging(project_root: str) -> logging.Logger:
-    """
-    Set up logging for the CoreFramework.
-
-    Args:
-        project_root (str): The root directory of the project.
-
-    Returns:
-        logging.Logger: Configured logger for the CoreFramework.
-    """
     logs_dir = os.path.join(project_root, 'logs')
     os.makedirs(logs_dir, exist_ok=True)
 
@@ -57,8 +46,8 @@ def setup_core_logging(project_root: str) -> logging.Logger:
     return logger
 
 class CoreFramework:
-    def __init__(self, modules_path: str,
-                 config_dir: str = "config",
+    def __init__(self, modules_path: str = "core/config/protocols",
+                 config_dir: str = "core/config",
                  vulnerabilities_path: str = None,
                  sendp_func=sendp,
                  sleep_func=time.sleep,
@@ -67,23 +56,8 @@ class CoreFramework:
                  auth_tools=None,
                  scanners=None,
                  exploits=None,
-                 test_network: bool=False):
-        """
-        Initialize the CoreFramework with necessary configurations.
-
-        Args:
-            modules_path (str): Path to the protocol modules.
-            config_dir (str): Directory for configuration files.
-            vulnerabilities_path (str): Path to the vulnerabilities file.
-            sendp_func (function): Function to send packets.
-            sleep_func (function): Function to sleep.
-            network_manager (NetworkInterfaceManager): Network manager instance.
-            data_storage_manager (DataStorageManager): Data storage manager instance.
-            auth_tools (AuthenticationTools): Authentication tools instance.
-            scanners (dict): Dictionary of scanners.
-            exploits (dict): Dictionary of exploits.
-            test_network (bool): Flag to enable test network.
-        """
+                 test_network: bool=False,
+                 interface: str='wlan0'):
         self.stop_event = threading.Event()
         self.modules_path = modules_path
         self.compose_file_path = os.path.join(modules_path, 'test_network', 'docker-compose.yml')
@@ -93,11 +67,9 @@ class CoreFramework:
         self.hidden_ssid_revealer = HiddenSSIDRevealer(interface='wlan0', stop_event=self.stop_event)
         self.signal_heatmap = SignalHeatmap(interface='wlan0', stop_event=self.stop_event)
         self.beacon_analyzer = BeaconAnalyzer(interface='wlan0', stop_event=self.stop_event)
-
         self.deauth_attacks: List[DeauthAttack] = []
+        self.interface = interface
 
-
-        # Initialize ConfigManager
         try:
             self.config_manager = ConfigManager(config_dir=config_dir)
             self.config = self.config_manager.get_config()
@@ -106,24 +78,20 @@ class CoreFramework:
             self.logger.error(f"Error loading configuration: {e}", exc_info=True)
             raise
 
-        # Validate general configuration keys
         required_general_keys = ['interface', 'report_directory']
         missing_keys = [key for key in required_general_keys if not hasattr(self.config.general, key)]
         if missing_keys:
             self.logger.error(f"Missing keys in general configuration: {missing_keys}")
             raise AttributeError(f"Missing keys in general configuration: {missing_keys}")
 
-        # Set vulnerabilities path
         if vulnerabilities_path:
             path_to_vulnerabilities = vulnerabilities_path
         else:
             path_to_vulnerabilities = os.path.join(self.project_root, 'vulnerabilities', 'vulnerabilities.json')
 
-        # Ensure vulnerabilities directory exists
         vulnerabilities_dir = os.path.dirname(path_to_vulnerabilities)
         os.makedirs(vulnerabilities_dir, exist_ok=True)
 
-        # Load vulnerability database
         try:
             if not os.path.isfile(path_to_vulnerabilities):
                 self.logger.warning(f"Vulnerability database not found at {path_to_vulnerabilities}. Creating a new one.")
@@ -141,7 +109,6 @@ class CoreFramework:
             self.logger.warning(f"Error loading vulnerability database: {e}. Initializing empty vulnerability database.", exc_info=True)
             self.vulnerability_db = {}
 
-        # Initialize Network and Data Storage Managers
         try:
             self.network_manager = network_manager if network_manager else NetworkInterfaceManager(interface=self.config.general.interface)
             self.data_storage_manager = data_storage_manager if data_storage_manager else DataStorageManager(report_directory=self.config.general.report_directory)
@@ -159,15 +126,12 @@ class CoreFramework:
             self.logger.error(f"Error starting test network: {e}", exc_info=True)
             raise
 
-        # Initialize Scanners and Exploits
         self.scanners = scanners if scanners else {}
         self.exploits = exploits if exploits else {}
 
-        # Assign sendp and sleep functions
         self.sendp = sendp_func
         self.sleep = sleep_func
 
-        # Load Protocol Modules
         try:
             self.load_protocol_modules()
         except Exception as e:
@@ -177,12 +141,6 @@ class CoreFramework:
         self.logger.info("CoreFramework initialized successfully.")
 
     def run_local_scan(self, interface: str):
-        """
-        Run a local scan on the specified interface.
-
-        Args:
-            interface (str): Network interface to scan.
-        """
         self.logger.info(f"Running local scan on interface: {interface}")
         try:
             self.network_manager.set_monitor_mode()
@@ -195,10 +153,10 @@ class CoreFramework:
             self.logger.error(f"Error running local scan: {e}", exc_info=True)
             raise
 
+    def set_interface(self, iface: str):
+        self.interface = iface
+
     def stop_all_operations(self):
-        """
-        Stop all ongoing operations.
-        """
         self.logger.info("Stopping all operations...")
         self.stop_event.set()
         self.stop_test_network()
@@ -212,9 +170,6 @@ class CoreFramework:
         self.signal_heatmap.generate_heatmap()
 
     def load_protocol_modules(self):
-        """
-        Load protocol modules from the specified directory.
-        """
         protocols_dir = self.modules_path
         self.logger.info(f"Loading protocol modules from {protocols_dir}...")
 
@@ -254,35 +209,17 @@ class CoreFramework:
         self.logger.info("Protocol modules loaded successfully.")
 
     def execute_deauth_attack(self, interface: str, target_bssid: str, target_client: str = None):
-        """
-        Executes a deauthentication attack.
-
-        Args:
-            interface (str): Network interface.
-            target_bssid (str): Target access point BSSID.
-            target_client (str, optional): Target client MAC address.
-        """
         stop_event = threading.Event()
         attack = DeauthAttack(interface, target_bssid, target_client, stop_event)
         attack.start_attack()
         self.deauth_attacks.append(attack)
 
     def stop_all_deauth_attacks(self):
-        """
-        Stops all ongoing deauthentication attacks.
-        """
         for attack in self.deauth_attacks:
             attack.stop_attack()
         self.deauth_attacks = []
 
     def run_scanner(self, scanner_name: str, target_info: dict):
-        """
-        Run the specified scanner on the target information.
-
-        Args:
-            scanner_name (str): Name of the scanner to run.
-            target_info (dict): Information about the target to scan.
-        """
         scanner = self.scanners.get(scanner_name)
         if not scanner:
             self.logger.error(f"Scanner '{scanner_name}' not found.")
@@ -301,15 +238,9 @@ class CoreFramework:
             raise
 
     def start_beacon_analysis(self):
-        """
-        Starts the beacon frame analysis.
-        """
         self.beacon_analyzer.run()
 
     def get_access_points(self):
-        """
-        Retrieves detected access points.
-        """
         return self.beacon_analyzer.get_access_points()
 
     def start_hidden_ssid_reveal(self):
@@ -319,13 +250,6 @@ class CoreFramework:
         return self.hidden_ssid_revealer.get_hidden_ssids()
 
     def run_exploit(self, exploit_name: str, vuln_info: dict):
-        """
-        Run the specified exploit on the vulnerability information.
-
-        Args:
-            exploit_name (str): Name of the exploit to run.
-            vuln_info (dict): Information about the vulnerability to exploit.
-        """
         exploit = self.exploits.get(exploit_name)
         if not exploit:
             self.logger.error(f"Exploit '{exploit_name}' not found.")
@@ -344,41 +268,21 @@ class CoreFramework:
             raise
 
     def start_test_network(self, compose_file: str = None):
-        """
-        Start the test network using the specified compose file.
-
-        Args:
-            compose_file (str): Path to the Docker Compose file.
-        """
         if not compose_file:
             self.logger.info("Starting test network...")
             start_network(self.compose_file_path)
 
-        # optional compose file path override
         if self.test_network:
             self.logger.info("Starting test network...")
             start_network(compose_file)
 
     def stop_test_network(self, compose_file: str):
-        """
-        Stop the test network using the specified compose file.
-
-        Args:
-            compose_file (str): Path to the Docker Compose file.
-        """
         if self.test_network is False:
             self.logger.warning("Test network is not enabled. Skipping stop operation.")
             return
         stop_network(compose_file)
 
     def send_continuous_packets(self, packet, interval: float):
-        """
-        Send packets continuously at the specified interval.
-
-        Args:
-            packet: The packet to send.
-            interval (float): Interval between packet sends in seconds.
-        """
         self.logger.info(f"Starting to send packets every {interval} seconds.")
         self.continuous_sending = True
         while self.continuous_sending:
@@ -390,22 +294,10 @@ class CoreFramework:
                 self.continuous_sending = False
 
     def stop_continuous_packets(self):
-        """
-        Stop sending packets continuously.
-        """
         self.logger.info("Stopping continuous packet sending.")
         self.continuous_sending = False
 
     def perform_anomaly_detection(self, traffic_data: List[Dict[str, Any]]) -> pd.DataFrame:
-        """
-        Performs anomaly detection on the provided traffic data.
-
-        Args:
-            traffic_data (List[Dict[str, Any]]): List of traffic data points.
-
-        Returns:
-            pd.DataFrame: Data containing detected anomalies.
-        """
         df = pd.DataFrame(traffic_data)
         detector = AnomalyDetector(df)
         detector.train_model()
@@ -413,44 +305,16 @@ class CoreFramework:
         return anomalies
 
     def get_scan_results(self):
-        """
-        Get the results of the network scan.
-
-        Returns:
-            dict: Dictionary containing the scan results.
-        """
         pass
 
     def get_exploit_results(self):
-        """
-        Get the results of the exploit execution.
-
-        Returns:
-            dict: Dictionary containing the exploit results.
-        """
         pass
 
     def get_additional_report_data(self):
-        """
-        Get additional data to include in the report.
-
-        Returns:
-            dict: Dictionary containing additional data.
-        """
         pass
 
     def generate_detailed_report(self, scan_results: Dict[str, Any], exploit_results: Dict[str, Any],
                                  report_data: Dict[str, Any], export_format: str, file_path: str):
-        """
-        Generates and exports a detailed report.
-
-        Args:
-            scan_results (Dict[str, Any]): Scan results.
-            exploit_results (Dict[str, Any]): Exploit results.
-            report_data (Dict[str, Any]): Additional data.
-            export_format (str): 'pdf', 'json', or 'csv'.
-            file_path (str): Destination file path.
-        """
         reporter = ReportGenerator(scan_results, exploit_results, report_data)
         if export_format == 'pdf':
             reporter.generate_pdf_report(file_path)
@@ -459,10 +323,49 @@ class CoreFramework:
         elif export_format == 'csv':
             reporter.export_csv(file_path)
 
+    def generate_report(self, vulnerability_db: dict, format: str = 'json'):
+        """
+        Generates a report based on the vulnerability database.
+
+        Args:
+            vulnerability_db (dict): Dictionary containing detected vulnerabilities.
+        """
+        self.logger.info("Generating reports...")
+        # Ensure report directories exist
+        json_dir = os.path.join(self.report_directory, "json")
+        txt_dir = os.path.join(self.report_directory, "txt")
+        os.makedirs(json_dir, exist_ok=True)
+        os.makedirs(txt_dir, exist_ok=True)
+
+        # JSON Report
+        if format == 'json':
+            json_report_path = os.path.join(json_dir, "report.json")
+            with open(json_report_path, 'w') as f:
+                json.dump(vulnerability_db, f, indent=4)
+            self.logger.info(f"JSON report generated at {json_report_path}")
+
+        # TXT Report
+        elif format == 'txt':
+            txt_report_path = os.path.join(txt_dir, "report.txt")
+            with open(txt_report_path, 'w') as f:
+                for scanner, vulnerabilities in vulnerability_db.get('scans', {}).items():
+                    f.write(f"Scanner: {scanner}\n")
+                    for vuln in vulnerabilities:
+                        f.write(f"  - SSID: {vuln.get('ssid', 'N/A')}\n")
+                        f.write(f"    BSSID: {vuln.get('bssid', 'N/A')}\n")
+                        f.write(f"    Protocol: {vuln.get('protocol', 'N/A')}\n")
+                        f.write(f"    Description: {vuln.get('description', 'N/A')}\n")
+                for exploit, vulnerabilities in vulnerability_db.get('exploits', {}).items():
+                    f.write(f"Exploit: {exploit}\n")
+                    for vuln in vulnerabilities:
+                        f.write(f"  - BSSID: {vuln.get('bssid', 'N/A')}\n")
+                        f.write(f"    Description: {vuln.get('description', 'N/A')}\n")
+                        f.write(f"    Action: {vuln.get('action', 'N/A')}\n")
+            self.logger.info(f"TXT report generated at {txt_report_path}")
+
+        self.logger.info("Reports generated successfully.")
+
     def finalize(self):
-        """
-        Finalize testing activities and generate a report.
-        """
         self.logger.info("Finalizing testing activities...")
         try:
             self.data_storage_manager.generate_report(self.vulnerability_db)

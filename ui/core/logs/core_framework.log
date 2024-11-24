@@ -1,0 +1,65 @@
+[2024-11-23 18:02:46,280] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-23 18:02:46,338] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-23 18:02:46,353] WARNING - CoreFramework - Vulnerability database not found at core/vulnerabilities/vulnerabilities.json. Creating a new one.
+[2024-11-23 18:02:46,364] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-23 18:02:46,365] INFO - CoreFramework - Loading protocol modules from core/config/protocols...
+[2024-11-23 18:02:46,365] ERROR - CoreFramework - Protocols directory not found at core/config/protocols.
+[2024-11-23 18:02:46,365] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at core/config/protocols.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 136, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 178, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at core/config/protocols.
+[2024-11-23 18:05:24,278] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-23 18:05:24,285] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-23 18:05:24,286] INFO - CoreFramework - Loaded vulnerability database from core/vulnerabilities/vulnerabilities.json.
+[2024-11-23 18:05:24,287] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-23 18:05:24,287] INFO - CoreFramework - Loading protocol modules from core/config/protocols/...
+[2024-11-23 18:05:24,287] ERROR - CoreFramework - Protocols directory not found at core/config/protocols/.
+[2024-11-23 18:05:24,287] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at core/config/protocols/.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 136, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 178, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at core/config/protocols/.
+[2024-11-23 18:14:44,890] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-23 18:14:44,897] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-23 18:14:44,898] INFO - CoreFramework - Loaded vulnerability database from core/vulnerabilities/vulnerabilities.json.
+[2024-11-23 18:14:44,900] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-23 18:14:44,901] INFO - CoreFramework - Loading protocol modules from core/config/protocols/...
+[2024-11-23 18:14:44,901] ERROR - CoreFramework - Protocols directory not found at core/config/protocols/.
+[2024-11-23 18:14:44,901] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at core/config/protocols/.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 136, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 178, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at core/config/protocols/.
+[2024-11-23 20:10:33,071] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-23 20:10:33,080] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-23 20:10:33,087] INFO - CoreFramework - Loaded vulnerability database from core/vulnerabilities/vulnerabilities.json.
+[2024-11-23 20:10:33,089] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-23 20:10:33,089] INFO - CoreFramework - Loading protocol modules from core/config/protocols...
+[2024-11-23 20:10:33,090] ERROR - CoreFramework - Protocols directory not found at core/config/protocols.
+[2024-11-23 20:10:33,090] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at core/config/protocols.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 136, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 178, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at core/config/protocols.
+[2024-11-23 20:14:20,684] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-23 20:14:20,732] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-23 20:14:20,733] INFO - CoreFramework - Loaded vulnerability database from core/vulnerabilities/vulnerabilities.json.
+[2024-11-23 20:14:20,734] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-23 20:14:20,734] INFO - CoreFramework - Loading protocol modules from core/config/protocols...
+[2024-11-23 20:14:20,734] ERROR - CoreFramework - Protocols directory not found at core/config/protocols.
+[2024-11-23 20:14:20,734] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at core/config/protocols.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 136, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 178, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at core/config/protocols.

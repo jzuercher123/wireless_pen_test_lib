@@ -13,6 +13,9 @@ from scapy.all import srp, conf
 from scapy.layers.l2 import ARP, Ether
 
 class LocalScanner:
+    """
+    A scanner to detect devices on the local network using ARP.
+    """
     def __init__(self, core_framework, interface: str):
         """
         Initialize the LocalScanner with the CoreFramework instance and network interface.

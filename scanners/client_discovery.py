@@ -6,6 +6,7 @@ from scapy.all import sniff
 from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt
 
 class ClientDiscovery:
+
     """
     Discovers clients connected to wireless networks by sniffing data frames.
     """
