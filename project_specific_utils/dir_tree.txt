@@ -1,0 +1,189 @@
+wireless_pen_test_lib/
+├── .env
+├── .gitignore
+├── README.md
+├── config/
+│   ├── config.yaml
+│   └── default_config.yaml
+├── core/
+│   ├── __init__.py
+│   ├── config/
+│   │   ├── __init__.py
+│   │   ├── config.yaml
+│   │   ├── config_defaults.yaml
+│   │   ├── default_config.yaml
+│   │   └── protocols/
+│   │       ├── __init__.py
+│   │       ├── base_protocol.py
+│   │       ├── bluetooth.py
+│   │       └── wifi.py
+│   ├── config_manager.py
+│   ├── event_dispatcher.py
+│   ├── log_manager.py
+│   ├── module_manager.py
+│   ├── report_generator.py
+│   ├── task_scheduler.py
+│   ├── test_config/
+│   │   └── config_defaults.yaml
+│   └── vulnerabilities/
+│       └── vulnerabilities.json
+├── exploits/
+│   ├── __init__.py
+│   ├── base_exploit.py
+│   ├── config/
+│   │   └── default_config.yaml
+│   ├── credential_extraction.py
+│   ├── payload_delivery.py
+│   ├── reports/
+│   ├── session_hijacking.py
+│   └── wep_exploit.py
+├── local_scanner.log
+├── logical_flow.puml
+├── main.py
+├── modules/
+│   ├── __init__.py
+│   ├── attack_modules/
+│   │   ├── __init__.py
+│   │   └── deauth_attack.py
+│   ├── credential_attacks/
+│   │   └── __init__.py
+│   ├── data_analytics/
+│   │   ├── __init__.py
+│   │   └── report_generator.py
+│   ├── machine_learning/
+│   │   ├── __init__.py
+│   │   ├── anomaly_detection.py
+│   │   └── device_fingerprinting.py
+│   ├── network_enumeration/
+│   │   ├── __init__.py
+│   │   ├── beacon_analyzer.py
+│   │   ├── hidden_ssid_reveal.py
+│   │   └── signal_heatmap.py
+│   └── wireless_protocols/
+│       └── __init__.py
+├── packet_handler/
+│   ├── __init__.py
+│   ├── base_packet_handler.py
+│   ├── packet_analyzer.py
+│   ├── packet_injector.py
+│   ├── packet_sniffer.py
+│   └── tests/
+│       ├── test_packet_analyzer.py
+│       └── test_packet_injector.py
+├── project_specific_utils/
+│   ├── __init__.py
+│   ├── authentication_tools.py
+│   ├── combined_py_files.txt
+│   ├── custom_threading.py
+│   ├── data_storage_manager.py
+│   ├── network_interface_manager.py
+│   ├── network_scanner.py
+│   ├── reports/
+│   │   ├── json/
+│   │   │   └── report.json
+│   │   └── txt/
+│   │       └── report.txt
+│   ├── save_project_files_to_txt_file.py
+│   ├── transcribe_dir_tree.py
+│   └── wireless_pen_test_lib.txt
+├── reports/
+│   ├── html/
+│   ├── json/
+│   └── pdf/
+├── requirements.txt
+├── scanners/
+│   ├── __init__.py
+│   ├── auth_bypass_scanner.py
+│   ├── base_scanner.py
+│   ├── client_discovery.py
+│   ├── config/
+│   │   └── default_config.yaml
+│   ├── dos_scanner.py
+│   ├── encryption_analysis.py
+│   ├── encryption_scanner.py
+│   ├── firmware_vulnerability_scan.py
+│   ├── local_scanner.py
+│   ├── network_discovery.py
+│   ├── reports/
+│   ├── wep_scanner.py
+│   ├── wpa3_scanner.py
+│   └── wpa_wpa2_scanner.py
+├── setup.py
+├── test_network/
+│   ├── Dockerfile
+│   ├── __init__.py
+│   ├── docker-compose.yml
+│   ├── entrypoint.sh
+│   ├── hosts/
+│   │   ├── host1/
+│   │   │   └── config.json
+│   │   └── host2/
+│   │       └── config.json
+│   ├── manage.py
+│   └── requirements.txt
+├── tests/
+│   ├── __init__.py
+│   ├── reports/
+│   ├── test_all.py
+│   ├── test_auth_bypass_scanner.py
+│   ├── test_authentication_tools.py
+│   ├── test_cli.py
+│   ├── test_config/
+│   │   ├── config.yaml
+│   │   ├── config_defaults.yaml
+│   │   └── default_config.yaml
+│   ├── test_config_manager.py
+│   ├── test_core.py
+│   ├── test_data_storage_manager.py
+│   ├── test_event_dispatcher.py
+│   ├── test_exploits.py
+│   ├── test_integration_config.py
+│   ├── test_log_manager.py
+│   ├── test_network_interface_manager.py
+│   ├── test_report_generator.py
+│   ├── test_session_hijack.py
+│   ├── test_wep_scanner.py
+│   ├── tests_round_three.py
+│   └── tests_round_two.py
+├── ui/
+│   ├── __init__.py
+│   ├── cli.py
+│   ├── config/
+│   │   └── default_config.yaml
+│   ├── core/
+│   │   ├── config/
+│   │   │   └── default_config.yaml
+│   │   └── vulnerabilities/
+│   │       └── vulnerabilities.json
+│   ├── frames/
+│   │   ├── __init__.py
+│   │   ├── anomaly_detector_frame.py
+│   │   ├── base_frame.py
+│   │   ├── beacon_analysis_frame.py
+│   │   ├── deauth_attack_frame.py
+│   │   ├── hidden_ssid_frame.py
+│   │   ├── live_network_frame.py
+│   │   ├── live_packet_monitor.py
+│   │   ├── network_graph_visualization.py
+│   │   ├── network_map.py
+│   │   ├── report_generation_frame.py
+│   │   ├── rogue_access_point.py
+│   │   ├── signal_heatmap_frame.py
+│   │   └── test_devices.py
+│   ├── gui.py
+│   ├── interactive_cli.py
+│   ├── local_scanner.log
+│   ├── reports/
+│   └── test_gui.py
+├── visualize_architecture.py
+├── vulnerabilities/
+│   ├── __init__.py
+│   ├── download_searchsploit_data.py
+│   └── vulnerabilities.json
+└── wireless_pen_test_lib.egg-info/
+    ├── PKG-INFO
+    ├── SOURCES.txt
+    ├── dependency_links.txt
+    ├── entry_points.txt
+    ├── requires.txt
+    └── top_level.txt
