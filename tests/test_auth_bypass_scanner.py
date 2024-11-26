@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from scanners.auth_bypass_scanner import AuthBypassScanner
+from wireless_pen_test_lib.scanners import AuthBypassScanner
 
 class TestAuthBypassScanner(unittest.TestCase):
     def setUp(self):

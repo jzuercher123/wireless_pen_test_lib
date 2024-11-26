@@ -4,7 +4,7 @@
 
 import sys
 import logging
-from ui.cli import cli  # Ensure the import path is correct
+from wireless_pen_test_lib.ui import cli  # Ensure the import path is correct
 
 def setup_logging():
     """

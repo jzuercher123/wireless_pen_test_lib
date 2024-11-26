@@ -3,8 +3,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt
-from scanners.wep_scanner import WEPScanner
-import threading
+from wireless_pen_test_lib.scanners.wep_scanner import WEPScanner
 
 
 class TestWEPScanner(unittest.TestCase):

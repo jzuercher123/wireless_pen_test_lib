@@ -5,7 +5,7 @@ import pytest
 from unittest import mock
 from unittest.mock import MagicMock, mock_open, call
 import json
-from core import CoreFramework
+from wireless_pen_test_lib.core import CoreFramework
 import os
 import threading
 
@@ -112,7 +112,7 @@ def core_framework(mocker, mock_config_manager, mock_vulnerabilities, mock_utili
     mocker.patch('core.exploits.payload_delivery.PayloadDelivery', return_value=mock_exploits['payload_delivery'])
 
     # Initialize CoreFramework
-    core = CoreFramework(modules_path='/path/to/modules', config_dir='/path/to/config')
+    core = CoreFramework(modules_path='/path/to/modules', config_dir='/path/to/configs')
 
     return core
 
@@ -147,7 +147,7 @@ def test_coreframework_initialization(core_framework, mock_config_manager, mock_
 def test_load_protocol_modules_called(core_framework, mocker):
     mock_load = mocker.spy(core_framework, 'load_protocol_modules')
     # Re-initialize CoreFramework to trigger load_protocol_modules
-    core = CoreFramework(modules_path='/path/to/modules', config_dir='/path/to/config')
+    core = CoreFramework(modules_path='/path/to/modules', config_dir='/path/to/configs')
     core.load_protocol_modules()
     mock_load.assert_called_once()
 

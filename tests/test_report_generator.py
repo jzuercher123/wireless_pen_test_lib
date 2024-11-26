@@ -1,21 +1,20 @@
 import unittest
 import os
-from core.config_manager import ConfigManager
-from core.log_manager import LogManager
-from core.report_generator import ReportGenerator
-from scanners.encryption_scanner import EncryptionWeaknessScanner
-from exploits.session_hijacking import SessionHijacking
+from wireless_pen_test_lib.core import ConfigManager
+from wireless_pen_test_lib.core.log_manager import LogManager
+from wireless_pen_test_lib.core import ReportGenerator
+from wireless_pen_test_lib.scanners import EncryptionWeaknessScanner
+from wireless_pen_test_lib.exploits import SessionHijacking
 import shutil
-import logging
 
 
 class TestReportGenerator(unittest.TestCase):
     def setUp(self):
-        # Set up a temporary config directory
+        # Set up a temporary configs directory
         self.test_config_dir = "test_config"
         os.makedirs(self.test_config_dir, exist_ok=True)
 
-        # Create default config
+        # Create default configs
         default_config = {
             "general": {
                 "interface": "wlan0mon",
@@ -50,7 +49,7 @@ class TestReportGenerator(unittest.TestCase):
             }
         }
 
-        with open(os.path.join(self.test_config_dir, "config.yaml"), 'w') as f:
+        with open(os.path.join(self.test_config_dir, "configs.yaml"), 'w') as f:
             import yaml
             yaml.dump(default_config, f)
 
@@ -97,7 +96,7 @@ class TestReportGenerator(unittest.TestCase):
         self.report_generator.create_html_template()
 
     def tearDown(self):
-        # Remove temporary config directory
+        # Remove temporary configs directory
         shutil.rmtree(self.test_config_dir)
 
         # Remove report files

@@ -1,15 +1,6 @@
 # tests/tests_round_two.py
 
-import os
-import json
-import pytest
-import yaml
-from click.testing import CliRunner
-from pydantic import ValidationError
-
 # Import your modules here
-from core.config_manager import ConfigManager, ConfigModel
-from project_specific_utils.network_interface_manager import NetworkInterfaceManager
 
 import os
 import json
@@ -20,15 +11,13 @@ from click.testing import CliRunner
 from project_specific_utils.network_interface_manager import NetworkInterfaceManager
 from project_specific_utils.data_storage_manager import DataStorageManager
 from project_specific_utils.authentication_tools import AuthenticationTools
-from core import CoreFramework
-from scanners.encryption_scanner import EncryptionWeaknessScanner
-from scanners.auth_bypass_scanner import AuthBypassScanner
-from scanners.dos_scanner import DosScanner
-from scanners.local_scanner import LocalScanner
-from exploits.session_hijacking import SessionHijacking
-from exploits.credential_extraction import CredentialExtraction
-from exploits.payload_delivery import PayloadDelivery
-from ui.cli import cli
+from wireless_pen_test_lib.core import CoreFramework
+from wireless_pen_test_lib.scanners import AuthBypassScanner
+from wireless_pen_test_lib.scanners import DosScanner
+from wireless_pen_test_lib.scanners import LocalScanner
+from wireless_pen_test_lib.exploits import CredentialExtraction
+from wireless_pen_test_lib.exploits import PayloadDelivery
+from wireless_pen_test_lib.ui import cli
 
 # =========================================
 # Fixtures
@@ -65,9 +54,9 @@ def sample_config(tmp_path):
         }
     }
 
-    config_dir = tmp_path / "config"
+    config_dir = tmp_path / "configs"
     config_dir.mkdir(parents=True, exist_ok=True)
-    config_file = config_dir / "config.yaml"
+    config_file = config_dir / "configs.yaml"
 
     with open(config_file, 'w') as f:
         yaml.dump(config_content, f)
@@ -111,7 +100,7 @@ def runner():
 # =========================================
 
 def test_config_manager_loads_config(sample_config):
-    from core.config_manager import ConfigManager
+    from wireless_pen_test_lib.core import ConfigManager
     config_manager = ConfigManager(config_dir=str(sample_config))
     config = config_manager.get_config()
 

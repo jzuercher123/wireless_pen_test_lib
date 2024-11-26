@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock, ANY
 from click.testing import CliRunner
 import os
-from ui.cli import cli
+from wireless_pen_test_lib.ui import cli
 
 
 class TestCLI(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from core.event_dispatcher import EventDispatcher
+from wireless_pen_test_lib.core.event_dispatcher import EventDispatcher
 
 class TestEventDispatcher(unittest.TestCase):
     def setUp(self):

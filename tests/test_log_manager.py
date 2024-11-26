@@ -1,17 +1,17 @@
 import unittest
 import os
-from core.config_manager import ConfigManager
-from core.log_manager import LogManager
+from wireless_pen_test_lib.core import ConfigManager
+from wireless_pen_test_lib.core.log_manager import LogManager
 import logging
 
 
 class TestLogManager(unittest.TestCase):
     def setUp(self):
-        # Set up a temporary config directory
+        # Set up a temporary configs directory
         self.test_config_dir = "test_config"
         os.makedirs(self.test_config_dir, exist_ok=True)
 
-        # Create default config
+        # Create default configs
         default_config = {
             "general": {
                 "interface": "wlan0mon",
@@ -46,11 +46,11 @@ class TestLogManager(unittest.TestCase):
             }
         }
 
-        with open(os.path.join(self.test_config_dir, "config.yaml"), 'w') as f:
+        with open(os.path.join(self.test_config_dir, "configs.yaml"), 'w') as f:
             import yaml
             yaml.dump(default_config, f)
 
-        # Create user config with some overrides
+        # Create user configs with some overrides
         user_config = {
             "general": {
                 "interface": "wlan1mon",
@@ -58,7 +58,7 @@ class TestLogManager(unittest.TestCase):
             }
         }
 
-        with open(os.path.join(self.test_config_dir, "config.yaml"), 'w') as f:
+        with open(os.path.join(self.test_config_dir, "configs.yaml"), 'w') as f:
             yaml.dump(user_config, f)
 
         # Initialize Config Manager
@@ -70,7 +70,7 @@ class TestLogManager(unittest.TestCase):
         self.logger.setLevel(logging.DEBUG)
 
     def tearDown(self):
-        # Remove temporary config directory
+        # Remove temporary configs directory
         shutil.rmtree(self.test_config_dir)
 
         # Remove log handlers

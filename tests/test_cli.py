@@ -50,7 +50,7 @@ def test_scan_command_runs_scanner(mocker, mock_coreframework):
     mock_coreframework.load_protocol_modules = MagicMock()
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, [
@@ -91,7 +91,7 @@ def test_scan_command_without_scanners_shows_available_scanners(mocker, mock_cor
     }
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, [
@@ -121,7 +121,7 @@ def test_exploit_command_without_exploits_shows_available_exploits(mocker, mock_
     }
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, [
@@ -148,17 +148,17 @@ def test_configure_command_shows_current_configuration(mocker, mock_coreframewor
     mock_config = MagicMock()
     mock_config.general.interface = 'wlan0mon'
     mock_config.general.report_directory = '/path/to/reports'
-    mock_coreframework.config_manager.config_dir = '/path/to/config'
+    mock_coreframework.config_manager.config_dir = '/path/to/configs'
     mock_coreframework.config_manager.get_config.return_value = mock_config
 
-    # Mock os.path.exists to simulate that config.yaml exists
+    # Mock os.path.exists to simulate that configs.yaml exists
     mocker.patch('os.path.exists', return_value=True)
 
     # Mock the open function to return a sample configuration
     mocker.patch('builtins.open', mocker.mock_open(read_data="general:\n  interface: wlan0mon\n"))
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, ['configure'])
@@ -198,7 +198,7 @@ def test_report_command_generates_json_report(mocker, mock_coreframework):
     mocker.patch('builtins.open', mock_open_write)
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, ['report', '--format', 'json'])
@@ -261,7 +261,7 @@ def test_report_command_generates_txt_report(mocker, mock_coreframework):
     mocker.patch('builtins.open', mock_open_write)
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, ['report', '--format', 'txt'])
@@ -311,7 +311,7 @@ def test_list_command_shows_available_scanners_and_exploits(mocker, mock_corefra
     }
 
     # Import the CLI after setting up mocks
-    from ui.cli import cli
+    from wireless_pen_test_lib.ui import cli
 
     runner = CliRunner()
     result = runner.invoke(cli, ['list'])

@@ -1,17 +1,17 @@
 import unittest
 import os
 import shutil
-from core.config_manager import ConfigManager
+from wireless_pen_test_lib.core import ConfigManager
 from pydantic import ValidationError
 
 
 class TestConfigManager(unittest.TestCase):
     def setUp(self):
-        # Set up a temporary config directory
+        # Set up a temporary configs directory
         self.test_config_dir = "test_config"
         os.makedirs(self.test_config_dir, exist_ok=True)
 
-        # Create default config
+        # Create default configs
         default_config = {
             "general": {
                 "interface": "wlan0mon",
@@ -46,11 +46,11 @@ class TestConfigManager(unittest.TestCase):
             }
         }
 
-        with open(os.path.join(self.test_config_dir, "config.yaml"), 'w') as f:
+        with open(os.path.join(self.test_config_dir, "configs.yaml"), 'w') as f:
             import yaml
             yaml.dump(default_config, f)
 
-        # Create user config with some overrides
+        # Create user configs with some overrides
         user_config = {
             "general": {
                 "interface": "wlan1mon"
@@ -62,7 +62,7 @@ class TestConfigManager(unittest.TestCase):
             }
         }
 
-        with open(os.path.join(self.test_config_dir, "config.yaml"), 'w') as f:
+        with open(os.path.join(self.test_config_dir, "configs.yaml"), 'w') as f:
             yaml.dump(user_config, f)
 
         # Set environment variables to override configurations
@@ -70,7 +70,7 @@ class TestConfigManager(unittest.TestCase):
         os.environ['EXPLOITS_PAYLOAD_DELIVERY_DEFAULT_DURATION'] = '15'
 
     def tearDown(self):
-        # Remove temporary config directory and environment variables
+        # Remove temporary configs directory and environment variables
         shutil.rmtree(self.test_config_dir)
         del os.environ['GENERAL_LOG_LEVEL']
         del os.environ['EXPLOITS_PAYLOAD_DELIVERY_DEFAULT_DURATION']
@@ -98,7 +98,7 @@ class TestConfigManager(unittest.TestCase):
 
     def test_invalid_config(self):
         # Write invalid log_level
-        with open(os.path.join(self.test_config_dir, "config.yaml"), 'a') as f:
+        with open(os.path.join(self.test_config_dir, "configs.yaml"), 'a') as f:
             f.write("\ngeneral:\n  log_level: 'VERBOSE'\n")
 
         with self.assertRaises(ValidationError):
