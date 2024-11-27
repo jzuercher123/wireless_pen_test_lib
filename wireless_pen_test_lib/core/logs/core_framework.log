@@ -1670,3 +1670,16 @@ Traceback (most recent call last):
     hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 FileNotFoundError: [WinError 2] The system cannot find the file specified
+[2024-11-26 18:46:39,608] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 18:46:39,619] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 18:46:39,624] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 18:46:39,624] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 18:46:39,624] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols...
+[2024-11-26 18:46:39,625] ERROR - CoreFramework - Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+[2024-11-26 18:46:39,625] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 135, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 177, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.

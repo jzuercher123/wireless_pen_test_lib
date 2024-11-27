@@ -104,3 +104,118 @@ Traceback (most recent call last):
   File "C:\Users\13096\wireless_pen_test_lib\core\__init__.py", line 231, in load_protocol_modules
     raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
 FileNotFoundError: Protocols directory not found at modules.
+[2024-11-26 18:51:22,862] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 18:51:22,868] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 18:51:22,873] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 18:51:22,874] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 18:51:22,874] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols...
+[2024-11-26 18:51:22,875] ERROR - CoreFramework - Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+[2024-11-26 18:51:22,875] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 199, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 225, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+[2024-11-26 18:53:56,791] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 18:53:56,797] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 18:53:56,802] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 18:53:56,802] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 18:53:56,803] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols...
+[2024-11-26 18:53:56,803] ERROR - CoreFramework - Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+[2024-11-26 18:53:56,803] ERROR - CoreFramework - Failed to load protocol modules: Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 199, in __init__
+    self.load_protocol_modules()
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 225, in load_protocol_modules
+    raise FileNotFoundError(f"Protocols directory not found at {protocols_dir}.")
+FileNotFoundError: Protocols directory not found at C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\configs\protocols.
+[2024-11-26 18:57:52,441] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 18:57:52,445] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 18:57:52,449] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 18:57:52,450] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 18:57:52,450] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols...
+[2024-11-26 18:57:52,451] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-26 18:57:52,452] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-26 18:57:52,455] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-26 18:57:52,457] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-26 18:57:52,457] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 18:57:52,458] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 18:57:54,854] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-26 18:57:54,854] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-26 19:16:06,489] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 19:16:08,073] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 19:16:08,319] ERROR - CoreFramework - Error initializing WifiScanner: 'WifiScanner' object has no attribute 'logger'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 139, in __init__
+    self.wifi_scanner = WifiScanner(interface=self.interface, logger=self.logger)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 35, in __init__
+    self.iface = self._get_interface(interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 62, in _get_interface
+    self.logger.warning(f"Interface '{interface_name}' not found. Using the first available interface.")
+    ^^^^^^^^^^^
+AttributeError: 'WifiScanner' object has no attribute 'logger'
+[2024-11-26 19:20:05,193] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 19:20:05,198] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 19:20:05,199] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 19:20:05,202] WARNING - CoreFramework - Interface 'wlan0' not found. Using the first available interface.
+[2024-11-26 19:20:05,203] DEBUG - CoreFramework - Using default interface: Realtek RTL8822CE 802.11ac PCIe Adapter
+[2024-11-26 19:20:05,205] DEBUG - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 19:20:05,205] INFO - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 19:20:05,210] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 19:20:05,211] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 19:20:05,211] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols...
+[2024-11-26 19:20:05,212] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-26 19:20:05,212] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-26 19:20:05,216] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-26 19:20:05,218] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-26 19:20:05,219] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 19:20:05,219] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 19:20:08,630] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-26 19:20:08,631] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-26 19:20:18,091] INFO - CoreFramework - Initiating Wi-Fi network scan...
+[2024-11-26 19:20:18,092] INFO - CoreFramework - Starting Wi-Fi network scan...
+[2024-11-26 19:20:23,098] ERROR - CoreFramework - Error during Wi-Fi scan: module 'pywifi.const' has no attribute 'AKM_TYPE_WEP'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 280, in scan_wifi_networks
+    networks = self.wifi_scanner.scan_networks(scan_duration=scan_duration)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 82, in scan_networks
+    security = self._get_security(network)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 107, in _get_security
+    elif const.AKM_TYPE_WEP in network.akm:
+         ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pywifi.const' has no attribute 'AKM_TYPE_WEP'. Did you mean: 'AKM_TYPE_WPA'?
+[2024-11-26 19:23:02,024] INFO - CoreFramework - Stopping all operations...
+[2024-11-26 19:23:02,028] INFO - CoreFramework - Stopping continuous packet sending.
+[2024-11-26 19:23:02,028] INFO - CoreFramework - Stopping all deauthentication attacks.
+[2024-11-26 19:23:02,029] INFO - CoreFramework - All deauthentication attacks stopped.
+[2024-11-26 19:24:50,538] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 19:24:50,546] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 19:24:50,546] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 19:24:50,548] WARNING - CoreFramework - Interface 'wlan0' not found. Using the first available interface.
+[2024-11-26 19:24:50,550] DEBUG - CoreFramework - Using default interface: Realtek RTL8822CE 802.11ac PCIe Adapter
+[2024-11-26 19:24:50,552] DEBUG - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 19:24:50,552] INFO - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 19:24:50,556] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 19:24:50,557] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 19:24:50,558] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols...
+[2024-11-26 19:24:50,558] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-26 19:24:50,559] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-26 19:24:50,561] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-26 19:24:50,563] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-26 19:24:50,564] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 19:24:50,565] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 19:24:53,776] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-26 19:24:53,777] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-26 19:24:58,327] INFO - CoreFramework - Initiating Wi-Fi network scan...
+[2024-11-26 19:24:58,327] INFO - CoreFramework - Starting Wi-Fi network scan...
+[2024-11-26 19:25:03,334] INFO - CoreFramework - Wi-Fi scan completed. 22 networks found.
+[2024-11-26 19:25:03,334] INFO - CoreFramework - Wi-Fi scan completed. 22 networks found.
+[2024-11-26 19:25:11,770] INFO - CoreFramework - Stopping all operations...
+[2024-11-26 19:25:11,770] INFO - CoreFramework - Stopping continuous packet sending.
+[2024-11-26 19:25:11,770] INFO - CoreFramework - Stopping all deauthentication attacks.
+[2024-11-26 19:25:11,770] INFO - CoreFramework - All deauthentication attacks stopped.

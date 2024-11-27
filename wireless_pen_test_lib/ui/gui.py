@@ -1,4 +1,4 @@
-# ui/gui.py
+# gui.py
 
 """
 WirelessPenTestLib GUI Module
@@ -13,6 +13,7 @@ It leverages Tkinter to create a tabbed interface that includes various frames f
 - Exploits
 - Reports
 - Settings
+- Wi-Fi Scanner
 
 The GUI interacts with the CoreFramework to perform network scanning, exploitation, and reporting tasks.
 
@@ -22,33 +23,32 @@ with explicit permission on networks you own or have authorization to test. Unau
 to networks is illegal and unethical.
 """
 
-import sys
-import os
-import json
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
 import threading
 import queue
+import os
+import json
 import re
 from typing import Optional, Dict, Any, List
 
-from wireless_pen_test_lib.ui.frames.anomaly_detector_frame import AnomalyDetectionFrame
-from wireless_pen_test_lib.ui.frames.signal_heatmap_frame import SignalHeatmapFrame
-
-# Add the parent directory to the system path to import core modules
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+# Ensure the package is installed in editable mode and use absolute imports
 from wireless_pen_test_lib.core import CoreFramework
 from wireless_pen_test_lib.core.config.protocols import register_scanners, register_exploits
+
+# Import all necessary frames
+from wireless_pen_test_lib.ui.frames.anomaly_detector_frame import AnomalyDetectionFrame
+from wireless_pen_test_lib.ui.frames.signal_heatmap_frame import SignalHeatmapFrame
 from wireless_pen_test_lib.ui.frames.live_network_frame import LiveNetworkFrame
 from wireless_pen_test_lib.ui.frames.live_packet_monitor import LivePacketMonitor
-from wireless_pen_test_lib.ui.frames.test_devices import FakeDeviceManager
 from wireless_pen_test_lib.ui.frames.rogue_access_point import FakeAccessPoint
 from wireless_pen_test_lib.ui.frames.network_graph_visualization import NetworkGraphVisualizationFrame
 from wireless_pen_test_lib.ui.frames.report_generation_frame import ReportGenerationFrame
 from wireless_pen_test_lib.ui.frames.beacon_analysis_frame import BeaconAnalysisFrame
 from wireless_pen_test_lib.ui.frames.deauth_attack_frame import DeauthAttackFrame
 from wireless_pen_test_lib.ui.frames.hidden_ssid_frame import HiddenSSIDFrame
+from wireless_pen_test_lib.ui.frames.wifi_scan_frame import WifiScanFrame
+from wireless_pen_test_lib.ui.frames.test_devices import FakeDeviceManager
 
 
 def create_test_data() -> Dict[str, Any]:
@@ -89,9 +89,10 @@ class WirelessPenTestGUI(tk.Tk):
     Attributes:
         wep_networks (Optional[Dict[str, Any]]): Stores WEP network information.
         wpa_networks (Optional[Dict[str, Any]]): Stores WPA network information.
-        core (Optional[CoreFramework]): Instance of the CoreFramework for backend operations.
-        vulnerability_db (Any): Database of known vulnerabilities.
-        stop_event (threading.Event): Event to signal threads to stop operations.
+        core (CoreFramework): Instance of the CoreFramework for backend operations.
+        vulnerability_db (Dict[str, Any]): Database of known vulnerabilities.
+        scan_log_queue (queue.Queue): Queue for scan log messages.
+        exploit_log_queue (queue.Queue): Queue for exploit log messages.
     """
 
     def __init__(self):
@@ -105,9 +106,6 @@ class WirelessPenTestGUI(tk.Tk):
         self.wpa_networks: Optional[Dict[str, Any]] = None
         self.title("WirelessPenTestLib GUI")
         self.geometry("1200x800")  # Increased size for better usability
-
-        # Initialize stop event to manage thread termination
-        self.stop_event = threading.Event()
 
         # Initialize queues for thread-safe GUI updates
         self.scan_log_queue = queue.Queue()
@@ -138,33 +136,8 @@ class WirelessPenTestGUI(tk.Tk):
         self.notebook = ttk.Notebook(container_frame)
         self.notebook.pack(fill=tk.BOTH, expand=True, side='top')
 
-        # Add Live Network Details tab
-        self.live_network_frame = LiveNetworkFrame(
-            parent=self.notebook,
-            core_framework=self.core,
-            scan_interval=30  # Scan every 30 seconds
-        )
-        self.notebook.add(self.live_network_frame, text="Live Network Details")
-
-        # Load vulnerability database from CoreFramework
-        self.vulnerability_db = self.core.vulnerability_db
-
-        # Create additional tabs for various functionalities
-        self.create_scan_tab()
-        self.create_exploit_tab()
-        self.create_report_tab()
-        self.create_settings_tab()
-        self.create_live_packet_monitor_tab()
-        self.create_fake_devices_tab()
-        self.create_rogue_access_point_tab()
-        self.create_network_visualization_tab()
-        self.create_report_generation_tab()
-        self.create_hidden_ssid_tab()
-        self.create_signal_heatmap_tab()
-        self.create_anomaly_detection_tab()
-        self.create_wireless_network_enumeration_tab()
-        self.create_deauth_attack_tab()
-        self.add_hidden_ssid_attack_frame_tab()
+        # Initialize and add all tabs
+        self.initialize_tabs()
 
         # Add a Stop button at the bottom of the container frame to halt ongoing operations
         self.add_stop_button(container_frame)
@@ -182,8 +155,8 @@ class WirelessPenTestGUI(tk.Tk):
         # Define paths to configuration directories and vulnerability database
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.abspath(os.path.join(current_dir, '..'))
-        protocols_path = os.path.join(project_root, 'core', 'configs', 'protocols')
-        config_dir = os.path.join(project_root, 'core', 'configs')
+        protocols_path = os.path.join(project_root, 'core', 'config', 'protocols')
+        config_dir = os.path.join(project_root, 'core', 'config')
         vulnerabilities_path = os.path.join(project_root, 'vulnerabilities', 'vulnerabilities.json')
 
         # Initialize CoreFramework
@@ -205,40 +178,85 @@ class WirelessPenTestGUI(tk.Tk):
             messagebox.showerror("Initialization Error", f"An unexpected error occurred: {e}")
         return None
 
-    def create_hidden_ssid_tab(self):
+    def initialize_tabs(self):
+        """
+        Initializes and adds all tabs to the Notebook.
+        """
+        # Live Network Details tab
+        self.live_network_frame = LiveNetworkFrame(
+            parent=self.notebook,
+            core_framework=self.core,
+            scan_interval=30  # Scan every 30 seconds
+        )
+        self.notebook.add(self.live_network_frame, text="Live Network Details")
+
+        # Hidden SSID Reveal tab
         self.hidden_ssid_frame = HiddenSSIDFrame(self.notebook, self.core)
         self.notebook.add(self.hidden_ssid_frame, text='Hidden SSID Reveal')
 
-    def enter_fake_data(self):
-        """
-        Inserts fake test data into the LiveNetworkFrame for testing purposes.
-        """
-        test_data = create_test_data()
-        self.wpa_networks = test_data["wpa_networks"]
-        self.wep_networks = test_data["wep_networks"]
-        self.live_network_frame.update_gui(test_data)
+        # Wi-Fi Scanner tab
+        self.wifi_scan_frame = WifiScanFrame(self.notebook, self.core)
+        self.notebook.add(self.wifi_scan_frame, text='Wi-Fi Scanner')
 
-    def run_gui_as_test(self):
-        """
-        Populates the GUI with fake data and starts the main loop.
-
-        Useful for testing the GUI without connecting to real networks.
-        """
-        self.enter_fake_data()
-        self.mainloop()
-
-    def create_scan_tab(self) -> None:
-        """
-        Creates the 'Scans' tab in the Notebook.
-        """
-        self.scans_tab = ScansTab(self.notebook, self.core, self.stop_event, self.scan_log_queue)
+        # Scans tab
+        self.scans_tab = ScansTab(
+            parent=self.notebook,
+            core_framework=self.core,
+            stop_event=self.core.stop_event,
+            log_queue=self.scan_log_queue
+        )
         self.notebook.add(self.scans_tab, text='Scans')
 
-    def create_report_generation_tab(self):
+        # Exploits tab
+        self.exploits_tab = ExploitsTab(
+            parent=self.notebook,
+            core_framework=self.core,
+            stop_event=self.core.stop_event,
+            log_queue=self.exploit_log_queue
+        )
+        self.notebook.add(self.exploits_tab, text='Exploits')
+
+        # Reports tab
+        self.reports_tab = ReportsTab(self.notebook, self.core)
+        self.notebook.add(self.reports_tab, text='Reports')
+
+        # Settings tab
+        self.settings_tab = SettingsTab(self.notebook)
+        self.notebook.add(self.settings_tab, text='Settings')
+
+        # Live Packet Monitor tab
+        self.live_packet_monitor = LivePacketMonitor(self.notebook)
+        self.notebook.add(self.live_packet_monitor, text="Live Packet Monitor")
+
+        # Fake Devices tab
+        self.fake_devices_frame = FakeDeviceManager(self.notebook)
+        self.notebook.add(self.fake_devices_frame, text="Fake Devices")
+
+        # Rogue Access Point tab
+        self.rogue_access_point_frame = FakeAccessPoint(self.notebook)
+        self.notebook.add(self.rogue_access_point_frame, text="Rogue Access Point")
+
+        # Network Visualization tab
+        self.network_visualization_frame = NetworkGraphVisualizationFrame(self.notebook)
+        self.notebook.add(self.network_visualization_frame, text="Network Visualization")
+
+        # Report Generation tab
         self.report_generation_frame = ReportGenerationFrame(self.notebook, self.core)
         self.notebook.add(self.report_generation_frame, text='Report Generation')
 
-    def create_deauth_attack_tab(self):
+        # Beacon Analysis tab
+        self.beacon_analysis_frame = BeaconAnalysisFrame(self.notebook, self.core)
+        self.notebook.add(self.beacon_analysis_frame, text='Beacon Analysis')
+
+        # Signal Heatmap tab
+        self.signal_heatmap_frame = SignalHeatmapFrame(self.notebook, self.core)
+        self.notebook.add(self.signal_heatmap_frame, text='Signal Heatmap')
+
+        # Anomaly Detection tab
+        self.anomaly_detection_frame = AnomalyDetectionFrame(self.notebook, self.core)
+        self.notebook.add(self.anomaly_detection_frame, text="Anomaly Detection")
+
+        # Deauth Attack tab
         self.deauth_attack_frame = DeauthAttackFrame(self.notebook, self.core)
         self.notebook.add(self.deauth_attack_frame, text='Deauth Attack')
 
@@ -252,40 +270,17 @@ class WirelessPenTestGUI(tk.Tk):
         stop_button = ttk.Button(parent, text="Stop", command=self.stop_operations)
         stop_button.pack(pady=10, side='bottom')
 
-    def create_wireless_network_enumeration_tab(self):
-        self.beacon_analysis_frame = BeaconAnalysisFrame(self.notebook, self.core)
-        self.notebook.add(self.beacon_analysis_frame, text='Beacon Analysis')
-
-    def add_hidden_ssid_attack_frame_tab(self):
-        """
-
-        :return:
-        """
-        self.hidden_ssid_frame = HiddenSSIDFrame(self.notebook, self.core)
-        self.notebook.add(self.hidden_ssid_frame, text='Hidden SSID')
-
     def stop_operations(self) -> None:
         """
         Handles the Stop button click event.
 
-        Signals all running operations (scans and exploits) to terminate gracefully.
+        Signals all running operations to terminate gracefully.
         """
-        if not self.stop_event.is_set():
-            self.stop_event.set()
-            self.scan_log_queue.put("Stopping operations...")
-            self.exploit_log_queue.put("Stopping operations...")
-
-            # Wait for threads to finish
-            if hasattr(self, 'scan_thread') and self.scan_thread.is_alive():
-                self.scan_thread.join(timeout=5)
-            if hasattr(self, 'exploit_thread') and self.exploit_thread.is_alive():
-                self.exploit_thread.join(timeout=5)
-
-            self.scan_log_queue.put("Operations stopped.")
-            self.exploit_log_queue.put("Operations stopped.")
+        if not self.core.stop_event.is_set():
+            self.core.stop_all_operations()
+            messagebox.showinfo("Operations Stopped", "All ongoing operations have been stopped.")
         else:
-            self.scan_log_queue.put("No ongoing operations to stop.")
-            self.exploit_log_queue.put("No ongoing operations to stop.")
+            messagebox.showinfo("No Ongoing Operations", "There are no ongoing operations to stop.")
 
     def process_scan_log_queue(self) -> None:
         """
@@ -304,78 +299,6 @@ class WirelessPenTestGUI(tk.Tk):
             message = self.exploit_log_queue.get_nowait()
             self.exploits_tab.log_message(self.exploits_tab.exploit_log, message)
         self.after(100, self.process_exploit_log_queue)
-
-    def create_exploit_tab(self) -> None:
-        """
-        Creates the 'Exploits' tab in the Notebook.
-        """
-        self.exploits_tab = ExploitsTab(self.notebook, self.core, self.stop_event, self.exploit_log_queue)
-        self.notebook.add(self.exploits_tab, text='Exploits')
-
-    def create_signal_heatmap_tab(self):
-        self.signal_heatmap_frame = SignalHeatmapFrame(self.notebook, self.core)
-        self.notebook.add(self.signal_heatmap_frame, text='Signal Heatmap')
-
-    def create_report_tab(self) -> None:
-        """
-        Creates the 'Reports' tab in the Notebook.
-        """
-        self.reports_tab = ReportsTab(self.notebook, self.core)
-        self.notebook.add(self.reports_tab, text='Reports')
-
-    def create_settings_tab(self) -> None:
-        """
-        Creates the 'Settings' tab in the Notebook.
-        """
-        self.settings_tab = SettingsTab(self.notebook)
-        self.notebook.add(self.settings_tab, text='Settings')
-
-    def create_live_packet_monitor_tab(self) -> None:
-        """
-        Creates the 'Live Packet Monitor' tab in the Notebook.
-        """
-        live_packet_monitor = LivePacketMonitor(self.notebook)
-        self.notebook.add(live_packet_monitor, text="Live Packet Monitor")
-
-    def create_fake_devices_tab(self) -> None:
-        """
-        Creates the 'Fake Devices' tab in the Notebook.
-        """
-        fake_devices_frame = FakeDeviceManager(self.notebook)
-        self.notebook.add(fake_devices_frame, text="Fake Devices")
-
-    def create_rogue_access_point_tab(self) -> None:
-        """
-        Creates the 'Rogue Access Point' tab in the Notebook.
-        """
-        rogue_access_point_frame = FakeAccessPoint(self.notebook)
-        self.notebook.add(rogue_access_point_frame, text="Rogue Access Point")
-
-    def create_network_visualization_tab(self) -> None:
-        """
-        Creates the 'Network Visualization' tab in the Notebook.
-        """
-        network_graph_frame = NetworkGraphVisualizationFrame(self.notebook)
-        self.notebook.add(network_graph_frame, text="Network Visualization")
-
-    def create_anomaly_detection_tab(self) -> None:
-        """
-        Creates the 'Anomaly Detection' tab in the Notebook.
-        """
-        anomaly_detection_frame = AnomalyDetectionFrame(self.notebook, self.core)
-        self.notebook.add(anomaly_detection_frame, text="Anomaly Detection")
-
-    def stop_operations(self) -> None:
-        """
-        Handles the Stop button click event.
-
-        Signals all running operations to terminate gracefully.
-        """
-        if not self.core.stop_event.is_set():
-            self.core.stop_all_operations()
-            messagebox.showinfo("Operations Stopped", "All ongoing operations have been stopped.")
-        else:
-            messagebox.showinfo("No Ongoing Operations", "There are no ongoing operations to stop.")
 
     def on_closing(self) -> None:
         """
@@ -486,6 +409,7 @@ class ScansTab(ttk.Frame):
             self.log_queue.put("Reports generated successfully.\n")
             messagebox.showinfo("Finalize Complete", "Reports generated successfully.")
         except Exception as e:
+            self.log_queue.put(f"Failed to finalize and generate reports: {e}\n")
             messagebox.showerror("Finalize Error", f"Failed to finalize and generate reports: {e}")
 
     def execute_scans(self, scanners: List[str], target: Dict[str, str]) -> None:
@@ -503,7 +427,7 @@ class ScansTab(ttk.Frame):
             self.log_queue.put(f"Running scanner: {sc}")
             try:
                 # Pass the stop_event to the scanner's scan method if possible
-                scan_result = self.core.run_scanner(sc, target, self.stop_event)
+                scan_result = self.core.run_scanner(sc, target)
                 self.log_queue.put(f"Scanner '{sc}' completed.\n")
 
                 # Optionally, display scan results in the log
@@ -702,7 +626,7 @@ class ExploitsTab(ttk.Frame):
 
             try:
                 # Execute the exploit via CoreFramework
-                self.core.run_exploit(ex, vuln, self.stop_event)
+                self.core.run_exploit(ex, vuln)
                 self.log_queue.put(f"Exploit '{ex}' completed.\n")
             except Exception as e:
                 self.log_queue.put(f"Error running exploit '{ex}': {e}\n")
@@ -871,7 +795,7 @@ def main():
     """
     Entry point for the WirelessPenTestLib GUI application.
 
-    Ensures the script is run with proper permissions and initializes the GUI.
+    Initializes and runs the GUI application.
     """
     # Initialize and run the GUI application
     app = WirelessPenTestGUI()
