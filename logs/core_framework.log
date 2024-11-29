@@ -219,3 +219,130 @@ AttributeError: module 'pywifi.const' has no attribute 'AKM_TYPE_WEP'. Did you m
 [2024-11-26 19:25:11,770] INFO - CoreFramework - Stopping continuous packet sending.
 [2024-11-26 19:25:11,770] INFO - CoreFramework - Stopping all deauthentication attacks.
 [2024-11-26 19:25:11,770] INFO - CoreFramework - All deauthentication attacks stopped.
+[2024-11-26 19:54:03,991] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 19:54:04,108] INFO - CoreFramework - Database Manager initialized successfully.
+[2024-11-26 19:54:04,108] ERROR - CoreFramework - Error loading configuration: name 'ConfigManager' is not defined
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 145, in __init__
+    self.config_manager = ConfigManager(config_dir=config_dir)
+                          ^^^^^^^^^^^^^
+NameError: name 'ConfigManager' is not defined
+[2024-11-26 20:06:22,425] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 20:06:22,501] INFO - CoreFramework - Database Manager initialized successfully.
+[2024-11-26 20:06:22,511] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 20:06:22,511] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 20:06:22,511] ERROR - CoreFramework - Error initializing WifiScanner: 'WifiScanner' object has no attribute '_get_interface'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 159, in __init__
+    self.wifi_scanner = WifiScanner(interface=self.interface, logger=self.logger, core_framework=self)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 29, in __init__
+    self.iface = self._get_interface(interface)
+                 ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WifiScanner' object has no attribute '_get_interface'
+[2024-11-26 20:08:39,053] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 20:08:39,127] INFO - CoreFramework - Database Manager initialized successfully.
+[2024-11-26 20:08:39,135] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 20:08:39,136] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 20:08:39,145] ERROR - CoreFramework - Error initializing WifiScanner: Interface 'wlan0' not found.
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 159, in __init__
+    self.wifi_scanner = WifiScanner(interface=self.interface, logger=self.logger, core_framework=self)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 30, in __init__
+    self.iface = self._get_interface(interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 90, in _get_interface
+    raise ValueError(f"Interface '{interface}' not found.")
+ValueError: Interface 'wlan0' not found.
+[2024-11-26 20:09:48,686] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 20:09:48,729] INFO - CoreFramework - Database Manager initialized successfully.
+[2024-11-26 20:09:48,736] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 20:09:48,736] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 20:09:48,737] ERROR - CoreFramework - Error initializing WifiScanner: 'WifiScanner' object has no attribute '_get_interface'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 159, in __init__
+    self.wifi_scanner = WifiScanner(interface=self.interface, logger=self.logger, core_framework=self)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 30, in __init__
+    self.iface = self._get_interface(interface)
+                 ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WifiScanner' object has no attribute '_get_interface'
+[2024-11-26 20:11:26,699] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 20:11:26,792] INFO - CoreFramework - Database Manager initialized successfully.
+[2024-11-26 20:11:26,806] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 20:11:26,806] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 20:11:26,809] DEBUG - CoreFramework - Available interfaces: ['Realtek RTL8822CE 802.11ac PCIe Adapter']
+[2024-11-26 20:11:26,811] WARNING - CoreFramework - Interface 'wlan0' not found. Using default interface.
+[2024-11-26 20:11:26,811] DEBUG - CoreFramework - Using default interface: Realtek RTL8822CE 802.11ac PCIe Adapter
+[2024-11-26 20:11:26,813] DEBUG - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 20:11:26,813] INFO - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 20:11:26,822] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 20:11:26,830] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 20:11:26,831] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols...
+[2024-11-26 20:11:26,834] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-26 20:11:26,851] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-26 20:11:26,857] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-26 20:11:26,863] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-26 20:11:26,863] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 20:11:26,863] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 20:11:28,579] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-26 20:11:28,579] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-26 20:16:34,728] INFO - CoreFramework - Initializing CoreFramework...
+[2024-11-26 20:16:34,790] INFO - CoreFramework - Database Manager initialized successfully.
+[2024-11-26 20:16:34,798] INFO - CoreFramework - Configuration loaded successfully.
+[2024-11-26 20:16:34,798] DEBUG - CoreFramework - Initializing WifiScanner.
+[2024-11-26 20:16:34,802] DEBUG - CoreFramework - Available interfaces: ['Realtek RTL8822CE 802.11ac PCIe Adapter']
+[2024-11-26 20:16:34,802] WARNING - CoreFramework - Interface 'wlan0' not found. Using default interface.
+[2024-11-26 20:16:34,802] DEBUG - CoreFramework - Using default interface: Realtek RTL8822CE 802.11ac PCIe Adapter
+[2024-11-26 20:16:34,803] DEBUG - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 20:16:34,803] INFO - CoreFramework - WifiScanner initialized successfully.
+[2024-11-26 20:16:34,807] INFO - CoreFramework - Loaded vulnerability database from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\vulnerabilities\vulnerabilities.json.
+[2024-11-26 20:16:34,809] INFO - CoreFramework - Network and Data Storage Managers initialized successfully.
+[2024-11-26 20:16:34,809] INFO - CoreFramework - Loading protocol modules from C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols...
+[2024-11-26 20:16:34,809] DEBUG - CoreFramework - Loading module 'base_protocol' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\base_protocol.py'.
+[2024-11-26 20:16:34,811] DEBUG - CoreFramework - Loading module 'bluetooth' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\bluetooth.py'.
+[2024-11-26 20:16:34,813] DEBUG - CoreFramework - Loading module 'wifi' from 'C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\config\protocols\wifi.py'.
+[2024-11-26 20:16:34,817] INFO - CoreFramework - Protocol modules loaded successfully.
+[2024-11-26 20:16:34,817] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 20:16:34,817] INFO - CoreFramework - CoreFramework initialized successfully.
+[2024-11-26 20:16:40,961] DEBUG - CoreFramework.LocalScanner - Operating System detected: Windows
+[2024-11-26 20:16:40,961] INFO - CoreFramework.DosScanner - DosScanner initialized.
+[2024-11-26 20:16:55,102] INFO - CoreFramework - Initiating Wi-Fi network scan...
+[2024-11-26 20:16:55,103] INFO - CoreFramework - Starting Wi-Fi network scan...
+[2024-11-26 20:17:00,109] DEBUG - CoreFramework - Scan complete. 22 networks found.
+[2024-11-26 20:17:00,109] ERROR - CoreFramework - Error during Wi-Fi scan: module 'pywifi.const' has no attribute 'AUTH_OPEN'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 300, in scan_wifi_networks
+    networks = self.wifi_scanner.scan_networks(scan_duration=scan_duration)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 185, in scan_networks
+    security = self._get_security(network)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 117, in _get_security
+    if auth == const.AUTH_OPEN:
+               ^^^^^^^^^^^^^^^
+AttributeError: module 'pywifi.const' has no attribute 'AUTH_OPEN'. Did you mean: 'AUTH_ALG_OPEN'?
+[2024-11-26 20:17:22,778] INFO - CoreFramework.LocalScanner - Manual network scan initiated.
+[2024-11-26 20:17:22,780] INFO - CoreFramework.LocalScanner - Starting local network scan for devices...
+[2024-11-26 20:17:22,794] ERROR - CoreFramework.LocalScanner - Error determining network range: Cannot find any interface with description eth0
+[2024-11-26 20:17:22,795] INFO - CoreFramework.LocalScanner - Manual network scan completed.
+[2024-11-26 20:17:40,162] INFO - CoreFramework - Initiating Wi-Fi network scan...
+[2024-11-26 20:17:40,163] INFO - CoreFramework - Starting Wi-Fi network scan...
+[2024-11-26 20:17:45,168] DEBUG - CoreFramework - Scan complete. 24 networks found.
+[2024-11-26 20:17:45,169] ERROR - CoreFramework - Error during Wi-Fi scan: module 'pywifi.const' has no attribute 'AUTH_OPEN'
+Traceback (most recent call last):
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\core\__init__.py", line 300, in scan_wifi_networks
+    networks = self.wifi_scanner.scan_networks(scan_duration=scan_duration)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 185, in scan_networks
+    security = self._get_security(network)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\13096\wireless_pen_test_lib\wireless_pen_test_lib\modules\network_enumeration\wifi_scanner.py", line 117, in _get_security
+    if auth == const.AUTH_OPEN:
+               ^^^^^^^^^^^^^^^
+AttributeError: module 'pywifi.const' has no attribute 'AUTH_OPEN'. Did you mean: 'AUTH_ALG_OPEN'?
+[2024-11-26 20:20:04,375] INFO - CoreFramework - Stopping all operations...
+[2024-11-26 20:20:04,375] INFO - CoreFramework - Stopping continuous packet sending.
+[2024-11-26 20:20:04,375] INFO - CoreFramework - Stopping all deauthentication attacks.
+[2024-11-26 20:20:04,375] INFO - CoreFramework - All deauthentication attacks stopped.

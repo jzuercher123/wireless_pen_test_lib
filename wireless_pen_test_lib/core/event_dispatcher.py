@@ -41,3 +41,15 @@ class EventDispatcher:
                 callback(*args, **kwargs)
             except Exception as e:
                 self.logger.error(f"Error in callback '{callback.__name__}' for event '{event_type}': {e}")
+
+
+# Example Usage
+def on_event_fired(message):
+    print(f"Event Fired: {message}")
+
+dispatcher = EventDispatcher()
+dispatcher.subscribe("on_event", on_event_fired)
+dispatcher.dispatch("on_event", "Hello, World!")
+# Output: Event Fired: Hello, World
+
+

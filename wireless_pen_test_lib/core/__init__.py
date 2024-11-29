@@ -17,24 +17,33 @@ import threading
 import time
 import json
 import importlib.util
-from scapy.all import sendp
 from typing import List, Dict, Any, Optional
 
-import pandas as pd
+from scapy.all import sendp
 
+import pandas as pd
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+from project_specific_utils.data_storage_manager import DataStorageManager
+from test_network.manage import start_network, stop_network
+
+from project_specific_utils.authentication_tools import AuthenticationTools
+from project_specific_utils.network_interface_manager import NetworkInterfaceManager
 # Importing necessary modules from the project
 from wireless_pen_test_lib.modules.network_enumeration.hidden_ssid_reveal import HiddenSSIDRevealer
 from wireless_pen_test_lib.modules.network_enumeration.signal_heatmap import SignalHeatmap
-from test_network.manage import start_network, stop_network
-from wireless_pen_test_lib.core.config_manager import ConfigManager
-from project_specific_utils.network_interface_manager import NetworkInterfaceManager
-from project_specific_utils.data_storage_manager import DataStorageManager
-from project_specific_utils.authentication_tools import AuthenticationTools
+from wireless_pen_test_lib.modules.network_enumeration.beacon_analyzer import BeaconAnalyzer
+from wireless_pen_test_lib.modules.attack_modules.deauth_attack import DeauthAttack
 from wireless_pen_test_lib.modules.network_enumeration.wifi_scanner import WifiScanner
 from wireless_pen_test_lib.modules.machine_learning.anomaly_detection import AnomalyDetector
 from wireless_pen_test_lib.modules.data_analytics.report_generator import ReportGenerator
-from wireless_pen_test_lib.modules.network_enumeration.beacon_analyzer import BeaconAnalyzer
-from wireless_pen_test_lib.modules.attack_modules.deauth_attack import DeauthAttack
+from wireless_pen_test_lib.core.config_manager import ConfigManager
+from wireless_pen_test_lib.core.pool_manager import Pool
+
+# Database Manager Import
+from wireless_pen_test_lib.core.database import DatabaseManager, Target
 
 def setup_core_logging(project_root: str) -> logging.Logger:
     """
@@ -88,9 +97,9 @@ class CoreFramework:
         vulnerabilities_path: Optional[str] = None,
         sendp_func=sendp,
         sleep_func=time.sleep,
-        network_manager: Optional[NetworkInterfaceManager] = None,
-        data_storage_manager: Optional[DataStorageManager] = None,
-        auth_tools: Optional[AuthenticationTools] = None,
+        network_manager: Optional[Any] = None,  # Replace 'Any' with actual type if available
+        data_storage_manager: Optional[Any] = None,  # Replace 'Any' with actual type if available
+        auth_tools: Optional[Any] = None,  # Replace 'Any' with actual type if available
         scanners: Optional[Dict[str, Any]] = None,
         exploits: Optional[Dict[str, Any]] = None,
         test_network: bool = False,
@@ -105,9 +114,9 @@ class CoreFramework:
             vulnerabilities_path (Optional[str]): Path to the vulnerability database.
             sendp_func: Function to send packets (default: scapy's sendp).
             sleep_func: Function to sleep (default: time.sleep).
-            network_manager (Optional[NetworkInterfaceManager]): Network interface manager.
-            data_storage_manager (Optional[DataStorageManager]): Data storage manager.
-            auth_tools (Optional[AuthenticationTools]): Authentication tools manager.
+            network_manager (Optional[Any]): Network interface manager.
+            data_storage_manager (Optional[Any]): Data storage manager.
+            auth_tools (Optional[Any]): Authentication tools manager.
             scanners (Optional[Dict[str, Any]]): Dictionary of scanner instances.
             exploits (Optional[Dict[str, Any]]): Dictionary of exploit instances.
             test_network (bool): Flag to indicate if a test network should be started.
@@ -125,6 +134,17 @@ class CoreFramework:
         self.logger = setup_core_logging(self.project_root)
         self.logger.info("Initializing CoreFramework...")
 
+        # setup pool manager
+        self.pool = Pool()
+
+        # Initialize Database Manager
+        try:
+            self.db_manager = DatabaseManager()
+            self.logger.info("Database Manager initialized successfully.")
+        except Exception as e:
+            self.logger.error(f"Error initializing DatabaseManager: {e}", exc_info=True)
+            raise
+
         # Initialize components
         try:
             # Configuration Management
@@ -136,7 +156,7 @@ class CoreFramework:
             raise
 
         try:
-            self.wifi_scanner = WifiScanner(interface=self.interface, logger=self.logger)
+            self.wifi_scanner = WifiScanner(interface=self.interface, logger=self.logger, core_framework=self)
             self.logger.info("WifiScanner initialized successfully.")
         except Exception as e:
             self.logger.error(f"Error initializing WifiScanner: {e}", exc_info=True)
@@ -515,6 +535,55 @@ class CoreFramework:
         anomalies = detector.detect_anomalies()
         self.logger.info("Anomaly detection completed.")
         return anomalies
+
+    # ------------------------ Universal Target Pool Methods ------------------------ #
+
+    def add_target_to_pool(self, target_data: dict) -> Optional[Target]:
+        """
+        Adds a discovered target to the universal pool.
+
+        Args:
+            target_data (dict): Dictionary containing target information.
+
+        Returns:
+            Optional[Target]: The added Target object, or None if failed.
+        """
+        try:
+            existing_target = self.db_manager.find_target_by_bssid(target_data.get('bssid'))
+            if existing_target:
+                self.logger.info(f"Target with BSSID {target_data.get('bssid')} already exists. Updating info.")
+                self.db_manager.update_target(target_data.get('bssid'), target_data)
+                return existing_target
+            else:
+                new_target = self.db_manager.add_target(target_data)
+                self.logger.info(f"Added new target: {new_target}")
+                return new_target
+        except Exception as e:
+            self.logger.error(f"Failed to add target to pool: {e}")
+            return None
+
+    def get_all_targets(self) -> List[Target]:
+        """
+        Retrieves all targets from the universal pool.
+
+        Returns:
+            List[Target]: List of Target objects.
+        """
+        return self.db_manager.get_all_targets()
+
+    def get_target_by_bssid(self, bssid: str) -> Optional[Target]:
+        """
+        Retrieves a specific target by its BSSID.
+
+        Args:
+            bssid (str): BSSID of the target.
+
+        Returns:
+            Optional[Target]: The Target object if found, else None.
+        """
+        return self.db_manager.find_target_by_bssid(bssid)
+
+    # ------------------------------------------------------------------------------------ #
 
     # Placeholder methods for future implementations
     def get_scan_results(self):

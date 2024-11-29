@@ -13,6 +13,7 @@ It leverages Tkinter to create a tabbed interface that includes various frames f
 - Exploits
 - Reports
 - Settings
+- Targets
 - Wi-Fi Scanner
 
 The GUI interacts with the CoreFramework to perform network scanning, exploitation, and reporting tasks.
@@ -26,11 +27,18 @@ to networks is illegal and unethical.
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import threading
+from threading import Event
 import queue
 import os
 import json
 import re
 from typing import Optional, Dict, Any, List
+import tkinter as tk
+from tkinter import ttk, messagebox
+from typing import Optional, List, Dict, Any
+import threading
+import re
+import logging
 
 # Ensure the package is installed in editable mode and use absolute imports
 from wireless_pen_test_lib.core import CoreFramework
@@ -49,7 +57,8 @@ from wireless_pen_test_lib.ui.frames.deauth_attack_frame import DeauthAttackFram
 from wireless_pen_test_lib.ui.frames.hidden_ssid_frame import HiddenSSIDFrame
 from wireless_pen_test_lib.ui.frames.wifi_scan_frame import WifiScanFrame
 from wireless_pen_test_lib.ui.frames.test_devices import FakeDeviceManager
-
+from wireless_pen_test_lib.ui.frames.targets_tab import TargetsTab
+from wireless_pen_test_lib.core.pool_manager import Pool
 
 def create_test_data() -> Dict[str, Any]:
     """
@@ -87,10 +96,7 @@ class WirelessPenTestGUI(tk.Tk):
     access point setup.
 
     Attributes:
-        wep_networks (Optional[Dict[str, Any]]): Stores WEP network information.
-        wpa_networks (Optional[Dict[str, Any]]): Stores WPA network information.
         core (CoreFramework): Instance of the CoreFramework for backend operations.
-        vulnerability_db (Dict[str, Any]): Database of known vulnerabilities.
         scan_log_queue (queue.Queue): Queue for scan log messages.
         exploit_log_queue (queue.Queue): Queue for exploit log messages.
     """
@@ -102,10 +108,8 @@ class WirelessPenTestGUI(tk.Tk):
         Sets up the main window, initializes the CoreFramework, and creates all necessary tabs.
         """
         super().__init__()
-        self.wep_networks: Optional[Dict[str, Any]] = None
-        self.wpa_networks: Optional[Dict[str, Any]] = None
         self.title("WirelessPenTestLib GUI")
-        self.geometry("1200x800")  # Increased size for better usability
+        self.geometry("1400x900")  # Increased size for better usability
 
         # Initialize queues for thread-safe GUI updates
         self.scan_log_queue = queue.Queue()
@@ -144,6 +148,9 @@ class WirelessPenTestGUI(tk.Tk):
 
         # Bind the protocol for window closing to ensure cleanup
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        # pool
+        self.pool = Pool()
 
     def initialize_coreframework(self) -> Optional[CoreFramework]:
         """
@@ -223,6 +230,10 @@ class WirelessPenTestGUI(tk.Tk):
         # Settings tab
         self.settings_tab = SettingsTab(self.notebook)
         self.notebook.add(self.settings_tab, text='Settings')
+
+        # Targets tab (Newly added)
+        self.targets_tab = TargetsTab(self.notebook, self.core)
+        self.notebook.add(self.targets_tab, text='Targets')
 
         # Live Packet Monitor tab
         self.live_packet_monitor = LivePacketMonitor(self.notebook)
@@ -356,7 +367,7 @@ class ScansTab(ttk.Frame):
         finalize_button.pack(pady=10)
 
         # Log Area for Scans
-        self.scan_log = tk.Text(self, height=15, state='disabled')
+        self.scan_log = tk.Text(self, height=20, state='disabled')
         self.scan_log.pack(padx=10, pady=10, fill='both', expand=True)
 
     def run_scans(self) -> None:
@@ -426,18 +437,28 @@ class ScansTab(ttk.Frame):
                 break
             self.log_queue.put(f"Running scanner: {sc}")
             try:
-                # Pass the stop_event to the scanner's scan method if possible
+                # Run scanner via CoreFramework
                 scan_result = self.core.run_scanner(sc, target)
                 self.log_queue.put(f"Scanner '{sc}' completed.\n")
 
-                # Optionally, display scan results in the log
-                for device in scan_result.get("devices", []):
-                    device_info = (f"IP: {device.get('ip', 'N/A')}, "
+                # Display scan results in the log
+                devices = scan_result.get("devices", [])
+                if not devices:
+                    self.log_queue.put(f"No devices found by scanner '{sc}'.\n")
+                for device in devices:
+                    device_info = (f"SSID: {device.get('ssid', 'N/A')}, "
+                                   f"BSSID: {device.get('bssid', 'N/A')}, "
+                                   f"IP: {device.get('ip', 'N/A')}, "
                                    f"MAC: {device.get('mac', 'N/A')}, "
                                    f"Hostname: {device.get('hostname', 'N/A')}, "
-                                   f"SSID: {device.get('ssid', 'N/A')}, "
-                                   f"BSSID: {device.get('bssid', 'N/A')}")
+                                   f"Signal: {device.get('signal', 'N/A')} dBm, "
+                                   f"Channel: {device.get('channel', 'N/A')}, "
+                                   f"Security: {device.get('security', 'N/A')}")
                     self.log_queue.put(f"Discovered Device: {device_info}")
+
+                    # Add the discovered device to the universal pool
+                    self.core.add_target_to_pool(device)
+
             except Exception as e:
                 self.log_queue.put(f"Error running scanner '{sc}': {e}\n")
 
@@ -469,25 +490,63 @@ class ScansTab(ttk.Frame):
         return bool(pattern.match(bssid))
 
 
+# wireless_pen_test_lib/ui/frames/exploits_tab.py
+
+"""
+ExploitsTab Module
+
+This module defines the ExploitsTab class, which provides a user interface for selecting and
+running network exploits against targeted Wi-Fi networks. It integrates with the CoreFramework
+to manage and execute exploits based on user selections.
+"""
+
+
+
 class ExploitsTab(ttk.Frame):
-    def __init__(self, parent: ttk.Notebook, core_framework: CoreFramework, stop_event: threading.Event,
-                 log_queue: queue.Queue):
+    """
+    ExploitsTab Class
+
+    Provides a user interface for selecting and executing network exploits against chosen targets.
+    """
+
+    def __init__(
+        self,
+        parent: ttk.Notebook,
+        core_framework: Any,
+        stop_event: threading.Event,
+        log_queue: queue.Queue[Dict[str, Any]]
+    ):
+
+        """
+        Initializes the ExploitsTab.
+
+        Args:
+            parent (ttk.Notebook): The parent Notebook widget.
+            core_framework (Any): Reference to the CoreFramework instance for backend operations.
+            stop_event (threading.Event): Event to signal stopping of ongoing exploits.
+            log_queue (threading.Queue): Queue for logging messages from exploit threads.
+        """
         super().__init__(parent)
         self.core = core_framework
         self.stop_event = stop_event
         self.log_queue = log_queue
+        self.logger = logging.getLogger('ExploitsTab')
+        self.logger.debug("Initializing ExploitsTab.")
         self.create_widgets()
+        self.populate_exploits()
+        self.update_target_list()
 
     def create_widgets(self) -> None:
         """
         Creates the widgets for the 'Exploits' tab.
         """
         # Exploit Selection Section
-        exploit_label = ttk.Label(self, text="Select Exploits:")
+        exploit_label = ttk.Label(self, text="Select Exploits:", font=("Helvetica", 12))
         exploit_label.pack(pady=5)
 
         self.exploit_vars: Dict[str, tk.BooleanVar] = {}
-        for ex in self.core.exploits.keys():
+        exploits = self.core.exploits.keys()
+        for ex in exploits:
             var = tk.BooleanVar()
             chk = ttk.Checkbutton(self, text=ex, variable=var)
             chk.pack(anchor='w', padx=20)
@@ -497,128 +556,148 @@ class ExploitsTab(ttk.Frame):
         target_frame = ttk.LabelFrame(self, text="Target Network")
         target_frame.pack(padx=10, pady=10, fill='x')
 
-        ssid_label = ttk.Label(target_frame, text="SSID:")
-        ssid_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
-        self.exploit_ssid_entry = ttk.Entry(target_frame, width=50)
-        self.exploit_ssid_entry.grid(row=0, column=1, padx=5, pady=5)
+        target_label = ttk.Label(target_frame, text="Select Target:")
+        target_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
 
-        bssid_label = ttk.Label(target_frame, text="BSSID:")
-        bssid_label.grid(row=1, column=0, padx=5, pady=5, sticky='e')
-        self.exploit_bssid_entry = ttk.Entry(target_frame, width=50)
-        self.exploit_bssid_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.selected_target_var = tk.StringVar()
+        self.target_combo = ttk.Combobox(target_frame, textvariable=self.selected_target_var, state='readonly')
+        self.target_combo.grid(row=0, column=1, padx=5, pady=5, sticky='w')
+
+        refresh_button = ttk.Button(target_frame, text="Refresh Targets", command=self.update_target_list)
+        refresh_button.grid(row=0, column=2, padx=5, pady=5)
 
         # Exploit-specific Parameters Section
         params_frame = ttk.LabelFrame(self, text="Exploit Parameters")
         params_frame.pack(padx=10, pady=10, fill='x')
 
-        # Session Hijacking Parameters
-        ip_label = ttk.Label(params_frame, text="Target IP (for Session Hijacking):")
-        ip_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
-        self.exploit_ip_entry = ttk.Entry(params_frame, width=50)
-        self.exploit_ip_entry.grid(row=0, column=1, padx=5, pady=5)
-
-        mac_label = ttk.Label(params_frame, text="Target MAC Address:")
-        mac_label.grid(row=1, column=0, padx=5, pady=5, sticky='e')
-        self.exploit_mac_entry = ttk.Entry(params_frame, width=50)
-        self.exploit_mac_entry.grid(row=1, column=1, padx=5, pady=5)
-
-        gateway_ip_label = ttk.Label(params_frame, text="Gateway IP:")
-        gateway_ip_label.grid(row=2, column=0, padx=5, pady=5, sticky='e')
-        self.exploit_gateway_ip_entry = ttk.Entry(params_frame, width=50)
-        self.exploit_gateway_ip_entry.grid(row=2, column=1, padx=5, pady=5)
-
-        gateway_mac_label = ttk.Label(params_frame, text="Gateway MAC Address:")
-        gateway_mac_label.grid(row=3, column=0, padx=5, pady=5, sticky='e')
-        self.exploit_gateway_mac_entry = ttk.Entry(params_frame, width=50)
-        self.exploit_gateway_mac_entry.grid(row=3, column=1, padx=5, pady=5)
-
         # Payload Type Selection (for Payload Delivery)
         payload_label = ttk.Label(params_frame, text="Payload Type (for Payload Delivery):")
-        payload_label.grid(row=4, column=0, padx=5, pady=5, sticky='e')
+        payload_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
         self.payload_type_var = tk.StringVar()
-        self.payload_type_combo = ttk.Combobox(params_frame, textvariable=self.payload_type_var, state='readonly')
-        self.payload_type_combo['values'] = ['reverse_shell', 'malicious_script']
-        self.payload_type_combo.grid(row=4, column=1, padx=5, pady=5)
+        self.payload_type_combo = ttk.Combobox(
+            params_frame,
+            textvariable=self.payload_type_var,
+            state='readonly',
+            values=['reverse_shell', 'malicious_script']
+        )
+        self.payload_type_combo.grid(row=0, column=1, padx=5, pady=5, sticky='w')
         self.payload_type_combo.current(0)
+
+        # Duration Selection (for duration-based exploits)
+        duration_label = ttk.Label(params_frame, text="Exploit Duration (seconds):")
+        duration_label.grid(row=1, column=0, padx=5, pady=5, sticky='e')
+        self.duration_entry = ttk.Entry(params_frame, width=30)
+        self.duration_entry.grid(row=1, column=1, padx=5, pady=5, sticky='w')
+        self.duration_entry.insert(0, "10")  # Default duration
 
         # Exploit Execution Button
         exploit_button = ttk.Button(self, text="Run Exploits", command=self.run_exploits)
         exploit_button.pack(pady=10)
 
         # Log Area for Exploits
-        self.exploit_log = tk.Text(self, height=15, state='disabled')
+        self.exploit_log = tk.Text(self, height=15, state='disabled', wrap='word')
         self.exploit_log.pack(padx=10, pady=10, fill='both', expand=True)
+
+    def populate_exploits(self) -> None:
+        """
+        Populates the exploit selection checkboxes based on available exploits.
+        """
+        # This method is already handled in create_widgets via self.exploit_vars
+        # Included for future enhancements if needed
+        pass
+
+    def update_target_list(self) -> None:
+        """
+        Updates the target selection combobox with the latest targets from the universal pool.
+        """
+        try:
+            targets = self.core.get_all_targets()
+            target_list = [f"{t.ssid} ({t.bssid})" for t in targets]
+            self.target_combo['values'] = target_list
+            if target_list:
+                self.target_combo.current(0)
+            else:
+                self.selected_target_var.set('')
+                self.logger.warning("No targets available in the pool.")
+        except Exception as e:
+            self.log_message(f"Error fetching targets: {e}")
+            self.logger.error(f"Error fetching targets: {e}")
 
     def run_exploits(self) -> None:
         """
         Initiates the exploitation process based on selected exploits and target information.
-
-        Validates user inputs and starts a separate thread to perform exploits to keep the GUI responsive.
         """
         selected_exploits = [ex for ex, var in self.exploit_vars.items() if var.get()]
-        ssid = self.exploit_ssid_entry.get().strip()
-        bssid = self.exploit_bssid_entry.get().strip()
+        selected_target = self.selected_target_var.get()
 
         # Input validation
         if not selected_exploits:
             messagebox.showwarning("No Exploits Selected", "Please select at least one exploit.")
             return
-        if not ssid or not bssid:
-            messagebox.showwarning("Incomplete Target Information", "Please provide both SSID and BSSID.")
+        if not selected_target:
+            messagebox.showwarning("No Target Selected", "Please select a target network.")
             return
-        if not self.is_valid_bssid(bssid):
-            messagebox.showwarning("Invalid BSSID", "Please provide a valid BSSID (MAC address).")
+
+        # Extract BSSID from selection
+        bssid_match = re.search(r'\(([^)]+)\)', selected_target)
+        if bssid_match:
+            bssid = bssid_match.group(1)
+        else:
+            messagebox.showwarning("Invalid Target Format", "Selected target has an invalid format.")
             return
+
+        target = {'ssid': selected_target.split('(')[0].strip(), 'bssid': bssid}
 
         # Gather exploit-specific parameters
-        target_session = {
-            'target_ip': self.exploit_ip_entry.get().strip(),
-            'target_mac': self.exploit_mac_entry.get().strip(),
-            'gateway_ip': self.exploit_gateway_ip_entry.get().strip(),
-            'gateway_mac': self.exploit_gateway_mac_entry.get().strip()
-        }
         payload_type = self.payload_type_var.get()
-        duration = 10  # Default duration; can be enhanced to allow user input
-
-        # Define the target network details
-        target = {
-            'ssid': ssid,
-            'bssid': bssid
-        }
+        duration = self.duration_entry.get().strip()
+        try:
+            duration = int(duration)
+        except ValueError:
+            messagebox.showwarning("Invalid Duration", "Please enter a valid integer for exploit duration.")
+            return
 
         # Reset stop_event before starting new exploits
         if self.stop_event.is_set():
             self.stop_event.clear()
 
         # Start exploitation in a separate thread
-        self.exploit_thread = threading.Thread(
+        exploit_thread = threading.Thread(
             target=self.execute_exploits,
-            args=(selected_exploits, target, target_session, payload_type, duration),
+            args=(selected_exploits, target, payload_type, duration),
             daemon=True
         )
-        self.exploit_thread.start()
+        exploit_thread.start()
 
     def execute_exploits(self, exploits: List[str], target: Dict[str, str],
-                         target_session: Dict[str, str], payload_type: str, duration: int) -> None:
+                         payload_type: str, duration: int) -> None:
         """
         Executes the selected exploits against the target network.
 
         Args:
-            exploits (list): List of exploit names to run.
+            exploits (List[str]): List of exploit names to run.
             target (Dict[str, str]): Target network details (SSID and BSSID).
-            target_session (Dict[str, str]): Session hijacking parameters.
             payload_type (str): Type of payload for payload delivery exploits.
             duration (int): Duration for which the exploit should run.
         """
         for ex in exploits:
             if self.stop_event.is_set():
-                self.log_queue.put("Exploit operation interrupted by user.")
+                self.log_message("Exploit operation interrupted by user.")
                 break
-            self.log_queue.put(f"Running exploit: {ex}")
+            self.log_message(f"Running exploit: {ex}")
+            self.logger.info(f"Running exploit: {ex}")
+
             vuln = self.core.vulnerability_db.get(ex, {})
 
             # Customize exploit parameters based on exploit type
             if ex == 'session_hijacking':
+                # Assuming the exploit expects a target_session dictionary
+                target_session = {
+                    'target_ip': target.get('ip', ''),
+                    'target_mac': target.get('mac', ''),
+                    'gateway_ip': target.get('gateway_ip', ''),
+                    'gateway_mac': target.get('gateway_mac', '')
+                }
                 vuln['target_session'] = target_session
             elif ex == 'payload_delivery':
                 vuln['payload_type'] = payload_type
@@ -627,36 +706,25 @@ class ExploitsTab(ttk.Frame):
             try:
                 # Execute the exploit via CoreFramework
                 self.core.run_exploit(ex, vuln)
-                self.log_queue.put(f"Exploit '{ex}' completed.\n")
+                self.log_message(f"Exploit '{ex}' completed successfully.\n")
+                self.logger.info(f"Exploit '{ex}' completed successfully.")
             except Exception as e:
-                self.log_queue.put(f"Error running exploit '{ex}': {e}\n")
+                self.log_message(f"Error running exploit '{ex}': {e}\n")
+                self.logger.error(f"Error running exploit '{ex}': {e}")
 
-    def log_message(self, log_widget: tk.Text, message: str) -> None:
+    def log_message(self, message: str) -> None:
         """
-        Logs messages to the specified log widget.
+        Logs messages to the exploit log text widget.
 
         Args:
-            log_widget (tk.Text): The text widget to log messages to.
             message (str): The message to log.
         """
-        log_widget.config(state='normal')
-        log_widget.insert(tk.END, message + '\n')
-        log_widget.see(tk.END)
-        log_widget.config(state='disabled')
+        self.exploit_log.config(state='normal')
+        self.exploit_log.insert(tk.END, message + '\n')
+        self.exploit_log.see(tk.END)
+        self.exploit_log.config(state='disabled')
+        self.logger.debug(f"Logged message: {message}")
 
-    @staticmethod
-    def is_valid_bssid(bssid: str) -> bool:
-        """
-        Validates the BSSID (MAC address) format.
-
-        Args:
-            bssid (str): The BSSID to validate.
-
-        Returns:
-            bool: True if valid, False otherwise.
-        """
-        pattern = re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
-        return bool(pattern.match(bssid))
 
 
 class ReportsTab(ttk.Frame):
@@ -677,6 +745,27 @@ class ReportsTab(ttk.Frame):
         export_button = ttk.Button(self, text="Export Report", command=self.export_report)
         export_button.pack(pady=5)
 
+        # Load and Display Current Report
+        self.load_report()
+
+    def load_report(self) -> None:
+        """
+        Loads and displays the current report from the vulnerabilities database.
+        """
+        try:
+            report_data = self.core.vulnerability_db
+            report_str = json.dumps(report_data, indent=4)
+            self.report_text.config(state='normal')
+            self.report_text.delete(1.0, tk.END)
+            self.report_text.insert(tk.END, report_str)
+            self.report_text.config(state='disabled')
+        except Exception as e:
+            messagebox.showerror("Report Error", f"Failed to load report: {e}")
+            self.report_text.config(state='normal')
+            self.report_text.delete(1.0, tk.END)
+            self.report_text.insert(tk.END, "Error loading report.")
+            self.report_text.config(state='disabled')
+
     def export_report(self) -> None:
         """
         Exports the generated reports to a file.
@@ -684,7 +773,7 @@ class ReportsTab(ttk.Frame):
         Allows the user to choose the format (TXT or JSON) and the destination file.
         """
         # Prompt user to choose export format and location
-        export_format = tk.StringVar(value='txt')
+        export_format = tk.StringVar(value='json')
         format_window = tk.Toplevel(self)
         format_window.title("Select Export Format")
         ttk.Label(format_window, text="Choose Report Format:").pack(padx=10, pady=10)
@@ -709,26 +798,9 @@ class ReportsTab(ttk.Frame):
                 file_path = filedialog.asksaveasfilename(defaultextension=".json",
                                                          filetypes=[("JSON Files", "*.json"), ("All files", "*.*")])
                 if file_path:
-                    # Collect report data from scanners and exploits
-                    report_data = {
-                        'scans': [],
-                        'exploits': []
-                    }
-                    for sc_name, scanner in self.core.scanners.items():
-                        if hasattr(scanner, 'detected_vulnerabilities') and scanner.detected_vulnerabilities:
-                            report_data['scans'].append({
-                                'scanner': sc_name,
-                                'vulnerabilities': scanner.detected_vulnerabilities
-                            })
-                    for ex_name, exploit in self.core.exploits.items():
-                        if hasattr(exploit, 'detected_vulnerabilities') and exploit.detected_vulnerabilities:
-                            report_data['exploits'].append({
-                                'exploit': ex_name,
-                                'vulnerabilities': exploit.detected_vulnerabilities
-                            })
                     try:
                         with open(file_path, 'w') as f:
-                            json.dump(report_data, f, indent=4)
+                            json.dump(self.core.vulnerability_db, f, indent=4)
                         messagebox.showinfo("Export Successful", f"Report exported to {file_path}")
                     except Exception as e:
                         messagebox.showerror("Export Error", f"Failed to export report: {e}")
@@ -765,29 +837,18 @@ class SettingsTab(ttk.Frame):
         """
         Loads and displays the current configuration settings from the vulnerabilities database.
         """
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.abspath(os.path.join(current_dir, '..'))
-        config_path = os.path.join(project_root, 'vulnerabilities', 'vulnerabilities.json')
-
-        if os.path.exists(config_path):
-            try:
-                with open(config_path, 'r') as f:
-                    config = json.load(f)
-                self.config_text.config(state='normal')
-                self.config_text.delete(1.0, tk.END)
-                for key, value in config.items():
-                    self.config_text.insert(tk.END, f"{key}: {value}\n")
-                self.config_text.config(state='disabled')
-            except Exception as e:
-                messagebox.showerror("Configuration Error", f"Failed to load configuration: {e}")
-                self.config_text.config(state='normal')
-                self.config_text.delete(1.0, tk.END)
-                self.config_text.insert(tk.END, "Error loading configuration.")
-                self.config_text.config(state='disabled')
-        else:
+        try:
+            report_data = self.core.vulnerability_db
+            report_str = json.dumps(report_data, indent=4)
             self.config_text.config(state='normal')
             self.config_text.delete(1.0, tk.END)
-            self.config_text.insert(tk.END, "No configuration found.")
+            self.config_text.insert(tk.END, report_str)
+            self.config_text.config(state='disabled')
+        except Exception as e:
+            messagebox.showerror("Configuration Error", f"Failed to load configuration: {e}")
+            self.config_text.config(state='normal')
+            self.config_text.delete(1.0, tk.END)
+            self.config_text.insert(tk.END, "Error loading configuration.")
             self.config_text.config(state='disabled')
 
 
